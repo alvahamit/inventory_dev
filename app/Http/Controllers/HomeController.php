@@ -28,12 +28,16 @@ class HomeController extends Controller
         $col_tot = \App\MoneyReceipt::all()->sum('amount');
         $cashInMarket = 'Tk. '.number_format(($inv_tot - $col_tot),2);
         $newOrders = \App\Order::whereOrderStatus('pending')->count();
+        $customersThisMonth = \App\User::whereHas('role', function($q){
+            $q->whereIn('name', ['Customer', 'Buyer', 'Client']);
+        })->where('created_at', '>=', \Carbon\Carbon::now()->startOfMonth())->count();
+        $collectionThisMonth = 'Tk. '.number_format((\App\MoneyReceipt::where('created_at', '>=', \Carbon\Carbon::now()->startOfMonth())->sum('amount')),2);
          
         if(Auth::check())
         {
             if(Auth::user()->role->first()->name == 'Administrator')
             { 
-                return view('admin.admin_dash.dash', compact('cashInMarket', 'newOrders')); 
+                return view('admin.admin_dash.dash', compact('cashInMarket', 'newOrders', 'customersThisMonth', 'collectionThisMonth')); 
             } 
         }
         else
