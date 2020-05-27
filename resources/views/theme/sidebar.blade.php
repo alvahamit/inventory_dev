@@ -1,7 +1,7 @@
 <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
     <!-- Sidebar - Brand -->
-    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{route('home')}}">
         <div class="sidebar-brand-icon rotate-n-15">
             <i class="fas fa-laugh-wink"></i>
         </div>
@@ -13,7 +13,7 @@
 
     <!-- Nav Item - Dashboard -->
     <li class="nav-item active">
-        <a class="nav-link" href="{{route('admin.dash')}}">
+        <a class="nav-link" href="{{route('home')}}">
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>Dashboard</span></a>
     </li>
@@ -44,7 +44,8 @@
     <!-- Nav Item - Catalog Collapse Menu -->
     <li class="nav-item">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#catalogSettings" aria-expanded="true" aria-controls="catalogSettings">
-            <i class="fab fa-opencart"></i>
+            <!--<i class="fab fa-opencart"></i>-->
+            <i class="fas fa-shopping-cart"></i>
             <span>Catalog</span>
         </a>
         <div id="catalogSettings" class="collapse" aria-labelledby="headingCatalogSettings" data-parent="#accordionSidebar">

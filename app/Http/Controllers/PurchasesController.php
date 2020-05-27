@@ -21,7 +21,21 @@ class PurchasesController extends Controller
     {
         //get data
         $data = Purchase::all();
-        Purchase::latest()->first() ? $lastUpdated = Purchase::latest()->first()->updated_at->diffForHumans() : $lastUpdated = "00:00:00";
+        if(Purchase::latest()->first())
+        {
+            if(Purchase::latest()->first()->updated_at)
+            {
+                $lastUpdated = Purchase::latest()->first()->updated_at->diffForHumans();
+            }
+            else
+            {
+                $lastUpdated = "00:00:00";
+            }
+        }
+        else
+        {
+            $lastUpdated = "00:00:00";
+        }
         //return view with data
         return view('admin.purchase.index',compact('data','lastUpdated'));
     }

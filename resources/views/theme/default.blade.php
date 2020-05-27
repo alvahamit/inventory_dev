@@ -16,7 +16,10 @@
         <meta name="description" content="">
         <meta name="author" content="">
 
-        <title>@yield('title', 'SB Admin 2 - Dashboard')</title>
+        <title>@yield('title', 'SB Admin 2')</title>
+        
+        <!--Laravel Compiled CSS-->
+        <link href="{{asset('css/app.css')}}" rel="stylesheet">
         
         <!-- Custom fonts for this template-->
         <link href="{!! asset('theme/vendor/fontawesome-free/css/all.min.css') !!}" rel="stylesheet" type="text/css">
@@ -28,13 +31,10 @@
         <!--For Datatable Styles-->
         <link href="{{asset('vendor/datatables/dataTables.bootstrap4.css')}}" rel="stylesheet">
         
-        <!--Laravel Compiled CSS-->
-        <link href="{{asset('css/app.css')}}" rel="stylesheet">
-
     </head>
 
     <body id="page-top">
-
+        <!--<div id='app'></div>-->
         <!-- Page Wrapper -->
         <div id="wrapper">
 
@@ -86,10 +86,14 @@
 
         <!-- Logout Modal-->
         @include('theme.logoutmodal')
-
+        
+        <!-- Laravel compiled js -->
+        <script src="{!! asset('js/app.js') !!}"></script>
+        
         <!-- Bootstrap core JavaScript-->
-        <script src="{!! asset('theme/vendor/jquery/jquery.min.js') !!}"></script>
-        <script src="{!! asset('theme/vendor/bootstrap/js/bootstrap.bundle.min.js') !!}"></script>
+        <!--<script src="{!! asset('theme/vendor/jquery/jquery.min.js') !!}"></script>-->
+        <!--<script src="{!! asset('theme/vendor/bootstrap/js/bootstrap.bundle.min.js') !!}"></script>-->
+        
 
         <!-- Core plugin JavaScript-->
         <script src="{!! asset('theme/vendor/jquery-easing/jquery.easing.min.js') !!}"></script>
@@ -104,12 +108,16 @@
         <script src="{!! asset('theme/js/demo/chart-area-demo.js') !!}"></script>
         <script src="{!! asset('theme/js/demo/chart-pie-demo.js') !!}"></script>
         
+        
+        
         <!--For Datatables to work-->
         <script src="{{asset('vendor/datatables/jquery.dataTables.js')}}"></script>
         <script src="{{asset('vendor/datatables/dataTables.bootstrap4.js')}}"></script>
         
         <!--Bootbox CDN-->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.4.0/bootbox.min.js"></script>
+        
+        
         
         @yield('scripts')
         

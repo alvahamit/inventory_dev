@@ -71,6 +71,7 @@ Route::group(['middleware' => 'auth'], function(){
  * Auth and Admin route group:
  */
 Route::group(['middleware' => ['auth','admin']], function(){
+    Route::get('/home', 'HomeController@index')->name('home');
     Route::resource('/v2/users', 'UsersController');
     Route::resource('/v2/roles', 'UsersRolesController');
 });
