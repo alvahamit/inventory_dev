@@ -81,7 +81,8 @@ Route::group(['middleware' => ['auth','admin']], function(){
 /*
  * Testing laravel
  */
-Route::get('test', ['uses'=>'TestController@index', 'as'=>'test.index']);
+Route::get('/test', 'HomeController@curYrMonInvTot')->name('area.chart.test');
+//Route::get('test', ['uses'=>'TestController@index', 'as'=>'test.index']);
 Route::view('/v2/show-invoice', 'admin.invoice.show')->name('invoice.show');
 
 

@@ -4,6 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Product;
+use App\Order;
+use App\Invoice;
+use App\MoneyReceipt;
+use Carbon\Carbon;
+
 
 class HomeController extends Controller
 {
@@ -24,25 +30,127 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $inv_tot = \App\Invoice::all()->sum('invoice_total');
-        $col_tot = \App\MoneyReceipt::all()->sum('amount');
+        $inv_tot = Invoice::all()->sum('invoice_total');
+        $col_tot = MoneyReceipt::all()->sum('amount');
         $cashInMarket = 'Tk. '.number_format(($inv_tot - $col_tot),2);
-        $newOrders = \App\Order::whereOrderStatus('pending')->count();
+        $newOrders = Order::whereOrderStatus('pending')->count();
         $customersThisMonth = \App\User::whereHas('role', function($q){
             $q->whereIn('name', ['Customer', 'Buyer', 'Client']);
-        })->where('created_at', '>=', \Carbon\Carbon::now()->startOfMonth())->count();
-        $collectionThisMonth = 'Tk. '.number_format((\App\MoneyReceipt::where('created_at', '>=', \Carbon\Carbon::now()->startOfMonth())->sum('amount')),2);
+        })->where('created_at', '>=', Carbon::now()->startOfMonth())->count();
+        $collectionThisMonth = 'Tk. '.number_format((MoneyReceipt::where('created_at', '>=', Carbon::now()->startOfMonth())->sum('amount')),2);
+        
+        $projectData = $this->projectCardData();
          
         if(Auth::check())
         {
             if(Auth::user()->role->first()->name == 'Administrator')
             { 
-                return view('admin.admin_dash.dash', compact('cashInMarket', 'newOrders', 'customersThisMonth', 'collectionThisMonth')); 
-            } 
+                return view('admin.admin_dash.dash', compact('cashInMarket', 'newOrders', 'customersThisMonth', 'collectionThisMonth', 'projectData')); 
+            }
+            else
+            {
+                return view('admin.dash1');
+            }
         }
         else
         {
-            return view('admin.dash1');
+            return view('welcome');
         }
+    }
+    
+    /*
+     * Current Year Monthly Invoice Total
+     * @return collection in $key $value pare.
+     * $key is number corresponding to Month.
+     * $value is the sum of invoice total of that month.
+     */
+    public function curYrMonInvTot() 
+    {
+        $mit = collect();; // Monthly Invoice Total
+        $mot = collect();; // Monthly Order Total
+        $mct = collect();; // Monthly Collection Total
+        $monthArr = ['01','02','03','04','05','06','07','08','09','10','11','12']; // Array of twelve months.
+        /*
+         * Bug Note: ('order_date', '>=', Carbon::now()->startOfYear()) 
+         * does not selet day 1 month 1 of the year.
+         */
+        //$orders = Order::all()->where('order_date', '>=', Carbon::now()->startOfYear());
+        $orders = Order::whereRaw('year(`order_date`) = ?', array(date('Y')))->get();
+        //$invoices = Invoice::all()->where('invoice_date', '>=', Carbon::now()->startOfYear());
+        $invoices = Invoice::whereRaw('year(`invoice_date`) = ?', array(date('Y')))->get();
+        //$collections = MoneyReceipt::all()->where('mr_date', '>=', Carbon::now()->startOfYear());
+        $collections = MoneyReceipt::whereRaw('year(`mr_date`) = ?', array(date('Y')))->get();
+        
+        /*
+         * Following gets an associative array of month and total
+         * Month formated "01" as key and
+         * total as regular number value.  
+         */
+        $monthlyOrderTotal = $orders->groupBy( function($date){ return Carbon::parse($date->order_date)->format('m'); })
+                ->map(function ($item) { return $item->sum('order_total'); });
+
+        $monthlyInvoiceTotal = $invoices->groupBy( function($date){ return Carbon::parse($date->invoice_date)->format('m'); })
+                ->map(function ($item) { return $item->sum('invoice_total'); });
+
+        $monthlyCollectionTotal = $collections->groupBy( function($date){ return Carbon::parse($date->mr_date)->format('m'); })
+                ->map(function ($item) { return $item->sum('amount'); });
+
+        foreach ($monthlyOrderTotal as $key => $value){
+            $mot->add(['month' => $key, 'total' => $value]);
+        }
+        
+        foreach ($monthlyInvoiceTotal as $key => $value){
+            $mit->add(['month' => $key, 'total' => $value]);
+        }
+        
+        foreach ($monthlyCollectionTotal as $key => $value){
+            $mct->add(['month' => $key, 'total' => $value]);
+        }
+        
+        foreach ($monthArr as $key => $value){
+            if(!in_array($value, $mot->pluck('month')->toArray()))
+            {
+                $mot->add(['month' => $value, 'total' => 0]);
+            }
+            
+            if(!in_array($value, $mit->pluck('month')->toArray()))
+            {
+                $mit->add(['month' => $value, 'total' => 0]);
+            }
+            
+            if(!in_array($value, $mct->pluck('month')->toArray()))
+            {
+                $mct->add(['month' => $value, 'total' => 0]);
+            }
+        }
+        
+        $oData = $mot->sortBy('month')->pluck('total');
+        $iData = $mit->sortBy('month')->pluck('total');
+        $cData = $mct->sortBy('month')->pluck('total');
+  
+        //return response()->json($invoices);
+        
+        return response()->json(['mot' => $oData, 'mit' => $iData, 'mct' => $cData]);
+        
+    }
+    
+    
+    //$data->add(['month'=> $key, 'amt' => '0']);
+
+    
+    
+    /*
+     * @return $result collection.
+     */
+    public function projectCardData()
+    {
+        $result = collect();
+        $products = Product::all();
+        foreach($products as $product)
+        {
+            $c = collect(['name' => $product->name, 'percentage' => $product->itemStockPercent()]) ;
+            $result->add($c);
+        }
+        return $result;
     }
 }

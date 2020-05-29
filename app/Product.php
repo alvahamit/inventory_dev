@@ -53,6 +53,7 @@ class Product extends Model
     /*
      * Method to explain stock
      * Cmt: for total stock.
+     * @returns $result[]
      */
     public function itemStock($inFormat = '', $storeId = '') {
         //Note: If store id is provided use id to get store specific stock otherwise get all stock:
@@ -98,6 +99,24 @@ class Product extends Model
                     'price' => $price
                 ];          
         }
+        return $result;
+    }
+    
+    /*
+     * Method to return item stock in percent for dash.
+     * Cmt: for total stock.
+     * @return $result percentage.
+     */
+    public function itemStockPercent(){
+        $in = 0;
+        $out = 0;
+        $stocks = $this->stocks;
+        foreach ($stocks as $stock){
+            if($stock->flag == "in"){ $in = $in + $stock->quantity; }
+            if($stock->flag == "out"){ $out = $out + $stock->quantity; }
+        }
+        $stockCount = ($in - $out);
+        $result = ($stockCount/$in)*100;
         return $result;
     }
    
