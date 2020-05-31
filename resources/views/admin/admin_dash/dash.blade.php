@@ -65,10 +65,11 @@
 <!-- Page level custom scripts -->
 <script src="{!! asset('theme/js/demo/chart-area-demo.js') !!}"></script>
 <script src="{!! asset('theme/js/demo/chart-pie-demo.js') !!}"></script>
+
 <script type="text/javascript">
 $(document).ready(function(){
     var updateChart = function(){
-        var action = '{{ route("area.chart.test") }}';
+        var action = '{{ route("admin.areachart.data") }}';
         var method = 'GET';
         $.ajax({
             data: {"_token": "{{ csrf_token() }}"},
@@ -88,7 +89,30 @@ $(document).ready(function(){
         }); // Ajax call
     }
     
+    var updatePieChart = function(){
+        var action = '{{ route("test") }}';
+        var method = 'GET';
+        $.ajax({
+            data: {"_token": "{{ csrf_token() }}"},
+            url: action,
+            type: method,
+            dataType: 'json',
+            success: function (data) {
+                //console.log(data);
+                myPieChart.data.labels = data.labels;
+                myPieChart.data.datasets[0].data = data.data;
+                myPieChart.data.datasets[0].backgroundColor = data.color;
+                myPieChart.data.datasets[0].hoverBackgroundColor = data.color;
+                myPieChart.update();
+            },
+            error: function (data) {
+                console.log(data);
+            }
+        }); // Ajax call
+    }
+    
     updateChart();
+    updatePieChart();
 });
 
 </script>

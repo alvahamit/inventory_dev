@@ -9,6 +9,8 @@ use App\Order;
 use App\Invoice;
 use App\MoneyReceipt;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Arr;
 
 
 class HomeController extends Controller
@@ -64,7 +66,7 @@ class HomeController extends Controller
      * $key is number corresponding to Month.
      * $value is the sum of invoice total of that month.
      */
-    public function curYrMonInvTot() 
+    public function getCurrentYearChartDataByMonth() 
     {
         $mit = collect();; // Monthly Invoice Total
         $mot = collect();; // Monthly Order Total
@@ -72,7 +74,7 @@ class HomeController extends Controller
         $monthArr = ['01','02','03','04','05','06','07','08','09','10','11','12']; // Array of twelve months.
         /*
          * Bug Note: ('order_date', '>=', Carbon::now()->startOfYear()) 
-         * does not selet day 1 month 1 of the year.
+         * does not select day 1 month 1 of the year.
          */
         //$orders = Order::all()->where('order_date', '>=', Carbon::now()->startOfYear());
         $orders = Order::whereRaw('year(`order_date`) = ?', array(date('Y')))->get();
@@ -134,9 +136,29 @@ class HomeController extends Controller
         
     }
     
-    
-    //$data->add(['month'=> $key, 'amt' => '0']);
 
+    /*
+    * Donut Chart Data function
+    */
+    public function getPieChartData() 
+    {
+        $colors = ['#1abc9c', '#16a085', '#2ecc71', '#27ae60', '#3498db', '#2980b9', '#f1c40f', '#f39c12', '#e67e22', '#d35400', '#e74c3c', '#c0392b', '#95a5a6', '#7f8c8d'  ];
+        $ip = DB::table('invoice_product')
+                ->selectRaw('product_id,item_name, sum(item_total) as total')
+                ->groupBy('product_id', 'item_name')
+                ->orderBy('total','desc')
+                ->get();
+        foreach($ip as $p)
+        {
+            $p->color = Arr::random($colors);
+        }
+        $labels = $ip->pluck('item_name');
+        $data = $ip->pluck('total');
+        $color = $ip->pluck('color');
+        
+        //return dd($ip);
+        return response()->json(['labels' => $labels, 'data' => $data, 'color' => $color]);
+    }
     
     
     /*

@@ -37,9 +37,9 @@ class Invoice extends Model
      * Inverse One to Many relation with Order.
      */
     public function order() {
-        return $this->belongsTo('App\Order');
+        return $this->belongsToMany('App\Order');
     }
-    
+      
     /*
      * Accessor for date:
      */

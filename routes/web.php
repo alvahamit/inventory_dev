@@ -15,6 +15,7 @@ Auth::routes();
 Route::get('/', function () {
     return view('welcome');
 });
+
 /*
  * Auth route group:
  */
@@ -74,6 +75,8 @@ Route::group(['middleware' => ['auth','admin']], function(){
     Route::get('/home', 'HomeController@index')->name('home');
     Route::resource('/v2/users', 'UsersController');
     Route::resource('/v2/roles', 'UsersRolesController');
+    //Ajax routes:
+    Route::get('/admin/area-chart-data', 'HomeController@getCurrentYearChartDataByMonth')->name('admin.areachart.data');
 });
 
 
@@ -81,7 +84,7 @@ Route::group(['middleware' => ['auth','admin']], function(){
 /*
  * Testing laravel
  */
-Route::get('/test', 'HomeController@curYrMonInvTot')->name('area.chart.test');
+Route::get('/test', 'HomeController@getPieChartData')->name('test');
 //Route::get('test', ['uses'=>'TestController@index', 'as'=>'test.index']);
 Route::view('/v2/show-invoice', 'admin.invoice.show')->name('invoice.show');
 
@@ -151,6 +154,4 @@ Route::view('/v2/show-invoice', 'admin.invoice.show')->name('invoice.show');
 
 
 
-Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');

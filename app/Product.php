@@ -26,6 +26,7 @@ class Product extends Model
         return $this->belongsToMany('App\Purchase','product_purchase', 'purchase_id', 'product_id');
     }
     
+    
     /*
      * Relation setup:
      * One to Many with Packing.

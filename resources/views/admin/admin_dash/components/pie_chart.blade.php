@@ -21,7 +21,7 @@
             <div class="chart-pie pt-4 pb-2">
                 <canvas id="myPieChart"></canvas>
             </div>
-            <div class="mt-4 text-center small">
+<!--            <div class="mt-4 text-center small">
                 <span class="mr-2">
                     <i class="fas fa-circle text-primary"></i> Margarine
                 </span>
@@ -34,7 +34,7 @@
                 <span class="mr-2">
                     <i class="fas fa-circle text-warning"></i> Whip Cream
                 </span>
-            </div>
+            </div>-->
         </div>
     </div>
 </div>
