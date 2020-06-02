@@ -27,12 +27,22 @@
     <li class="breadcrumb-item active">{{$mr->mr_no}}</li>
 </ol>
 
+
 <div class="container">
     <div class="col-md-12">
 <!--        <div class="row">
             <div class="col-md-6 text-left"><h5><strong>MR Date: </strong> {{$mr->mr_date}}</h5></div>
             <div class="col-md-6 text-right"><h5><strong>MR No: </strong> {{$mr->mr_no}}</h5></div>
         </div>-->
+        <div class="row">
+            <div class="col-md-12">
+                <form method="post" action="{{route('print.mr')}}" accept-charset="UTF-8">
+                    @csrf
+                    <input type="hidden" name="id" value="{{$mr->id}}">
+                    <button type="submit" class="btn btn-primary float-right mr-1"><i class="far fa-file-pdf fa-lg"></i> PDF</button>
+                </form>
+            </div>
+        </div>
         <div class="card">
             <div class="card-header">
                 <h4 class="text-md-center"><strong>Money Receipt</strong></h4>

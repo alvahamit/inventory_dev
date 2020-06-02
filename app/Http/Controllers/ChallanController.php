@@ -11,6 +11,7 @@ use App\Challan;
 use Yajra\DataTables\Facades\DataTables;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
+use PDF;
 
 class ChallanController extends Controller
 {
@@ -348,4 +349,19 @@ class ChallanController extends Controller
         
         return response()->json(['success' => 'Item has been destroyed.', 'challan'=> $challan->challan_no ]);
     }
+    
+    
+    /*
+     * For printing:
+     */
+    public function pdf(Request $request)
+    {
+        //return $request;
+        $challan = Challan::findOrFail($request->id);
+        $challan->products;
+        $pdf = PDF::loadView('admin.challan.print', compact('challan'))->setPaper('a4', 'portrait');
+        $fileName = 'challan_'.$challan->challan_no;
+        return $pdf->stream($fileName.'.pdf');
+    }
+    
 }

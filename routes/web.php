@@ -66,6 +66,15 @@ Route::group(['middleware' => 'auth'], function(){
    Route::get('/v2/get-store-stock', 'StoresController@getStoreProducts')->name('get.store.stock');
    Route::POST('/v2/challans-store-transfer', 'ChallanController@storeTransfer')->name('challans.store.transfer');
    Route::get('/v2/mr/get', 'MoneyReceiptController@getMr')->name('mr.ajax.get');
+   
+   /*
+    * Printing routes
+    */
+   Route::post('/purchase/pdf','PurchasesController@pdf')->name('print.purchase');
+   Route::post('/order/pdf','OrdersController@pdf')->name('print.order');
+   Route::post('/invoice/pdf','InvoiceController@pdf')->name('print.invoice');
+   Route::post('/challan/pdf','ChallanController@pdf')->name('print.challan');
+   Route::post('/mr/pdf','MoneyReceiptController@pdf')->name('print.mr');
 });
 
 /*

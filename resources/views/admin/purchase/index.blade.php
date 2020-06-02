@@ -24,7 +24,7 @@
 </ol>
 <!--<h1>Hi!! you have made following purchases:</h1>-->
 <!--Add new button-->
-<div class="form-group text-right">
+<div class="form-group text-right d-print-none">
     <!--<a class="btn btn-primary right" href="{{route('purchases.create')}}">Add new</a>-->
     <button id="createNew" class="btn btn-primary col-1 right">Add new</button>
 </div> 

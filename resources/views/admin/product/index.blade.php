@@ -25,7 +25,7 @@
 </ol>
 <!--<h1>Hi!! I found following products:</h1>-->
 <!--Add new button-->
-<div class="form-group text-right">
+<div class="form-group text-right d-print-none">
     <a class="btn btn-primary right" href="{{route('products.create')}}">Add new</a>
 </div> 
 <!-- DataTables Example -->

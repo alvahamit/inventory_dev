@@ -18,12 +18,24 @@ Purchase Ref# {!! $purchase->ref_no !!}
 
 @section('content')
 <div class="container">
+    
     <div class="row">
         <div class="col-md-12">
-            <div class="text-center">
+            <form method="post" action="{{route('print.purchase')}}" accept-charset="UTF-8">
+                @csrf
+                <input type="hidden" name="id" value="{{$purchase->id}}">
+                <button type="submit" class="btn btn-primary float-right mr-1"><i class="far fa-file-pdf fa-lg"></i> PDF</button>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            
+            <!--<div class="text-center">-->
                 <!--<h2>Purchase reference # <a href="{{route('purchases.edit',$purchase->id)}}">{{$purchase->ref_no}}</a></h2>-->
-            </div>
-            <hr>
+            <!--</div>-->
+            
+            <!--<hr>-->
             <div><strong>Receive Date:</strong> {{$purchase->receive_date}}</div>
             <div class="col-xs-12 col-md-3 col-lg-3 float-xs-left float-right text-md-right">
                 <strong>Supplier:</strong><br>

@@ -25,7 +25,7 @@
 </ol>
 <!--<h3>Hi!! I found following users for you:</h3>-->
 <!--Add new button-->
-<div class="form-group text-right">
+<div class="form-group text-right d-print-none">
     <!--<a class="btn btn-primary right" href="{{route('users.create')}}">Add new</a>-->
     <button id="newBtn" class="btn btn-primary col-1 right">New</button>
 </div> 

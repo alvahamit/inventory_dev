@@ -24,7 +24,7 @@
 </ol>
 <!--<h1>Hi!! I found following suppliers for you:</h1>-->
 <!--Add new button-->
-<div class="form-group text-right">
+<div class="form-group text-right d-print-none">
     <!--<a class="btn btn-primary right" href="{{route('suppliers.create')}}">Add new</a>-->
     <button id="newBtn" class="btn btn-primary col-1 right">New</button>
 </div> 

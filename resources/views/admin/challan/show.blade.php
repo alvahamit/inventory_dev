@@ -18,11 +18,22 @@
 @section('content')
 <div class="tab-pane fade show active" id="challan">
     <input type="hidden" id="challan_id" value="{{$challan->id}}">
+    
+    <div class="row">
+        <div class="col-md-12">
+            <form method="post" action="{{route('print.challan')}}" accept-charset="UTF-8">
+                @csrf
+                <input type="hidden" name="id" value="{{$challan->id}}">
+                <button type="submit" class="btn btn-primary float-right mr-1"><i class="far fa-file-pdf fa-lg"></i> PDF</button>
+            </form>
+        </div>
+    </div>
+    
     <h4 class="mt-2 pt-1 pb-2">
         Ref No # {{$challan->challan_no}} 
         <!--Print challan button-->
-        <a id="printBtn" class="btn btn-warning btn-sm float-right"><i class="fas fa-print fa-lg"></i></a> 
-        <a id="pdfBtn" class="btn btn-success btn-sm float-right mr-1"><i class="far fa-file-pdf fa-lg"></i></a>
+        <!--<a id="printBtn" class="btn btn-warning btn-sm float-right"><i class="fas fa-print fa-lg"></i></a>--> 
+        <!--<a id="pdfBtn" class="btn btn-success btn-sm float-right mr-1"><i class="far fa-file-pdf fa-lg"></i></a>-->
     </h4>
 
 

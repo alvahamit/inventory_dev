@@ -10,6 +10,7 @@ use Yajra\DataTables\Facades\DataTables;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use NumberFormatter;
+use PDF;
 
 class MoneyReceiptController extends Controller
 {
@@ -74,7 +75,8 @@ class MoneyReceiptController extends Controller
      * Helper funciton:
      * This converts paymode number to name to store in DB.
      */
-    public function payModeName(int $id) {
+    public function payModeName(int $id) 
+    {
         switch ($id) {
             case 1:
               $payMode = 'cash';
@@ -144,7 +146,8 @@ class MoneyReceiptController extends Controller
         //
     }
     
-    public function getMr(Request $request){
+    public function getMr(Request $request)
+    {
         $mr = Mr::findOrFail($request->id);
         $mr->unformated_mr_date = $mr->getRawOriginal('mr_date');
         return response()->json(['mr' => $mr]);
@@ -182,4 +185,20 @@ class MoneyReceiptController extends Controller
         $mr->delete();
         return response()->json(['success'=> 'MR deleted','mr_no' => $mr_no]);
     }
+    
+    
+    /*
+     * For printing:
+     */
+    public function pdf(Request $request)
+    {
+        //return $request;
+        $mr = Mr::findOrFail($request->id);
+        $inwords = new NumberFormatter("en", NumberFormatter::SPELLOUT);
+        $mr->inwords = $inwords->format($mr->amount);
+        $pdf = PDF::loadView('admin.moneyreceipt.print', compact('mr'))->setPaper('a4', 'portrait');
+        $fileName = 'mr_'.$mr->mr_no;
+        return $pdf->stream($fileName.'.pdf');
+    }
+    
 }

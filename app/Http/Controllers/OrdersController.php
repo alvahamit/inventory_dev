@@ -10,18 +10,20 @@ use App\Order;
 use Yajra\DataTables\Facades\DataTables;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use PDF;
+use NumberFormatter;
 
 
 class OrdersController extends Controller
 {
-
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
     //Ajax call to index
-    public function index(Request $request) {
+    public function index(Request $request) 
+    {
         if ($request->ajax()) {
             //return response()->json(['success' => 'ajax called']); 
             return DataTables::of(Order::query())
@@ -91,7 +93,8 @@ class OrdersController extends Controller
     /*
      * Ajax address fetcher
      */
-    public function getAddress(Request $request) {
+    public function getAddress(Request $request) 
+    {
         $buyer = Buyer::findOrFail($request->id);
         $address = $buyer->addresses;
         //$contacts = $buyer->contacts()->where('is_billing', true)->get();
@@ -102,19 +105,20 @@ class OrdersController extends Controller
     /*
      * Ajax order fetcher
      */
-    public function getOrder(Request $request) {
+    public function getOrder(Request $request) 
+    {
         $order = Order::findOrFail($request->id);
         $order->unformated_order_date = $order->getRawOriginal('order_date');
         $order->products;
         return response()->json(['order' => $order ]);
     }
     
-
     /*
      * Packing receiver codes.
      * This function/method helps to get packing of products:
      */
-    public function getPacking($productId, $quantityType, $quantity) {
+    public function getPacking($productId, $quantityType, $quantity) 
+    {
         // Packing modifyer codes:
         $product = Product::findOrFail($productId);
         if($quantityType == 'packing' ){ 
@@ -138,7 +142,8 @@ class OrdersController extends Controller
     /*
      * Ajax order fecher for Invoice.
      */
-    public function getOrderForInvoice(Request $request) {
+    public function getOrderForInvoice(Request $request) 
+    {
         $order = Order::findOrFail($request->id);
         $order->unformated_order_date = $order->getOriginal('order_date');
         $order->products;
@@ -164,7 +169,8 @@ class OrdersController extends Controller
     /*
      * Ajax order fecher for Challan.
      */
-    public function getOrderForChallan(Request $request) {
+    public function getOrderForChallan(Request $request) 
+    {
         $order = Order::findOrFail($request->id);
         $order->unformated_order_date = $order->getOriginal('order_date');
         $order->products;
@@ -179,10 +185,6 @@ class OrdersController extends Controller
         }
         return response()->json(['order' => $order ]);
     }
-    
-    
-    
-    
     
     /*
      * Ajax product fetcher
@@ -201,9 +203,6 @@ class OrdersController extends Controller
             return json_encode($data);
         }
     }
-    
-    
-    
 
     /**
      * Store a newly created resource in storage.
@@ -383,4 +382,20 @@ class OrdersController extends Controller
         return response()->json(['success'=> 'Order deleted','order' => $order_no]);
         
     }
+    
+    /*
+     * For printing:
+     */
+    public function pdf(Request $request)
+    {
+        //return $request;
+        $order = Order::findOrFail($request->id);
+        $inwords = new NumberFormatter("en", NumberFormatter::SPELLOUT);
+        $order->inwords = $inwords->format($order->order_total);
+        $pdf = PDF::loadView('admin.order.print', compact('order'))->setPaper('a4', 'portrait');
+        $fileName = 'order_'.$order->order_no;
+        return $pdf->stream($fileName.'.pdf');
+    }
+    
+    
 }

@@ -18,11 +18,16 @@
 @section('content')
 <div class="tab-pane fade show active" id="invoice">
     <input type="hidden" id="invoice_id" value="{{$invoice->id}}">
+    <form method="post" action="{{route('print.invoice')}}" accept-charset="UTF-8">
+        @csrf
+        <input type="hidden" name="id" value="{{$invoice->id}}">
+        <button type="submit" class="btn btn-primary float-right mr-1"><i class="far fa-file-pdf fa-lg"></i> PDF</button>
+    </form>
     <h4 class="mt-2 pt-1 pb-2">
         Ref No # {{$invoice->invoice_no}} 
         <!--Print invoice button-->
-        <a id="printBtn" class="btn btn-warning btn-sm float-right"><i class="fas fa-print fa-lg"></i></a> 
-        <a id="pdfBtn" class="btn btn-success btn-sm float-right mr-1"><i class="far fa-file-pdf fa-lg"></i></a>
+        <!--<a id="printBtn" class="btn btn-warning btn-sm float-right"><i class="fas fa-print fa-lg"></i></a>--> 
+        <!--<a id="pdfBtn" class="btn btn-success btn-sm float-right mr-1"><i class="far fa-file-pdf fa-lg"></i></a>-->
     </h4>
 
 

@@ -7,6 +7,8 @@ use App\Purchase;
 use App\Product;
 use App\User as Supplier;
 use App\Http\Requests\PurchaseFormRequest;
+use PDF;
+use NumberFormatter;
 
 
 
@@ -186,5 +188,22 @@ class PurchasesController extends Controller
         $data['items'] = $items;
         return json_encode($data);
     }
+    
+    /*
+     * For printing:
+     */
+    public function pdf(Request $request)
+    {
+        //return $request;
+        $purchase = Purchase::findOrFail($request->id);
+        $inwords = new NumberFormatter("en", NumberFormatter::SPELLOUT);
+        $purchase->inwords = $inwords->format($purchase->total);
+        $pdf = PDF::loadView('admin.purchase.print', compact('purchase'))->setPaper('a4', 'portrait');
+        //$pdf->save(storage_path().'_purchase.pdf');
+        //return $pdf->download('purchase.pdf');
+        $fileName = 'purchase_'.$purchase->ref_no;
+        return $pdf->stream($fileName.'.pdf');
+    }
+    
     
 }

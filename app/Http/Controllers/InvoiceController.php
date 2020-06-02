@@ -10,6 +10,8 @@ use App\Product;
 use Yajra\DataTables\Facades\DataTables;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
+use PDF;
+use NumberFormatter;
 
 class InvoiceController extends Controller
 {
@@ -232,4 +234,20 @@ class InvoiceController extends Controller
         }
         return response()->json(['success' => 'Invoice deleted', 'invoice'=> $invoice->invoice_no ]);
     }
+    
+    /*
+     * For printing:
+     */
+    public function pdf(Request $request)
+    {
+        //return $request;
+        $invoice = Invoice::findOrFail($request->id);
+        $inwords = new NumberFormatter("en", NumberFormatter::SPELLOUT);
+        $invoice->inwords = $inwords->format($invoice->invoice_total);
+        $pdf = PDF::loadView('admin.invoice.print', compact('invoice'))->setPaper('a4', 'portrait');
+        $fileName = 'invoice_'.$invoice->invoice_no;
+        return $pdf->stream($fileName.'.pdf');
+    }
+    
+    
 }
