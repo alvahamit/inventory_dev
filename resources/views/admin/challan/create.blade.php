@@ -57,26 +57,6 @@
                 </select>
             </div>
         </div>
-<!--        <div id="add-for-transfer-challan" class="form-row col-md-12" hidden="hidden">
-            <div class="form-group col-md-6">
-                <label for="from_store">Move from:</label>
-                <select class="custom-select" name="from_store" id="from_store" disabled="disabled">
-                    <option value="0" selected>Choose...</option>
-                    @foreach($stores as $store)
-                    <option value="{{ $store->id }}"> {{ $store->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="form-group col-md-6">
-                <label for="to_store">To store:</label>
-                <select class="custom-select" name="to_store" id="to_store" disabled="disabled">
-                    <option value="0" selected>Choose...</option>
-                    @foreach($stores as $store)
-                    <option value="{{ $store->id }}"> {{ $store->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-        </div>-->
         <div id="add-for-delivery-challan" class="form-row col-md-12">
             <div class="col-md-6">
                 <div class="form-group">
@@ -99,8 +79,8 @@
                     <textarea rows="4" class="form-control" name="delivery_to" id="delivery_to" readonly="readonly" disabled="disabled"></textarea>
                 </div>
                 <div class="form-group">
-                    <button id="choose-another-add" class="btn btn-primary col-md-5 form-control">Choose Other</button>
-                    <button id="edit-delivery-add" class="btn btn-warning col-md-5 form-control">Edit Existing</button>
+                    <button id="choose-another-add" class="btn btn-primary btn-sm "><i class="fas fa-address-card"></i> Change</button>
+                    <button id="edit-delivery-add" class="btn btn-secondary btn-circle btn-sm "><i class="fas fa-edit"></i> </button>
                 </div>
             </div>
         </div>
@@ -132,24 +112,15 @@
                         </tr>
                     </thead>
                     <tbody>
-<!--                        <tr>
-                            <td><input type="text" name="item_name[]" id="item_name" class="form-control" readonly="readonly"></td>
-                            <td class="text-center"><input type="text" name="item_unit[]" id="item_unit" class="form-control" readonly="readonly"></td>
-                            <td class="text-center"><input type="text" name="item_qty[]" id="item_qty" class="form-control" readonly="readonly"></td>
-                            <td><button id="remove" type="button" class="close" data-dismiss="alert">&times;</button></td>
-                        </tr>-->
                     </tbody>
                 </table>
             </div> <!-- ./table-responsive -->
         </div> <!-- ./form-row -->
         <div class="form-row col-md-12 pt-2">
-            <div class="form-group col-md-6">
+            <div class="form-group col-md-3 offset-md-3">
                 <button type="submit" class="btn btn-success form-control" id="saveBtn" value="store">Save</button>
             </div>
-<!--            <div class="form-group col-md-4">
-                <button class="btn btn-danger form-control" id="deleteBtn">Delete</button>
-            </div>-->
-            <div class="form-group col-md-6">
+            <div class="form-group col-md-3">
                 <button class="btn btn-danger form-control" id="closeBtn">Close</button>
             </div>
         </div>
@@ -208,6 +179,33 @@
     .carousel-inner {
         margin-bottom:20px;
     }
+    label{
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+    @media (max-width: 575px) {
+        .my-modal-dialog {
+            max-width: 95%; 
+            width: 95% !important;
+        }
+        label{
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        div .form-row .col-md-12 {
+            padding: 0;
+        }
+        div .form-row {
+            padding: 0;
+        }
+        .container{
+            padding: 0;
+        }
+        label{
+            font-size: 0.8rem;
+        }
+    }
+    
 </style>
 
 @stop
@@ -216,6 +214,11 @@
 <!--Script for this page-->
 <script type="text/javascript">
 $(document).ready(function(){
+    
+    $('input').addClass('form-control-sm');
+    $('select').addClass('custom-select-sm');
+    
+    
     /*
      * Disable choose-another-add button
      * if customer_id is empty.
@@ -250,10 +253,10 @@ $(document).ready(function(){
                 var row_no = + row_count + 1;
                 var trID = 'set' + row_no; //This is the table row ID for new row.
                 var html = '<tr id="' + trID + '" class="set">' +
-                        '<td><input type="text" name="item_name[]" id="item_name' + row_no + '" class="form-control" readonly="readonly" value="'+ value.name +'"></td>' +
+                        '<td><input type="text" name="item_name[]" id="item_name' + row_no + '" class="form-control form-control-sm" readonly="readonly" value="'+ value.name +'"></td>' +
                         '<input type="hidden" name="item_id[]" id="item_id' + row_no + '" value="'+ value.id +'">' +
-                        '<td class="text-center"><input type="text" name="item_unit[]" id="item_unit' + row_no + '" class="form-control" value="'+ value.pivot.product_packing +'" readonly="readonly"></td>'+
-                        '<td class="text-center"><input type="number" name="item_qty[]" id="item_qty' + row_no + '" class="form-control text-center item_qty" value="'+ value.pivot.quantity +'"></td>'+
+                        '<td class="text-center"><input type="text" name="item_unit[]" id="item_unit' + row_no + '" class="form-control form-control-sm" value="'+ value.pivot.product_packing +'" readonly="readonly"></td>'+
+                        '<td class="text-center"><input type="number" name="item_qty[]" id="item_qty' + row_no + '" class="form-control form-control-sm text-center item_qty" value="'+ value.pivot.quantity +'"></td>'+
                         '<input type="hidden" name="invoicable_qty[]" id="invoicable_qty' + row_no + '" value="'+ value.pivot.quantity +'">' +
                         '<td><button id="remove' + row_no + '" type="button" class="close" data-dismiss="alert" >&times;</button></td>' +
                         '</tr>';
@@ -321,8 +324,16 @@ $(document).ready(function(){
     */
     $('#edit-delivery-add').click(function(e){
         e.preventDefault();
-        $('#delivery_to').removeAttr('disabled');
-        $('#delivery_to').removeAttr('readonly');
+        var disabled = $('#delivery_to').prop('disabled');
+        if (disabled) {
+            $("#delivery_to").prop('disabled', false);		// if disabled, enable
+            $('#delivery_to').prop('readonly', false);
+        } else {
+          $("#delivery_to").prop('disabled', true);		// if enabled, disable
+          $('#delivery_to').prop('readonly', true);
+        }
+        //$('#delivery_to').removeAttr('disabled');
+        //$('#delivery_to').removeAttr('readonly');
     })
     
     /*
@@ -372,10 +383,11 @@ $(document).ready(function(){
         e.preventDefault();
         var customerId = $('#customer_id').val();
         $.get('{{ route("customers.index") }}' +'/' + customerId, function (data) {
+            var name = data['customer']['name'];
             var addresses = data['customer']['addresses'];
             var contacts = data['customer']['contacts'];
             var contactList;
-            $('#modelHeading').html(data['customer']['name']);
+            $('#modelHeading').html(name);
             $('#displayEmail').html( 
                         '<div class="container">'+
                             '<span><i class="far fa-envelope"></i> '+
@@ -446,7 +458,7 @@ $(document).ready(function(){
                         +value.state+', '
                         +value.city+'<br>\r\n'
                         +value.postal_code+'</p>'
-                        +'<button class="useBtn btn btn-primary right col-3 float-right" >Use</button>'
+                        +'<button class="useBtn btn btn-primary right float-right" >Use</button>'
                         +'</div>'
                     );
                     //console.log(value.pivot.is_primary);
@@ -470,8 +482,10 @@ $(document).ready(function(){
             
             $('button.useBtn').click(function(){
                 var add = $(this).prev().text();
-                $('#delivery_to').val(add);
+                var phones = $('#displayContact .container').text();
+                $('#delivery_to').val(name+' \r\n'+add+' \r\n'+phones);
                 $('#delivery_to').attr('disabled', 'disabled');
+                $('#ajaxModel').modal('hide');
             });
             
         });
@@ -512,7 +526,7 @@ $(document).ready(function(){
                    $('#items .set').remove();
                    $('#saveBtn').html('Save');
                    $('#delivery_to').attr('disabled', 'disabled');
-                   history.go(-1);
+                   $('#closeBtn').trigger('click');
                 },
                 error: function (data) {
                    console.log('Error:', data);    
@@ -525,6 +539,7 @@ $(document).ready(function(){
                    //Change button text.
                    $('#saveBtn').html('Save');
                    $('#delivery_to').attr('disabled', 'disabled');
+                   $("html, body").animate({ scrollTop: 0 }, 1000);
                 }
         }); // Ajax call
 
@@ -533,7 +548,10 @@ $(document).ready(function(){
     
     $('#closeBtn').click(function(e){
         e.preventDefault();
-        history.go(-1);
+        //history.go(-1);
+        var route = '{{ route("orders.index") }}' + '/' + $('#order_id').val();
+        window.location.href=route;
+        return false;
     });
     
     /*

@@ -68,4 +68,7 @@
     </div>
     <div class="card-footer small text-muted">Updated {{now()->format('g:i a l jS F Y')}}</div>
 </div>
+
+
+
 @stop

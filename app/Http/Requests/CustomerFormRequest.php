@@ -70,6 +70,7 @@ class CustomerFormRequest extends FormRequest
    {
        return [
            'address_label.required' => 'Please choose a label for address.',
+           'country_code.required' => 'Country for address is required.',
            'contact_label.required' => 'Must add at least one contact.',
            'contact_label.*'=> 'Please choose a label for contact.',
            'country_code_contact.*'=> 'Contact no country code is required',

@@ -1,7 +1,7 @@
 <!-- 
     Author:     Alvah Amit Halder
     Document:   Money Receipt(MR) Index blade.
-    Model/Data: App\MoneyReceipt as Customer.
+    Model/Data: App\MoneyReceipt
     Controller: MoneyReceiptController
 -->
 
@@ -28,7 +28,7 @@
 <!--Add new button-->
 <div class="form-group text-right">
     <!--<a class="btn btn-primary right" href="{{route('purchases.create')}}">Add new</a>-->
-    <button id="createNew" class="btn btn-primary col-1 right">Create New</button>
+    <button id="createNew" class="btn btn-primary right">Create New</button>
 </div> 
 <!-- DataTables Example -->
 <div class="card mb-3">
@@ -95,33 +95,15 @@
                                 </div>
                                 <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
                                     <div class="card-body">
-                                        <!--name input-->
+                                        <!--Reference input-->
                                         <div class="form-group">
-                                            <div class="form-label-group">
-                                                <input 
-                                                    type="text" 
-                                                    name="mr_no" 
-                                                    id="mr_no" 
-                                                    class="form-control" 
-                                                    placeholder="MR number" 
-                                                    autofocus="autofocus" 
-                                                    value="{{old('mr_no')}}">
-                                                <label for="mr_no">MR number...</label>
-                                            </div>
+                                            <label for="mr_no">MR Number:</label>
+                                            <input type="text" name="mr_no" id="mr_no" autofocus="autofocus" class="form-control" value="{{old('mr_no')}}">
                                         </div>
-                                        <!--email input-->
+                                        <!--Date input-->
                                         <div class="form-group">
-                                            <div class="form-label-group">
-                                                <input 
-                                                    type="date" 
-                                                    name="mr_date" 
-                                                    id="mr_date" 
-                                                    class="form-control" 
-                                                    placeholder="MR Date"
-                                                    value="{{old('mr_date')}}"
-                                                    >
-                                                <label for="mr_date">Receipt Date...</label>
-                                            </div>
+                                            <label for="mr_date">Receive Date:</label>
+                                            <input type="date" name="mr_date" id="mr_date" class="form-control" value="{{old('mr_date')}}">
                                         </div>
                                     </div>
                                 </div>
@@ -151,81 +133,41 @@
                                         
                                         <!--customer input-->
                                         <div class="form-group">
-                                            <div class="form-label-group">
+                                            <label for="customer_id">Customer Name:</label>
                                             <select class="custom-select" name="customer_id" id="customer_id">
                                                 <option value="">Select customer...</option>
                                                 @foreach($customers as $customer)
                                                 <option value="{{$customer->id}}">{{$customer->name}}</option>
                                                 @endforeach
                                             </select>
-                                            </div>
                                         </div>
                                         
                                         <div class="form-group">
-                                            <div class="form-label-group">
-                                                <input 
-                                                    type="text" 
-                                                    name="customer_name" 
-                                                    id="customer_name" 
-                                                    class="form-control"
-                                                    placeholder="customer name" 
-                                                    value="{{old('customer_name')}}">
-                                                <label for="customer_name">Customer name...</label>
-                                            </div>
+                                            <label for="customer_name">Customer Name:</label>
+                                            <input type="text" name="customer_name" id="customer_name" class="form-control" value="{{old('customer_name')}}">
                                         </div>
                                         <!--organization input-->
                                         <div class="form-group">
-                                            <div class="form-label-group">
-                                                <input 
-                                                    type="text" 
-                                                    name="customer_company" 
-                                                    id="customer_company" 
-                                                    class="form-control"
-                                                    placeholder="customer company" 
-                                                    value="{{old('customer_company')}}">
-                                                <label for="customer_company">Company name...</label>
-                                            </div>
+                                            <label for="customer_company">Company:</label>
+                                            <input type="text" name="customer_company" id="customer_company" class="form-control" value="{{old('customer_company')}}">
                                         </div>
                                         <!--address input-->
                                         <div class="form-group">
                                             <div class="form-label-group">
-<!--                                                <input 
-                                                    type="text" 
-                                                    name="customer_address" 
-                                                    id="customer_address" 
-                                                    class="form-control"
-                                                    placeholder="customer address" 
-                                                    value="{{old('customer_address')}}">
-                                                <label for="customer_address">Customer Address...</label>-->
-                                                <textarea name="customer_address" class="form-control" id="customer_address" rows="3" placeholder="Customer address..."></textarea>
+                                                <label for="customer_address">Address:</label>
+                                                <textarea name="customer_address" class="form-control" id="customer_address" rows="3">{!! old('customer_address') !!}</textarea>
                                             </div>
                                         </div>
                                         <!--customer_phone input-->
                                         <div class="form-group">
                                             <div class="form-row">
                                                 <div class="col-md-6">
-                                                    <div class="form-label-group">
-                                                        <input 
-                                                            type="tel"
-                                                            name="customer_phone" 
-                                                            id="customer_phone" 
-                                                            class="form-control"
-                                                            placeholder="customer_phone" 
-                                                            value="{{old('customer_phone')}}">
-                                                        <label for="customer_phone">Phone...</label>
-                                                    </div>
+                                                    <label for="customer_phone">Phone:</label>
+                                                    <input type="tel" name="customer_phone" id="customer_phone" class="form-control" value="{{old('customer_phone')}}">
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <div class="form-label-group">
-                                                        <input 
-                                                            type="email" 
-                                                            name="customer_email" 
-                                                            id="customer_email" 
-                                                            class="form-control"
-                                                            placeholder="customer_email" 
-                                                            value="{{old('customer_email')}}">
-                                                        <label for="customer_email">Email...</label>
-                                                    </div>
+                                                    <label for="customer_email">Email:</label>
+                                                    <input type="email" name="customer_email" id="customer_email" class="form-control" value="{{old('customer_email')}}">
                                                 </div>
                                             </div>
                                         </div>
@@ -244,18 +186,8 @@
                                     <div class="card-body">
                                         <!--MR Amount-->
                                         <div class="form-group">
-                                            <div class="form-label-group">
-                                                <input 
-                                                    type="number"
-                                                    step="1"
-                                                    min="0"
-                                                    name="amount" 
-                                                    id="amount" 
-                                                    class="form-control"
-                                                    placeholder="amount" 
-                                                    value="{{old('amount')}}">
-                                                <label for="amount">Received amount...</label>
-                                            </div>
+                                            <label for="amount">Amount (BDT):</label>
+                                            <input type="number" step="1" min="0" name="amount" id="amount" class="form-control" value="{{old('amount')}}">
                                         </div>
                                         <!--Payment method-->
                                         <!--Input chooser radio button-->
@@ -276,46 +208,18 @@
                                         <!-- Pay mode details -->
                                         <div id="chequeModeFields">
                                             <div class="form-group">
-                                                <div class="form-label-group">
-                                                    <input 
-                                                        type="text"
-                                                        name="bank_name" 
-                                                        id="bank_name" 
-                                                        class="form-control"
-                                                        placeholder="bank_name" 
-                                                        value="{{old('bank_name')}}">
-                                                    <label for="bank_name">Bank name...</label>
-                                                </div>
+                                                <label for="bank_name">Bank Name:</label>
+                                                <input type="text" name="bank_name" id="bank_name" class="form-control" value="{{old('bank_name')}}">
                                             </div>
                                             <div class="form-group">
-                                                <div class="form-label-group">
-                                                    <input 
-                                                        type="number"
-                                                        step="1"
-                                                        min="0"
-                                                        name="cheque_no" 
-                                                        id="cheque_no" 
-                                                        class="form-control"
-                                                        placeholder="cheque_no" 
-                                                        value="{{old('cheque_no')}}">
-                                                    <label for="cheque_no">Cheque no...</label>
-                                                </div>
+                                                <label for="cheque_no">Cheque No:</label>
+                                                <input type="number" step="1" min="0" name="cheque_no" id="cheque_no" class="form-control" value="{{old('cheque_no')}}">
                                             </div>
                                         </div>
                                         <div id="bkashModeFields">
                                             <div class="form-group">
-                                                <div class="form-label-group">
-                                                    <input 
-                                                        type="number"
-                                                        step="1"
-                                                        min="0"
-                                                        name="bkash_tr_no" 
-                                                        id="bkash_tr_no" 
-                                                        class="form-control"
-                                                        placeholder="bkash_tr_no" 
-                                                        value="{{old('bkash_tr_no')}}">
-                                                    <label for="bkash_tr_no">bKash trx no...</label>
-                                                </div>
+                                                <label for="bkash_tr_no">bKash Trx. No:</label>
+                                                <input type="number" step="1" min="0" name="bkash_tr_no" id="bkash_tr_no" class="form-control" value="{{old('bkash_tr_no')}}">
                                             </div>
                                         </div>
                                     </div> <!--./card-body-->
@@ -340,10 +244,28 @@
         </div> <!-- ./modal-content -->
     </div> <!-- ./modal-dialog -->
 </div> <!-- #/ajaxModel -->
+<!--Page Styles-->
 <style>
     .mymodal-dialog { 
-        max-width: 30%; 
-        width: 30% !important; 
+        max-width: 40%; 
+        width: 40% !important; 
+    }
+    @media (max-width: 575px) {
+        .mymodal-dialog {
+            max-width: 95%; 
+            width: 95% !important;
+        }
+        #ajaxModel .modal-body{
+            padding: 0;
+        }
+        .container-fluid{
+            padding: 8px;
+        }
+        label{
+            font-size: 0.8rem;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
     }
     .mymodal-body{
         background-color: lightgray;
@@ -398,12 +320,17 @@
     function inputChooser(){
         var radioVal = $("input[name='inputChooser']:checked").val();
         if(radioVal === '1'){
-            $('#customer_id').hide();
-            $('#customer_name').show();
+            $("#customer_id").val($("#customer_id option:first").val());
+            fillCustomerAddress();
+            $('#customer_name').val('');
+            $('#customer_id').parent().hide();
+            $('#customer_name').parent().show();
         }
         if(radioVal === '2'){
-            $('#customer_name').hide();
-            $('#customer_id').show();
+            $('#customer_name').val('');
+            fillCustomerAddress();
+            $('#customer_name').parent().hide();
+            $('#customer_id').parent().show();
         }
     }
 
@@ -432,6 +359,33 @@
             $('#bkashModeFields').show();
         }
     }
+    
+    
+    /*
+    * @param {boolean} status
+    * @param {string} message
+    * @returns {String}
+    * Description: This function is used to show page message.
+    */
+   function showMsg(status, message)
+   {
+       if(status == false)
+       {
+           var html =  '<div class="alert alert-warning alert-dismissible fade show">'+
+                           '<strong>'+ message + '</strong>'+
+                           '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
+                       '</div>'
+           return html;
+       }
+       if(status == true)
+       {
+           var html =  '<div class="alert alert-success alert-dismissible fade show">'+
+                           '<strong>'+ message + '</strong>'+
+                           '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
+                       '</div>'
+           return html;
+       }
+   }
 
     /*
      * Document Ready function:
@@ -439,17 +393,22 @@
      * @returns {undefined}
      */
     $(document).ready(function(){
+        //Initialize form:
         inputChooser();
         payModeChooser();
         $('#saveBtn').val('create');
+        
         /*
          * Radio button click function:
          * @param {type} e
          * @returns {undefined}
+         * Syntax Variation: $("input:radio[name='SomeName']")
          */
         $("input[type='radio']").click(function(){
-            inputChooser();
-            payModeChooser();
+            console.log($(this).prop('name'));
+            var radioName = $(this).prop('name');
+            if(radioName == 'inputChooser'){inputChooser();}
+            if(radioName == 'payModeChooser'){payModeChooser();}
         });
 
         /*
@@ -501,16 +460,6 @@
             $('#ajaxModel').modal('show');
             $('#ajaxModel').modal('handleUpdate');
         }); //Create New - Button click function.
-
-
-        /*
-        * xClose icon click event:
-        */
-        $('#xClose').click(function(e){
-            e.preventDefault();
-            closeModal();
-        });
-
 
         /*
          * Customer select on change function:
@@ -625,6 +574,9 @@
                         $('#form-errors').show();
                         //Change button text.
                         $('#saveBtn').html('Save');
+                        //Sctoll to top:
+                        $("#ajaxModel").animate({ scrollTop: 0 }, 1000);
+                        //$('#ajaxModel').scrollTop(0);
                     }
             }); // Ajax call
 
@@ -709,17 +661,9 @@
                 dataType: 'json',
                 success: function(data) { 
                     console.log(data);
-                    //blank: $('#').val(data.mr.);
                     $('#id').val(data.mr.id);
                     $('#mr_no').val(data.mr.mr_no);
                     $('#mr_date').val(data.mr.unformated_mr_date);
-                    $('#customer_name').val(data.mr.customer_name);
-                    $('#customer_company').val(data.mr.customer_company);
-                    $('#customer_address').val(data.mr.customer_address);
-                    $('#amount').val(data.mr.amount);
-                    $('#bank_name').val(data.mr.bank_name);
-                    $('#cheque_no').val(data.mr.cheque_no);
-                    $('#bkash_tr_no').val(data.mr.bkash_tr_no);
                     if(data.mr.customer_id !== null){
                         $("#selectCustomer").prop("checked", true);
                         $('#customer_id').val(data.mr.customer_id).attr('selected', 'selected');
@@ -727,18 +671,24 @@
                         $("#typeInCustomer").prop("checked", true);
                     }
                     inputChooser();
+                    $('#customer_name').val(data.mr.customer_name);
+                    $('#customer_company').val(data.mr.customer_company);
+                    $('#customer_address').val(data.mr.customer_address);
+                    $('#amount').val(data.mr.amount);
+                    $('#bank_name').val(data.mr.bank_name);
+                    $('#cheque_no').val(data.mr.cheque_no);
+                    $('#bkash_tr_no').val(data.mr.bkash_tr_no);
                     if(data.mr.pay_mode == 'cash'){ $("#payModeCash").prop("checked", true); }
                     if(data.mr.pay_mode == 'cheque'){ $("#payModeCheque").prop("checked", true); }
                     if(data.mr.pay_mode == 'bkash'){ $("#payModeBkash").prop("checked", true); }
                     payModeChooser();
                     $('#customer_phone').val(data.mr.customer_phone);
                     $('#customer_email').val(data.mr.customer_email);
-                    
-                    //$('#quantity_type').val(data.order.quantity_type).attr('selected', 'selected').trigger('change');
-
                 },
                 error: function(data) { 
                     console.log(data); 
+                    //Sctoll to top:
+                    $("#ajaxModel").animate({ scrollTop: 0 }, 1000);
                 }
             });
 
@@ -797,11 +747,14 @@
                             success: function (data) {
                                 console.log(data);
                                 $('#dataTable').DataTable().ajax.reload();
-                                alert('Money receipt '+data.mr_no+' deleted.');
+                                //alert('Money receipt '+data.mr_no+' deleted.');
+                                //Page message:
+                                $('#pageMsg').html(showMsg(data.status, data.message));
                             },
                             error: function (data) {
                                 console.log(data);
-                                alert('Something is not right!!!');
+                                //alert('Something is not right!!!');
+                                $('#pageMsg').html(showMsg(false, 'Something is not right!!!'));
                             }
                         }); // Ajax call
                     }

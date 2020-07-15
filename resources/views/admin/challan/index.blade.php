@@ -40,6 +40,7 @@
                     <tr>
                         <th>Id</th>
                         <th>Challan No</th>
+                        <th>Order No</th>
                         <th>Challan Date</th>
                         <th>Customer Name</th>
                         <th>Products</th>
@@ -51,6 +52,7 @@
                     <tr>
                         <th>Id</th>
                         <th>Challan No</th>
+                        <th>Order No</th>
                         <th>Challan Date</th>
                         <th>Customer Name</th>
                         <th>Products</th>
@@ -85,6 +87,7 @@ $(document).ready(function(){
         columns: [
             {data: 'id', name: 'id'},
             {data: 'challan_no', name: 'challan_no'},
+            {data: 'order_no', name: 'order_no'},
             {data: 'challan_date', name: 'challan_date'},
             {data: 'customer_name', name: 'customer_name'},
             {data: 'transfer_items', name: 'transfer_items'},

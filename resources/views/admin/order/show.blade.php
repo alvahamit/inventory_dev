@@ -51,9 +51,6 @@
         </form>
         <h4 class="mt-2 pt-1 pb-2">
             Date: {{$order->order_date}}
-            <!--Print order button-->
-            <!--<a id="printBtn" class="btn btn-warning btn-sm float-right"><i class="fas fa-print fa-lg"></i></a>--> 
-            <!--<a id="pdfBtn" class="btn btn-success btn-sm float-right mr-1"><i class="far fa-file-pdf fa-lg"></i></a>-->
         </h4>
         <div class="row">
             <div class="col-md-12">
@@ -66,15 +63,15 @@
                         <strong>Billing Address:</strong><br>
                         {{$order->customer_name}}<br>
                         {{$order->customer_company}}<br>
-                        {{$order->customer_address1}}<br>
-                        {{$order->customer_address2}}<br>
+                        {{$order->customer_address}}<br>
+                        <i class="fas fa-phone-square-alt"></i> {{$order->customer_contact}}<br>
                     </div>
                     <div class="col-xs-12 col-md-6 col-lg-6 float-xs-right float-right text-md-right">
                         <strong>Shipping Address:</strong><br>
                         {{$order->shipp_to_name}}<br>
                         {{$order->shipp_to_company}}<br>
-                        {{$order->shipping_address1}}<br>
-                        {{$order->shipping_address2}}<br>
+                        {{$order->shipping_address}}<br>
+                        <i class="fas fa-phone-square-alt"></i> {{$order->shipping_contact}}<br>
                     </div>
                 </div>
             </div>
@@ -180,7 +177,7 @@
         <h4 class="mt-2">Issued Invoices</h4>
         <!--Add new button-->
         <div class="form-group text-right">
-            <a class="btn btn-primary col-1 right" href="{{route('order.invoice.create',$order->id)}}">New Invoice</a>
+            <a class="btn btn-primary right" href="{{route('order.invoice.create',$order->id)}}">New Invoice</a>
         </div> 
         <!-- DataTables Example -->
         <div class="card mb-3">
@@ -233,8 +230,7 @@
         <h4 class="mt-2">Issued Challan</h4>
         <!--Add new button-->
         <div class="form-group text-right">
-            <!--<button id="createNewChallan" class="btn btn-primary col-1 right">New Challan</button>-->
-            <a class="btn btn-primary col-1 right" href="{{route('order.challan.create', $order->id)}}">New Challan</a>
+            <a class="btn btn-primary right" href="{{route('order.challan.create', $order->id)}}">New Challan</a>
         </div> 
         <!-- DataTables Example -->
         <div class="card mb-3">
@@ -317,6 +313,7 @@
 @section('scripts')
 <script type="text/javascript">
 $(document).ready(function(){
+        
     /*
     * Initialize Yajra on invoice data table.
     */
@@ -340,6 +337,7 @@ $(document).ready(function(){
         ],
         order:[[0, "desc"]]
    });
+   
    
     /*
     * invoiceDataTable Delete icon click:
@@ -370,12 +368,16 @@ $(document).ready(function(){
                         dataType: 'json',
                         success: function (data) {
                             console.log(data);
-                            $('#invoiceDataTable').DataTable().ajax.reload();
+                            //$('#invoiceDataTable').DataTable().ajax.reload();
                             bootbox.alert({
                                 size: "small",
                                 title: "Deleted...",
                                 message: "Invoice no. "+data.invoice+" deleted.",
                                 backdrop: true,
+                                callback: function () {
+                                    location.reload(true);
+                                    //setTimeout(function(){location.reload()}, 3000);
+                                }
                             });
                         },
                         error: function (data) {
@@ -395,8 +397,8 @@ $(document).ready(function(){
                 }
               }
             }
-          }) //Confirm Box
-    }) //Delete Icon click end.
+          }); //Confirm Box
+    }); //Delete Icon click end.
    
    /*
     * Initialize Yajra on challan data table.
@@ -451,12 +453,16 @@ $(document).ready(function(){
                         dataType: 'json',
                         success: function (data) {
                             console.log(data);
-                            $('#challanDataTable').DataTable().ajax.reload();
+                            //$('#challanDataTable').DataTable().ajax.reload();
                             bootbox.alert({
                                 size: "small",
                                 title: "Deleted...",
                                 message: "Delivery challan <strong>"+data.challan.toUpperCase()+"</strong> deleted.",
                                 backdrop: true,
+                                callback: function () {
+                                    location.reload(true);
+                                    //setTimeout(function(){location.reload()}, 3000);
+                                }
                             });
                         },
                         error: function (data) {

@@ -13,10 +13,12 @@ class StoresTableSeeder extends Seeder
     {
         //Using data insert statement.
         DB::table('stores')->insert([
-            'name' => 'CTG Port',
-            'address' => 'Port Internal Rd, Chattogram',
-            'location' => 'Chattogram',
-            'contact_no' => '03125-22220'
+            'name' => 'Staging Area',
+            'address' => 'Default area, for staging stock.',
+            'location' => 'Default',
+            'contact_no' => '00000-00000',
+            'created_at' => now(),
+            'updated_at' => now()
         ]);
         //using factory classes.
         factory(App\Store::class, 4)->create();

@@ -26,7 +26,7 @@
 <!--Add new button-->
 <div class="form-group text-right d-print-none">
     <!--<a class="btn btn-primary right" href="{{route('suppliers.create')}}">Add new</a>-->
-    <button id="newBtn" class="btn btn-primary col-1 right">New</button>
+    <button id="newBtn" class="btn btn-primary right">Add New</button>
 </div> 
 <!-- DataTables Example -->
 <div class="card mb-3">
@@ -111,51 +111,26 @@
                                     <div class="card-body">
                                         <!--name input-->
                                         <div class="form-group">
-                                            <div class="form-label-group">
-                                                <input 
-                                                    type="text" 
-                                                    name="name" 
-                                                    id="name" 
-                                                    class="form-control" 
-                                                    placeholder="Supplier name" 
-                                                    autofocus="autofocus" 
-                                                    value="{{old('name')}}">
-                                                <label for="name">Supplier name...</label>
-                                            </div>
+                                            <label for="name">Supplier Name:</label>
+                                            <input type="text" name="name" id="name" class="form-control" autofocus="autofocus" value="{{old('name')}}">
                                         </div>
                                         <!--organization input-->
                                         <div class="form-group">
-                                            <div class="form-label-group">
-                                                <input 
-                                                    type="text" 
-                                                    name="organization" 
-                                                    id="organization" 
-                                                    class="form-control"
-                                                    placeholder="organization" 
-                                                    value="{{old('organization')}}">
-                                                <label for="organization">Company name...</label>
-                                            </div>
+                                            <label for="organization">Company:</label>
+                                            <input type="text" name="organization" id="organization" class="form-control" value="{{old('organization')}}">
                                         </div>
                                         <!--email input-->
                                         <div class="form-group">
-                                            <div class="form-label-group">
-                                                <input 
-                                                    type="text" 
-                                                    name="email" 
-                                                    id="email" 
-                                                    class="form-control" 
-                                                    placeholder="Email address"
-                                                    value="{{old('email')}}"
-                                                    >
-                                                <label for="email">Email address...</label>
-                                            </div>
+                                            <label for="email">Email:</label>
+                                            <input type="email" name="email" id="email" class="form-control" value="{{old('email')}}">
                                         </div>
                                         <!--Role picker-->
                                         <div class="form-group">
                                             <div class="form-row">
-                                                <div class="col-md-6">
-                                                    <select class="form-control" name="role" id="role">
-                                                        <option selected="selected" value="">User Role...</option>
+                                                <div class="col-md-12">
+                                                    <label for="role">Role:</label>
+                                                    <select class="custom-select" name="role" id="role">
+                                                        <option selected="selected" value="">Select role...</option>
                                                         @foreach($roles as $key => $value)
                                                         <option value="{{$key}}">{{$value}}</option>
                                                         @endforeach
@@ -165,10 +140,8 @@
                                         </div>
                                         <!--File upload input-->
                                         <div class="form-group">
-                                            <div class="form-label-group">
-                                                <input type="file" name="image" id="image" class="form-control-file">
-                                                <label for="image">Upload photo (optional)</label>
-                                            </div>
+                                            <label for="image">Upload Photo (optional):</label>
+                                            <input type="file" name="image" id="image" class="form-control-file">
                                         </div>
                                     </div>
                                 </div>
@@ -190,9 +163,9 @@
                                                 <div class="col-md-12">
                                                     <!--hidden id input-->
                                                     <input type="hidden" name="address_id" id="address_id">
-                                                    <label>Address Label: </label>
-                                                    <select class="form-control" name="address_label" id="address_label">
-                                                        <option selected="selected" value="">Pick a label...</option>
+                                                    <label>Address Label:</label>
+                                                    <select class="custom-select" name="address_label" id="address_label">
+                                                        <option selected="selected" value="">Select label...</option>
                                                         @foreach ($address_labels as $key => $value)
                                                         <option value="{{ $value }}">{{ ucfirst($value) }}</option>
                                                         @endforeach
@@ -222,44 +195,19 @@
                                         
                                         <!--address input-->
                                         <div class="form-group">
-                                            <!--<div class="form-label-group">
-                                                <input 
-                                                    type="text" 
-                                                    name="address" 
-                                                    id="address" 
-                                                    class="form-control"
-                                                    placeholder="address" 
-                                                    value="{{old('address')}}">
-                                                <label for="address">Full Address...</label>
-                                            </div>-->
-                                            <textarea rows="3" class="form-control" name="address" id="address" placeholder="Full address..." value="{{old('address')}}"></textarea>
+                                            <label for="address">Address:</label>
+                                            <textarea rows="3" class="form-control" name="address" id="address">{!!old('address')!!}</textarea>
                                         </div>
                                         <!--state/city input-->
                                         <div class="form-group">
                                             <div class="form-row">
                                                 <div class="col-md-6">
-                                                    <div class="form-label-group">
-                                                        <input 
-                                                            type="text" 
-                                                            name="state" 
-                                                            id="state" 
-                                                            class="form-control"
-                                                            placeholder="state" 
-                                                            value="{{old('state')}}">
-                                                        <label for="state">State...</label>
-                                                    </div>
+                                                    <label for="state">State:</label>
+                                                    <input type="text" class="form-control" name="state" id="state" value="{{old('state')}}">
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <div class="form-label-group">
-                                                        <input 
-                                                            type="text" 
-                                                            name="city" 
-                                                            id="city" 
-                                                            class="form-control"
-                                                            placeholder="city" 
-                                                            value="{{old('city')}}">
-                                                        <label for="city">City...</label>
-                                                    </div>
+                                                    <label for="city">City:</label>
+                                                    <input type="text" name="city" id="city" class="form-control" value="{{old('city')}}">
                                                 </div>
                                             </div>
                                         </div>
@@ -267,28 +215,12 @@
                                         <div class="form-group">
                                             <div class="form-row">
                                                 <div class="col-md-6">
-                                                    <div class="form-label-group">
-                                                        <input 
-                                                            type="text" 
-                                                            name="postal_code" 
-                                                            id="postal_code" 
-                                                            class="form-control"
-                                                            placeholder="postal_code" 
-                                                            value="{{old('postal_code')}}">
-                                                        <label for="postal_code">Postal code...</label>
-                                                    </div>
+                                                    <label for="postal_code">Post Code:</label>
+                                                    <input type="text" name="postal_code" id="postal_code" class="form-control" value="{{old('postal_code')}}">
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <div class="form-label-group">
-                                                        <input 
-                                                            type="text" 
-                                                            name="area" 
-                                                            id="area" 
-                                                            class="form-control"
-                                                            placeholder="area" 
-                                                            value="{{old('area')}}">
-                                                        <label for="area">Area (Optional)...</label>
-                                                    </div>
+                                                    <label for="area">Area (Optional):</label>
+                                                    <input type="text" name="area" id="area" class="form-control" value="{{old('area')}}">
                                                 </div>
                                             </div>
                                         </div>
@@ -296,28 +228,12 @@
                                         <div class="form-group">
                                             <div class="form-row">
                                                 <div class="col-md-6">
-                                                    <div class="form-label-group">
-                                                        <input 
-                                                            type="text" 
-                                                            name="latitude" 
-                                                            id="latitude" 
-                                                            class="form-control"
-                                                            placeholder="latitude" 
-                                                            value="{{old('latitude')}}">
-                                                        <label for="latitude">Latitude...</label>
-                                                    </div>
+                                                    <label for="latitude">Latitude:</label>
+                                                    <input type="text" name="latitude" id="latitude" class="form-control" value="{{old('latitude')}}">
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <div class="form-label-group">
-                                                        <input 
-                                                            type="text" 
-                                                            name="longitude" 
-                                                            id="longitude" 
-                                                            class="form-control"
-                                                            placeholder="longitude" 
-                                                            value="{{old('longitude')}}">
-                                                        <label for="longitude">Longitude...</label>
-                                                    </div>
+                                                    <label for="longitude">Longitude:</label>
+                                                    <input type="text" name="longitude" id="longitude" class="form-control" value="{{old('longitude')}}">
                                                 </div>
                                             </div>
                                         </div>
@@ -325,8 +241,8 @@
                                         <div class="form-group">
                                             <div class="form-row">
                                                 <div class="col-md-12">
-                                                    <label>Country: </label>
-                                                    <select class="form-control" name="country_code" id="country_code">
+                                                    <label>Country:</label>
+                                                    <select class="custom-select" name="country_code" id="country_code">
                                                         <option selected="selected" value="">Select Country...</option>
                                                         @foreach($countries as $country)
                                                         <option value="{{$country->code}}">{{$country->name}}</option>
@@ -412,7 +328,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <button id="addContactBtn" type="button" class="btn btn-success btn-sm mt-2">Add</button>
+                                        <button id="addContactBtn" type="button" class="btn btn-success btn-sm mt-2"><i class="fas fa-plus"></i> Add</button>
                                     </div> <!--./card-body-->
                                 </div> <!--./collapse-->
                             </div> 
@@ -436,8 +352,17 @@
 </div> <!-- #/ajaxModel -->
 <style>
     .mymodal-dialog { 
-        max-width: 30%; 
-        width: 30% !important; 
+        max-width: 40%; 
+        width: 40% !important; 
+    }
+    @media (max-width: 575px) {
+        .mymodal-dialog {
+            max-width: 95%; 
+            width: 95% !important;
+        }
+        label{
+            font-size: 0.8rem;
+        }
     }
     .mymodal-body{
         background-color: lightgray;
@@ -620,41 +545,36 @@
             e.preventDefault();
             var count = $(this).closest('.card-body').children().length - 1;
             var html = '<div class="form-group pb-3">'+
-                            '<div class="form-row pb-3">'+
-                                '<div class="col-md-12">'+
-                                    '<input type="hidden" name="contact_ids[]" id="contact_id'+count+'">'+
-                                    '<select class="form-control" name="contact_label[]" id="contact_label'+count+'">'+
-                                        '<option selected="selected" value="">Contact Label...</option>'+
-                                        '@foreach($contact_labels as $key => $value)'+
-                                        '<option value="{{$value}}">{{ ucfirst($value) }}</option>'+
-                                        '@endforeach'+
-                                    '</select>'+
-                                '</div>'+
+                        '<div class="form-row pb-3">'+
+                            '<div class="col-md-12">'+
+                                '<input type="hidden" name="contact_ids[]" id="contact_id'+count+'">'+
+                                '<label for="contact_label0">Contact Label:</label>'+
+                                '<select class="custom-select" name="contact_label[]" id="contact_label'+count+'">'+
+                                    '<option selected="selected" value="">Select Label...</option>'+
+                                    '@foreach($contact_labels as $key => $value)'+
+                                    '<option value="{{$value}}">{{ ucfirst($value) }}</option>'+
+                                    '@endforeach'+
+                                '</select>'+
                             '</div>'+
-                            '<div class="form-row">'+
-                                '<div class="col-md-3">'+
-                                    '<div class="form-label-group">'+
-                                        '<input type="text" name="country_code_contact[]" class="form-control" placeholder="country_code_contact" id="country_code_contact'+count+'">'+ 
-                                        '<label for="country_code_contact'+count+'">Co Code</label>'+
-                                    '</div>'+
-                                '</div>'+
-                                '<div class="col-md-3">'+
-                                    '<div class="form-label-group">'+
-                                        '<input type="text" name="city_code_contact[]" class="form-control" placeholder="city_code_contact" id="city_code_contact'+count+'">'+
-                                        '<label for="city_code_contact'+count+'">City Code</label>'+
-                                    '</div>'+
-                                '</div>'+
-                                '<div class="col-md-5">'+
-                                    '<div class="form-label-group">'+
-                                        '<input type="text" name="number[]" class="form-control" placeholder="number" id="number'+count+'">'+
-                                        '<label for="number'+count+'">Phone number...</label>'+
-                                    '</div>'+
-                                '</div>'+
-                                '<div class="col-md-1">'+
-                                    '<a href="remContactBtn" class="btn btn-warning btn-sm mt-2">Del</a>'+
-                                '</div>'+
+                        '</div>'+
+                        '<div class="form-row">'+
+                            '<div class="col-md-3">'+
+                                '<label for="country_code_contact'+count+'">Country Code:</label>'+
+                                '<input type="text" name="country_code_contact[]" id="country_code_contact'+count+'" class="form-control">'+
                             '</div>'+
-                        '</div>';
+                            '<div class="col-md-3">'+
+                                '<label for="city_code_contact'+count+'">City Code:</label>'+
+                                '<input type="text" name="city_code_contact[]" id="city_code_contact'+count+'" class="form-control">'+
+                            '</div>'+
+                            '<div class="col-md-5">'+
+                                '<label for="number'+count+'">Phone Number:</label>'+
+                                '<input type="text" name="number[]" id="number'+count+'" class="form-control">'+
+                            '</div>'+
+                            '<div class="col-md-1">'+
+                                '<a href="remContactBtn" class="btn form-control" style="margin-top:2rem;"><i class="fas fa-trash-alt"></i></a>'+
+                            '</div>'+
+                        '</div>'+
+                    '</div>';
                 $(this).before(html);
         });
 
@@ -799,7 +719,9 @@
                 $('#name').val(data['user']['name']);
                 $('#organization').val(data['user']['organization']);
                 $('#email').val(data['user']['email']);
-                $('#role').val(data['user']['role'][0]['id']).attr('selected','selected');
+                if(data['user']['role'].length>0){
+                    $('#role').val(data['user']['role'][0]['id']).attr('selected','selected');
+                }
 
                 if(addressId !== ""){ 
                     //console.log(addressId); 
@@ -833,41 +755,36 @@
                         $(contacts).each(function(index, value){
                             var count = index;
                             var html = '<div class="form-group pb-3">'+
-                                            '<div class="form-row pb-3">'+
-                                                '<div class="col-md-12">'+
-                                                    '<input value="'+value.id+'" type="hidden" name="contact_ids[]" id="contact_id'+count+'">'+
-                                                    '<select class="form-control" name="contact_label[]" id="contact_label'+count+'">'+
-                                                        '<option selected="selected" value="">Contact Label...</option>'+
-                                                        '@foreach($contact_labels as $key => $value)'+
-                                                        '<option value="{{$value}}">{{ ucfirst($value) }}</option>'+
-                                                        '@endforeach'+
-                                                    '</select>'+
-                                                '</div>'+
-                                            '</div>'+
-                                            '<div class="form-row">'+
-                                                '<div class="col-md-3">'+
-                                                    '<div class="form-label-group">'+
-                                                        '<input value="'+value.country_code+'" type="text" name="country_code_contact[]" class="form-control" placeholder="country_code_contact" id="country_code_contact'+count+'">'+ 
-                                                        '<label for="country_code_contact'+count+'">Co Code</label>'+
-                                                    '</div>'+
-                                                '</div>'+
-                                                '<div class="col-md-3">'+
-                                                    '<div class="form-label-group">'+
-                                                        '<input value="'+value.city_code+'" type="text" name="city_code_contact[]" class="form-control" placeholder="city_code_contact" id="city_code_contact'+count+'">'+
-                                                        '<label for="city_code_contact'+count+'">City Code</label>'+
-                                                    '</div>'+
-                                                '</div>'+
-                                                '<div class="col-md-5">'+
-                                                    '<div class="form-label-group">'+
-                                                        '<input value="'+value.number+'" type="text" name="number[]" class="form-control" placeholder="number" id="number'+count+'">'+
-                                                        '<label for="number'+count+'">Phone number...</label>'+
-                                                    '</div>'+
-                                                '</div>'+
-                                                '<div class="col-md-1">'+
-                                                    '<a href="remContactBtn" class="btn btn-warning btn-sm mt-2">Del</a>'+
-                                                '</div>'+
-                                            '</div>'+
-                                        '</div>';
+                                    '<div class="form-row pb-3">'+
+                                        '<div class="col-md-12">'+
+                                            '<input value="'+value.id+'" type="hidden" name="contact_ids[]" id="contact_id'+count+'">'+
+                                            '<label for="contact_label'+count+'">Contact Label:</label>'+
+                                            '<select class="custom-select" name="contact_label[]" id="contact_label'+count+'">'+
+                                                '<option selected="selected" value="">Select label...</option>'+
+                                                '@foreach($contact_labels as $key => $value)'+
+                                                '<option value="{{$value}}">{{ ucfirst($value) }}</option>'+
+                                                '@endforeach'+
+                                            '</select>'+
+                                        '</div>'+
+                                    '</div>'+
+                                    '<div class="form-row">'+
+                                        '<div class="col-md-3">'+
+                                            '<label for="country_code_contact'+count+'">Country Code:</label>'+
+                                            '<input value="'+value.country_code+'" type="text" name="country_code_contact[]" class="form-control" id="country_code_contact'+count+'">'+ 
+                                        '</div>'+
+                                        '<div class="col-md-3">'+
+                                            '<label for="city_code_contact'+count+'">City Code:</label>'+
+                                            '<input value="'+value.city_code+'" type="text" name="city_code_contact[]" class="form-control" id="city_code_contact'+count+'">'+
+                                        '</div>'+
+                                        '<div class="col-md-5">'+
+                                            '<label for="number'+count+'">Phone Number:</label>'+
+                                            '<input value="'+value.number+'" type="text" name="number[]" class="form-control" id="number'+count+'">'+
+                                        '</div>'+
+                                        '<div class="col-md-1">'+
+                                            '<a href="remContactBtn" class="btn form-control" style="margin-top:2rem;"><i class="fas fa-trash-alt"></i></a>'+
+                                        '</div>'+
+                                    '</div>'+
+                                '</div>';
 
                                 $('#addContactBtn').before(html);
                                 $('#contact_label'+count).val(value.label).attr('selected','selected');

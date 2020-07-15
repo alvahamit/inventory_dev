@@ -31,32 +31,12 @@
             {{method_field('PATCH')}}
             @csrf
             <div class="form-group">
-                <div class="form-label-group">
-                    <input 
-                        type="text" 
-                        name="name" 
-                        id="name" 
-                        class="form-control" 
-                        placeholder="Country name" 
-                        autofocus="autofocus" 
-                        value="{{old('name', $country->name)}}"
-                        required="required"
-                    >
-                    <label for="name">Type in new country name</label>
-                </div>
+                <label for="name">Country Name:</label>
+                <input type="text" name="name" id="name" class="form-control" autofocus="autofocus" value="{{old('name', $country->name)}}" required="required">
             </div>
             <div class="form-group">
-                <div class="form-label-group">
-                    <input 
-                        type="text" 
-                        name="code" 
-                        id="code" 
-                        class="form-control" 
-                        placeholder="Country code" 
-                        value="{{old('code',$country->code)}}"
-                    >
-                    <label for="code">Type in a code for the country</label>
-                </div>
+                <label for="code">Short Code:</label>
+                <input type="text" name="code" id="code" class="form-control" value="{{old('code',$country->code)}}">
             </div>
             <!--Buttons with separate form for delete-->
             <div class="form-group">

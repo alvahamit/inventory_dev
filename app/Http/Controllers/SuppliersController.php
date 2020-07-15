@@ -13,6 +13,7 @@ use Yajra\DataTables\Facades\DataTables;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use NumberFormatter;
+use Illuminate\Support\Facades\Hash;
 
 
 class SuppliersController extends Controller
@@ -89,7 +90,8 @@ class SuppliersController extends Controller
         $user = Supplier::create([ 
             'name'=> ucwords($request->name), 
             'organization' => $request->organization, 
-            'email' => $request->email
+            'email' => $request->email,
+            'password' => Hash::make('password')
         ]);
         //Find role
         $role = Role::findOrFail($request->role);

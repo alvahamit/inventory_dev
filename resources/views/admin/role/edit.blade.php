@@ -32,28 +32,14 @@
             {{method_field('PATCH')}}
             @csrf
             <div class="form-group">
-                <div class="form-label-group">
-                    <input 
-                        type="text" 
-                        name="name" 
-                        id="name" 
-                        class="form-control" 
-                        placeholder="Role name" 
-                        autofocus="autofocus" 
-                        value="{{old('name', $data->name)}}"
-                        required="required">
-                    <label for="name">Update role name</label>
-                </div>
+                <label for="name">Role Name:</label>
+                <input type="text" name="name" id="name" class="form-control" autofocus="autofocus" value="{{old('name', $data->name)}}" required="required">
             </div>
             <div class="form-group">
-                <label for="description">Type updated description (optional):</label>
-                    <textarea
-                        type="text" 
-                        name="description" 
-                        id="description" 
-                        class="form-control" 
-                        rows="3">{{old('description', $data->description)}}</textarea>
+                <label for="description">Role Description (optional):</label>
+                <textarea type="text" name="description" id="description" class="form-control" rows="3">{{old('description', $data->description)}}</textarea>
             </div>
+            
             <!--Buttons with separate form for delete-->
             <div class="form-group">
                 <div class="form-row">

@@ -149,8 +149,14 @@ class InvoiceController extends Controller
             }
         }
             
-        
-        Order::findOrFail($request->order_id)->update(['is_invoiced' => true,  'order_status' => 'processing',]);
+        //Order::findOrFail($request->order_id)->update(['is_invoiced' => true,  'order_status' => 'processing',]);
+        $order = Order::findOrFail($request->order_id);
+        if($order->order_status == "pending"){
+             $order->update(['order_status' => 'processing']);
+        }
+        if(!$order->is_invoiced){
+             $order->update(['is_invoiced' => true]);
+        }
 
         return response()->json(['success' => 'invoice stored', 'request' => $request->all()]);
     }

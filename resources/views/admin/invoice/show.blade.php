@@ -41,13 +41,13 @@
                 <div class="col-xs-12 col-md-6 col-lg-6 float-xs-left float-left text-md-left">
                     <div class="col-md-6 float-left">
                         <strong>Invoiced by:</strong><br>
-                        {{ $invoice->invoiced_by }}
+                        {!! nl2br($invoice->invoiced_by) !!}
                     </div>
                 </div>
                 <div class="col-xs-12 col-md-6 col-lg-6 float-xs-right float-right text-md-right">
                     <div class="col-md-6 float-right">
                         <strong>Billed to:</strong><br>
-                        {{$invoice->billed_to}}
+                        {!! nl2br($invoice->billed_to) !!}
                     </div>
                 </div>
             </div>

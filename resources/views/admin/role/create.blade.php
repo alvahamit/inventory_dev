@@ -31,29 +31,12 @@
         <form method="POST" action="{{route('roles.store')}}" accept-charset="UTF-8">
             @csrf
             <div class="form-group">
-                <div class="form-label-group">
-                    <input 
-                        type="text" 
-                        name="name" 
-                        id="name" 
-                        class="form-control" 
-                        placeholder="Role name" 
-                        autofocus="autofocus" 
-                        value="{{old('name')}}"
-                        required="required"
-                    >
-                    <label for="name">Type in new role name</label>
-                </div>
+                <label for="name">Role Name:</label>
+                <input type="text" name="name" id="name" class="form-control" autofocus="autofocus" value="{{old('name')}}" required="required">
             </div>
             <div class="form-group">
-                <label for="description">Type in new role description (optional):</label>
-                    <textarea
-                        type="text" 
-                        name="description" 
-                        id="description" 
-                        class="form-control" 
-                        value=""
-                        rows="3">{{old('description')}}</textarea>
+                <label for="description">Role Description (optional):</label>
+                <textarea type="text" name="description" id="description" class="form-control" rows="3">{{old('description')}}</textarea>
             </div>
             <!--<input class="btn btn-primary btn-block" type="submit" value="Register">-->
             <div class="form-group">

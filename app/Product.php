@@ -117,7 +117,12 @@ class Product extends Model
             if($stock->flag == "out"){ $out = $out + $stock->quantity; }
         }
         $stockCount = ($in - $out);
-        $result = ($stockCount/$in)*100;
+        /*
+         * Division by zero is undefined. Therefore with zero in-stock
+         * this formula will give error. That is why ternerary if statement
+         * is used to check in value.
+         */
+        $in != 0 ? $result=($stockCount/$in)*100 : $result=0;
         return $result;
     }
    

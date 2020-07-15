@@ -7,6 +7,9 @@ use App\Http\Requests\OrderFormRequest;
 use App\User as Buyer;
 use App\Product;
 use App\Order;
+use App\Role;
+use App\Contact;
+use App\Address;
 use Yajra\DataTables\Facades\DataTables;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -216,23 +219,50 @@ class OrdersController extends Controller
         $order->order_no = $request->order_no;
         $order->order_date = $request->order_date;
         $request->has('user_id') ? $order->user_id = $request->user_id : "";
-        $request->has('customer_name') ? $order->customer_name = $request->customer_name : $order->customer_name = Buyer::findOrFail($request->user_id)->name;
+        //Create user if not exist:
+        if($request->has('user_id'))
+        {
+            $customer = Buyer::findOrFail($request->user_id);
+        }
+        else 
+        {
+            //Create customer
+            $customer = Buyer::create([ 
+                'name'=> $request->customer_name, 
+                'organization' => $request->customer_company,
+                'password' => "",
+            ]); 
+            //Find role
+            $role = Role::whereIn('name',['Customer', 'Buyer','Client'])->first();
+            //Save role for customer
+            $customer->role()->save($role);
+            //Create address
+            $address = Address::create([ 'address' => $request->customer_address ]);
+            //Save address for customer
+            $customer->addresses()->save($address);
+            //Save Contact
+            $contact = Contact::create([ 'number' => $request->contact_no ]);
+            $customer->contacts()->save( $contact );
+        }
+        //$request->has('customer_name') ? $order->customer_name = $request->customer_name : $order->customer_name = Buyer::findOrFail($request->user_id)->name;
+        $order->user_id = $customer->id;
+        $order->customer_name = $customer->name;
         if($request->has('select-customer'))
         {
             $order->customer_company = $request->select_customer_company;
-            $order->customer_address1 = $request->select_customer_address;
-            $order->customer_address2 = $request->select_customer_address2;
+            $order->customer_address = $request->select_customer_address;
+            $order->customer_contact = $request->select_customer_contact;
         } 
         else 
         {
             $order->customer_company = $request->customer_company;
-            $order->customer_address1 = $request->customer_address;
-            $order->customer_address2 = $request->customer_address2;
+            $order->customer_address = $request->customer_address;
+            $order->customer_contact = $request->contact_no;
         }
         $order->shipp_to_name = $request->customer_name_shipping;
         $order->shipp_to_company = $request->shipping_company;
-        $order->shipping_address1 = $request->shipping_address;
-        $order->shipping_address2 = $request->shipping_address2;
+        $order->shipping_address = $request->shipping_address;
+        $order->shipping_contact = $request->shipping_contact;
         $order->quantity_type = $request->quantity_type;
         $order->order_total = $request->total;
         $order->is_invoiced = false;
@@ -308,28 +338,60 @@ class OrdersController extends Controller
         $order = Order::findOrFail($id);
         $order->order_no = $request->order_no;
         $order->order_date = $request->order_date;
-        $request->has('user_id') ? $order->user_id = $request->user_id : "";
-        $request->has('customer_name') ? $order->customer_name = $request->customer_name : $order->customer_name = Buyer::findOrFail($request->user_id)->name;
+        //$request->has('user_id') ? $order->user_id = $request->user_id : "";
+        
+        //Create user if not exist:
+        if($request->has('user_id'))
+        {
+            $customer = Buyer::findOrFail($request->user_id);
+        }
+        else 
+        {
+            //Create customer
+            $customer = Buyer::create([ 
+                'name'=> $request->customer_name, 
+                'organization' => $request->customer_company,
+                'password' => "",
+            ]); 
+            //Find role
+            $role = Role::whereIn('name',['Customer', 'Buyer','Client'])->first();
+            //Save role for customer
+            $customer->role()->save($role);
+            //Create address
+            $address = Address::create([ 'address' => $request->customer_address ]);
+            //Save address for customer
+            $customer->addresses()->save($address);
+            //Save Contact
+            $contact = Contact::create([ 'number' => $request->contact_no ]);
+            $customer->contacts()->save( $contact );
+        }
+        
+        //$request->has('customer_name') ? $order->customer_name = $request->customer_name : $order->customer_name = Buyer::findOrFail($request->user_id)->name;
+        $order->user_id = $customer->id;
+        $order->customer_name = $customer->name;
         if($request->has('select-customer'))
         {
             $order->customer_company = $request->select_customer_company;
-            $order->customer_address1 = $request->select_customer_address;
-            $order->customer_address2 = $request->select_customer_address2;
+            $order->customer_address = $request->select_customer_address;
+            $order->customer_contact = $request->select_customer_contact;
         } 
         else 
         {
             $order->customer_company = $request->customer_company;
-            $order->customer_address1 = $request->customer_address;
-            $order->customer_address2 = $request->customer_address2;
+            $order->customer_address = $request->customer_address;
+            $order->customer_contact = $request->contact_no;
         }
         $order->shipp_to_name = $request->customer_name_shipping;
         $order->shipp_to_company = $request->shipping_company;
-        $order->shipping_address1 = $request->shipping_address;
-        $order->shipping_address2 = $request->shipping_address2;
+        $order->shipping_address = $request->shipping_address;
+        $order->shipping_contact = $request->shipping_contact;
         $order->quantity_type = $request->quantity_type;
         $order->order_total = $request->total;
-        $order->is_invoiced = false;
-        $order->order_status = 'pending';
+        //Check if order is under processing:
+        if($order->invoices()->count() > 0 OR $order->challans()->count() > 0)
+        {$order->order_status = 'processing';} else {$order->order_status = 'pending';}
+        $order->invoices()->count() > 0 ? $order->is_invoiced = true : $order->is_invoiced = false;
+        
         $order->update();
         
         if( $order->products->count() > 0 ){
@@ -376,11 +438,25 @@ class OrdersController extends Controller
     public function destroy($id)
     {
         $order = Order::findOrFail($id);
-        $order_no = $order->order_no;
-        $order->products()->detach();
-        $order->delete();
-        return response()->json(['success'=> 'Order deleted','order' => $order_no]);
         
+        if($order->invoices()->count() > 0 OR $order->challans()->count() > 0)
+        {
+            return response()->json([
+                'status' => false,
+                'message' => "Sorry!!! Order is under processing. Delete all invoices and challans related to this order before performing this action."
+            ]);
+        } 
+        else 
+        {
+            $order_no = $order->order_no;
+            $order->products()->detach();
+            $order->delete();
+            return response()->json([
+                'status' => true,
+                'order' => $order_no,
+                'message' => "Success!!! Order ".$order_no." has been deleted."
+            ]);
+        }
     }
     
     /*

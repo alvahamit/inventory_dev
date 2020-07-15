@@ -20,12 +20,12 @@ class CreateOrdersTable extends Migration
             $table->integer('user_id')->nullable();
             $table->string('customer_name');
             $table->string('customer_company');
-            $table->string('customer_address1');
-            $table->string('customer_address2');
+            $table->text('customer_address');
+            $table->string('customer_contact');
             $table->string('shipp_to_name');
             $table->string('shipp_to_company');
-            $table->string('shipping_address1');
-            $table->string('shipping_address2');
+            $table->text('shipping_address');
+            $table->string('shipping_contact');
             $table->string('quantity_type')->nullable();
             $table->double('order_total',15,2);
             $table->boolean('is_invoiced')->nullable();

@@ -29,8 +29,14 @@ class CustomersController extends Controller
             $q->whereIn('name',['Buyer', 'Customer', 'Client']);
         });
         $data->latest()->first() ? $lastUpdated = $data->latest()->first()->updated_at->diffForHumans() : $lastUpdated = "never";
+        
+        //Get all customers(buyer, client, customer) data:
+        $data = Customer::whereHas('role', function($q){
+            $q->whereIn('name',['Buyer', 'Customer', 'Client']);
+        })->orderBy('id','desc')->get();
+        
         if($request->ajax()){
-            return DataTables::of($data->orderBy('id','desc')->get())
+            return DataTables::of($data)
                     ->addColumn('name', function($row){
                         return '<a href="'.$row->id.'">'.$row->name.'</a>';
                     })
@@ -38,7 +44,8 @@ class CustomersController extends Controller
                         return $row->role->first()->name;
                     })
                     ->addColumn('address_first', function($row){
-                        return $row->addresses()->first()->address;
+                        return $address = $row->addresses()->first()->address;
+                        //return  "No address found.";
                     })
                     ->addColumn('created_at', function($row){
                         return $row->created_at->diffForHumans();
@@ -254,10 +261,27 @@ class CustomersController extends Controller
     public function destroy($id)
     {
         $customer = Customer::findOrFail($id);
-        $customer->addresses()->detach();
-        $customer->contacts()->detach();
-        $customer->delete();
-        return response()->json(['message' => 'Customer '.$customer->name.' removed.' ]);
+        $name = $customer->name;
+        $company = $customer->organization;
+        if($customer->orders()->count() == 0)
+        {
+            $customer->addresses()->detach();
+            $customer->contacts()->detach();
+            $customer->delete();
+            //return response()->json(['message' => 'Customer '.$customer->name.' removed.' ]);
+            return response()->json([
+                'status'=> true,
+                'message' => "Success!!! Customer, ".$name." of ".$company.", has been deleted."
+            ]);
+        }
+        else
+        {
+            return response()->json([
+                'status' => false,
+                'message' => "Sorry!!! ".$name." has orders. Please delete ".$name."'s orders first."
+            ]);
+        }
+        
     }
     
     /*

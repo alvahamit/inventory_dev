@@ -31,60 +31,31 @@
             {{method_field('PATCH')}}
             @csrf
             <div class="form-group">
-                <div class="form-label-group">
-                    <input 
-                        type="text" 
-                        name="name" 
-                        id="name" 
-                        class="form-control" 
-                        placeholder="Country name" 
-                        autofocus="autofocus" 
-                        value="{{old('name', $store->name)}}"
-                        required="required">
-                    <label for="name">Type in store name</label>
-                </div>
+                <label for="name">Store Name:</label>
+                <input type="text" name="name" id="name" class="form-control" autofocus="autofocus" value="{{old('name', $store->name)}}" required="required">
             </div>
             <div class="form-group">
-                <div class="form-label-group">
-                    <input 
-                        type="text" 
-                        name="address" 
-                        id="address" 
-                        class="form-control" 
-                        placeholder="Address" 
-                        value="{{old('address', $store->address)}}"
-                        required="required">
-                    <label for="address">Type in store address</label>
-                </div>
+                <label for="address">Address:</label>
+                <textarea rows="3" class="form-control" name="address" id="address" required="required">{!! old('address', $store->address) !!}</textarea>
             </div>
             <div class="form-group">
-                <div class="form-label-group">
-                    <input 
-                        type="text" 
-                        name="location" 
-                        id="location" 
-                        class="form-control" 
-                        placeholder="Store location" 
-                        value="{{old('location', $store->location)}}"
-                        required="required">
-                    <label for="location">Type in store location</label>
-                </div>
+                <label for="location">Location:</label>
+                <input type="text" name="location" id="location" class="form-control" value="{{old('location', $store->location)}}" required="required">
             </div>
             <div class="form-group">
-                <div class="form-label-group">
-                    <input 
-                        type="tel"
-                        pattern="[0-9]{3}[0-9]{4}[0-9]{4}"
-                        name="contact_no" 
-                        id="contact_no" 
-                        class="form-control" 
-                        placeholder="Store contact" 
-                        value="{{old('contact_no', $store->contact_no)}}"
-                        required="required">
-                    <label for="contact_no">Type a contact no. for the store</label>
-                    <small>Format: 017XXXXXXXX</small>
-                </div>
+                <label for="contact_no">Contact No:</label>
+                <input type="tel"
+                    pattern="[0-9]{3}[0-9]{4}[0-9]{4}"
+                    name="contact_no" 
+                    id="contact_no" 
+                    class="form-control" 
+                    value="{{old('contact_no', $store->contact_no)}}"
+                    required="required">
+                <small>Format: 017XXXXXXXX</small>
             </div>
+            
+
+
             <!--Buttons with separate form for delete-->
             <div class="form-group">
                 <div class="form-row">

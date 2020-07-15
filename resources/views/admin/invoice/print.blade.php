@@ -23,12 +23,14 @@
         <div class="row col-12">
             <div class="col-6">
                 <strong>Invoiced By:</strong><br>
-                {{$invoice->invoiced_by}}<br>
+                {!! nl2br($invoice->invoiced_by) !!}
+                <br>
 
             </div>
             <div class="col-6 offset-6 text-right">
                 <strong>Billed to:</strong><br>
-                {{$invoice->billed_to}}<br>
+                {!! nl2br($invoice->billed_to) !!}
+                <br>
             </div>
         </div>
         <div class="row col-12">

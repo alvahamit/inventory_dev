@@ -16,12 +16,12 @@ class Order extends Model
             'user_id',
             'customer_name',
             'customer_company',
-            'customer_address1',
-            'customer_address2',
+            'customer_address',
+            'customer_contact',
             'shipp_to_name',
             'shipp_to_company',
-            'shipping_address1',
-            'shipping_address2',
+            'shipping_address',
+            'shipping_contact',
             'quantity_type',
             'order_total',
             'is_invoiced',
@@ -56,6 +56,14 @@ class Order extends Model
      */
     public function isInvoiced(){
         return count($this->invoices) > 0 ? true : false;
+    }
+    
+    /*
+     * Check if sales challan is issued.
+     * returns true or false
+     */
+    public function issuedChallan(){
+        return count($this->challans) > 0 ? true : false;
     }
     
     /*

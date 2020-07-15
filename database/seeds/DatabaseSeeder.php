@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
         $this->call(AddressesTableSeeder::class);
         $this->call(ContactsTableSeeder::class);
         $this->call(PurchasesTableSeeder::class);
-        $this->call(MoneyReceiptsTableSeeder::class);
+        //$this->call(MoneyReceiptsTableSeeder::class);
         //Pivot table seeders
         $this->call(PackingsTableSeeder::class);
         $this->call(CategoryProductTableSeeder::class);

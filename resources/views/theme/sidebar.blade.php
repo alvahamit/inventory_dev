@@ -23,7 +23,7 @@
 
     <!-- Heading -->
     <div class="sidebar-heading">
-        Configuration
+        Settings
     </div>
 
     <!-- Nav Item - Users Collapse Menu -->
@@ -78,7 +78,7 @@
 
     <!-- Heading -->
     <div class="sidebar-heading">
-        Application
+        Buy and Sell
     </div>
 
     <!-- Nav Item - Purchase Collapse Menu -->
@@ -138,23 +138,27 @@
                 <h6 class="collapse-header">Transfer Stock:</h6>
                 <a class="collapse-item" href="{{route('transfer.challan.create')}}">Transfer Stock</a>
                 <a class="collapse-item" href="{{route('transfer.challan.index')}}">Transfer Records</a>
+                <div class="collapse-divider"></div>
+                <h6 class="collapse-header">Stock-out (other):</h6>
+                <a class="collapse-item" href="{{route('home')}}">Sampling</a>
+                <a class="collapse-item" href="{{route('home')}}">Wastage</a>
             </div>
         </div>
     </li>
 
     <!-- Nav Item - Charts -->
-    <li class="nav-item">
+<!--    <li class="nav-item">
         <a class="nav-link" href="charts.html">
             <i class="fas fa-fw fa-chart-area"></i>
             <span>Charts</span></a>
-    </li>
+    </li>-->
 
     <!-- Nav Item - Tables -->
-    <li class="nav-item">
+<!--    <li class="nav-item">
         <a class="nav-link" href="tables.html">
             <i class="fas fa-fw fa-table"></i>
             <span>Tables</span></a>
-    </li>
+    </li>-->
 
     <!-- Divider -->
     <hr class="sidebar-divider d-none d-md-block">

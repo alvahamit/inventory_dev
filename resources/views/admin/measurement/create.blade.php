@@ -30,46 +30,17 @@
         <form method="POST" action="{{route('measurements.store')}}" accept-charset="UTF-8">
             @csrf
             <div class="form-group">
-                <div class="form-label-group">
-                    <input 
-                        type="text" 
-                        name="unit" 
-                        id="unit" 
-                        class="form-control" 
-                        placeholder="Unit name" 
-                        autofocus="autofocus" 
-                        value="{{old('unit')}}"
-                        required="required">
-                    <label for="unit">Type in new measure unit name.</label>
-                </div>
+                <label for="unit">Measure Unit Name:</label>
+                <input type="text" name="unit" id="unit" class="form-control" autofocus="autofocus" value="{{old('unit')}}" required="required">
             </div>
             <div class="form-group">
-                <div class="form-label-group">
-                    <input 
-                        type="text" 
-                        name="short" 
-                        id="short" 
-                        class="form-control" 
-                        placeholder="Short code" 
-                        value="{{old('short')}}"
-                        required="required">
-                    <label for="short">Type in a short code of measure unit.</label>
-                </div>
+                <label for="short">Short Code:</label>
+                <input type="text" name="short" id="short" class="form-control" value="{{old('short')}}" required="required">
             </div>
             <div class="form-group">
-                <div class="form-label-group">
-                    <input 
-                        type="text" 
-                        name="used_for" 
-                        id="used_for" 
-                        class="form-control" 
-                        placeholder="Description" 
-                        value="{{old('used_for')}}"
-                        required="required">
-                    <label for="used_for">Type in a what this measure unit is used for.</label>
-                </div>
+                <label for="used_for">Description:</label>
+                <input type="text" name="used_for" id="used_for" class="form-control" value="{{old('used_for')}}" required="required">
             </div>
-            <!--<input class="btn btn-primary btn-block" type="submit" value="Register">-->
             <div class="form-group">
                 <div class="form-row">
                     <div class="col-md-6">

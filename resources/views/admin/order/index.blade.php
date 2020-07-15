@@ -1,8 +1,8 @@
 <!-- 
     Author:     Alvah Amit Halder
-    Document:   Users's Index blade.
-    Model/Data: App\User
-    Controller: UsersController
+    Document:   Orders's Index blade.
+    Model/Data: App\Order
+    Controller: OrdersController
 -->
 
 @extends('theme.default')
@@ -30,7 +30,7 @@
 <!--Add new button-->
 <div class="form-group text-right d-print-none">
     <!--<a class="btn btn-primary right" href="{{route('purchases.create')}}">Add new</a>-->
-    <button id="createNew" class="btn btn-primary col-1 right">New Order</button>
+    <button id="createNew" class="btn btn-primary right">New Order</button>
 </div> 
 <!-- DataTables Example -->
 <div class="card mb-3">
@@ -73,271 +73,209 @@
 <div class="modal mymodal fade bd-example-modal-lg" id="ajaxModel" aria-hidden="true">
     <div class="modal-dialog mymodal-dialog modal-dialog-scrollable modal-lg">
         <div class="modal-content">
-            <!--<button type="button" class="close close-button topright" data-dismiss="modal" aria-hidden="true">×</button>-->
-            <div class="float-right">
-                <button id="xClose" type="button" class="close close-button pr-2 pt-1" aria-label="Close" data-dismiss="modal">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>    
             <div class="modal-header">
                 <h4 class="modal-title" id="modelHeading"></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
-            <div class="modal-body">
-
+            <div class="modal-body mymodal-body">
+                
+                <!--Order Form-->
                 <form id="orderForm" name="orderForm" class="form-horizontal" autocomplete="off">
                     <div id="form-errors" class="alert alert-warning"></div>
                     @csrf
                     <!--hidden id input-->
                     <input type="hidden" name="id" id="id">
+                    
                     <!-- form-group -->
                     <div class="form-group">
                         <div class="form-row">
-                            <div class="col-md-6">
-                                <div class="form-label-group">
-                                    <input type="text" 
-                                           name="order_no"
-                                           id="order_no" 
-                                           class="form-control" 
-                                           placeholder="Order no." 
-                                           autofocus="autofocus"
-                                           value="{{old('order_no')}}">
-                                    <label for="order_no">Order Number...</label>
-                                </div>
+                            <div class="col-md-3">
+                                <label for="order_no">Order Number:</label>
+                                <input type="text" name="order_no" id="order_no" class="form-control" autofocus="autofocus" value="{{old('order_no')}}">
                             </div>
-                            <div class="col-md-6">
-                                <div class="form-label-group">
-                                    <input type="date"
-                                           name="order_date"
-                                           id="order_date" 
-                                           class="form-control"
-                                           placeholder="order_date"
-                                           value="{{old('order_date')}}">
-                                    <label for="order_date">Order Date</label>
-                                </div>
+                            <div class="col-md-3 offset-md-6">
+                                <label for="order_date">Order Date:</label>
+                                <input type="date" name="order_date" id="order_date" class="form-control" value="{{old('order_date')}}">
                             </div>
                         </div>
                     </div>
                     <!-- ./form-group -->
-
-                    <!-- form-group -->
-                    <div class="form-group">
-                        <div class="form-row">
-                            <div class="col-md-6">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="modelHeading">Billing Address</h5>
-                                </div>
-                                <div class="form-group">
-                                    <div class="pt-1">
-                                        <div class="checkbox">
-                                            <label><input id="select-customer" name="select-customer" type="checkbox" value="1"> Select customer form list</label>
+                    
+                    <!--Accordion-->
+                    <div class="accordion pb-3" id="accordionExample">
+                        <!--Card of General Information-->
+                        <div class="card">
+                            <div class="card-header" id="headingOne">
+                                <h2 class="mb-0">
+                                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                        Order Addresses:
+                                    </button>
+                                </h2>
+                            </div> <!--#/headingOne--> 
+                            <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
+                                <div class="card-body">
+                                    <div class="container">
+                                        <!-- form-group -->
+                                        <div class="form-group">
+                                            <div class="form-row">
+                                                <div class="col-md-6">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="modelHeading">Billing Address</h5>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <div class="pt-1">
+                                                            <div class="checkbox">
+                                                                <label><input id="select-customer" name="select-customer" type="checkbox" value="1"> Select customer form list</label>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <fieldset id="select-customer-fieldset" style="display: none" disabled="disabled"> <!-- select-customer-fieldset -->
+                                                            <label for="user_id">Customer's Name:</label>
+                                                            <select name="user_id" id="user_id" class="custom-select">
+                                                                <option value="">Select customer...</option>
+                                                            </select>
+                                                            <div class="pt-1">
+                                                                <label for="select_customer_company">Company:</label>
+                                                                <input type="text" name="select_customer_company" id="select_customer_company" 
+                                                                       class="form-control" value="{{old('select_customer_company')}}">
+                                                            </div>
+                                                            <div class="pt-1">
+                                                                <label for="select_customer_address">Address:</label>
+                                                                <textarea type="text" name="select_customer_address" id="select_customer_address" 
+                                                                          class="form-control" rows="3">{!! old('select_customer_address') !!}</textarea>
+                                                            </div>
+                                                            <div class="pt-1">
+                                                                <label for="select_customer_contact">Contact no:</label>
+                                                                <input type="text" name="select_customer_contact" id="select_customer_contact" 
+                                                                       class="form-control" value="{{old('select_customer_contact')}}">
+                                                            </div>
+                                                        </fieldset> <!-- #/select-customer-fieldset -->
+                                                        
+                                                        <fieldset id="new-customer-fieldset"> <!-- #new-customer-fieldset -->
+                                                            <div class="pt-1">
+                                                                <label for="customer_name">Customer Name:</label>
+                                                                <input type="text" name="customer_name" id="customer_name" class="form-control" value="{{old('customer_name')}}">
+                                                            </div>
+                                                            <div class="pt-1">
+                                                                <label for="customer_company">Company:</label>
+                                                                <input type="text" name="customer_company" id="customer_company" class="form-control" value="{{old('customer_company')}}">
+                                                            </div>
+                                                            <div class="pt-1">
+                                                                <label for="customer_address">Address:</label>
+                                                                <textarea type="text" name="customer_address" id="customer_address" class="form-control" 
+                                                                          rows="3">{!! old('customer_address') !!}</textarea>
+                                                            </div>
+                                                            <div class="pt-1">
+                                                                <label for="contact_no">Contact no:</label>
+                                                                <input type="tel" name="contact_no" id="contact_no" class="form-control" value="{{old('contact_no')}}">
+                                                            </div>
+                                                        </fieldset> <!-- #/new-customer-fieldset -->
+                                                        
+                                                    </div> <!-- ./form-group -->
+                                                </div> <!-- ./col-md-6 -->
+                                                <div class="col-md-6">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="modelHeading">Shipping Address</h5>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <div class="pt-1">
+                                                            <div class="checkbox">
+                                                                <label><input id="same_address" name="same_address" type="checkbox" value="1" checked="true"> Same as billing</label>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <fieldset id="shipping-address" disabled="true"> <!--#shipping-address fieldset-->
+                                                            <div class="pt-1">
+                                                                <label for="customer_name_shipping">Receiver's Name:</label>
+                                                                <input type="text" name="customer_name_shipping" id="customer_name_shipping" 
+                                                                       class="form-control" value="{{old('customer_name_shipping')}}">
+                                                            </div>
+                                                            <div class="pt-1">
+                                                                <label for="shipping_company">Company:</label>
+                                                                <input type="text" name="shipping_company" id="shipping_company" 
+                                                                       class="form-control" value="{{old('shipping_company')}}">
+                                                            </div>
+                                                            <div class="pt-1">
+                                                                <label for="shipping_address">Address:</label>
+                                                                <textarea type="text" name="shipping_address" id="shipping_address" class="form-control" 
+                                                                          rows="3"value="">{!! old('shipping_address') !!}</textarea>
+                                                            </div>
+                                                            <div class="pt-1">
+                                                                <label for="shipping_address2">Contact no:</label>
+                                                                <input type="tel" name="shipping_contact" id="shipping_contact" 
+                                                                       class="form-control" value="{{old('shipping_contact')}}">
+                                                            </div>
+                                                        </fieldset> <!--#/shipping-address fieldset-->
+                                                        
+                                                    </div> <!--./form-group-->
+                                                </div> <!-- ./col-md-6 -->
+                                            </div> <!-- ./form-row -->
+                                        </div> <!-- ./form-group -->
+                                    </div> <!--./container-->                    
+                                </div> <!--./card-body-->
+                            </div> <!--#/collapseOne-->
+                        </div> <!--./card--> 
+                        <!--Card of Order Items-->
+                        <div class="card">
+                            <div class="card-header" id="headingTwo">
+                                <h2 class="mb-0">
+                                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                                        Order Items:
+                                    </button>
+                                </h2>
+                            </div> <!--#/headingTwo--> 
+                            <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
+                                <div class="card-body">
+                                    <div class="form-group"> <!-- form-group -->
+                                        <!--Unit chooser-->
+                                        <div class="form-row pb-3">
+                                            <label class="col-form-label col-form-label-sm" for="quantity_type">Quantity Type: </label>
+                                            <select id="quantity_type" name="quantity_type" class="custom-select custom-select-sm col-md-3">
+                                                <option value="">Wholesale Packing</option>
+                                                <option value="pcs">Retail Unit/Pcs</option>
+                                                <option value="weight">Weight/Volume</option>
+                                            </select>
                                         </div>
-                                    </div>
-                                    <fieldset id="select-customer-fieldset" style="display: none" disabled="disabled">
-                                        <select name="user_id" id="user_id" class="form-control">
-                                            <option value="">Select Customer...</option>
-                                        </select>
-                                        <div class="pt-1">
-                                            <div class="form-label-group">
-                                                <input type="text" 
-                                                       name="select_customer_company"
-                                                       id="select_customer_company" 
-                                                       class="form-control" 
-                                                       placeholder="Customer company" 
-                                                       value="{{old('select_customer_company')}}">
-                                                <label for="select_customer_company">Company name...</label>
-                                            </div>
-                                        </div>
-                                        <div class="pt-1">
-                                            <div class="form-label-group">
-                                                <input type="text" 
-                                                       name="select_customer_address"
-                                                       id="select_customer_address" 
-                                                       class="form-control" 
-                                                       placeholder="Customer address" 
-                                                       value="{{old('select_customer_address')}}">
-                                                <label for="select_customer_address">Customer address...</label>
-                                            </div>
-                                        </div>
-                                        <div class="pt-1">
-                                            <div class="form-label-group">
-                                                <input type="text" 
-                                                       name="select_customer_address2"
-                                                       id="select_customer_address2" 
-                                                       class="form-control" 
-                                                       placeholder="Customer address line 2" 
-                                                       value="{{old('select_customer_address2')}}">
-                                                <label for="select_customer_address2">Address line 2...</label>
-                                            </div>
-                                        </div>
-                                    </fieldset> <!-- #/select-customer-fieldset -->
-
-                                    <fieldset id="new-customer-fieldset">
-                                        <div class="pt-1">
-                                            <div class="form-label-group">
-                                                <input type="text" 
-                                                       name="customer_name"
-                                                       id="customer_name" 
-                                                       class="form-control" 
-                                                       placeholder="Customer name" 
-                                                       value="{{old('customer_name')}}">
-                                                <label for="customer_name">Customer name...</label>
-                                            </div>
-                                        </div>
-                                        <div class="pt-1">
-                                            <div class="form-label-group">
-                                                <input type="text" 
-                                                       name="customer_company"
-                                                       id="customer_company" 
-                                                       class="form-control" 
-                                                       placeholder="Customer company" 
-                                                       value="{{old('customer_company')}}">
-                                                <label for="customer_company">Company name...</label>
-                                            </div>
-                                        </div>
-                                        <div class="pt-1">
-                                            <div class="form-label-group">
-                                                <input type="text" 
-                                                       name="customer_address"
-                                                       id="customer_address" 
-                                                       class="form-control" 
-                                                       placeholder="Customer address" 
-                                                       value="{{old('customer_address')}}">
-                                                <label for="customer_address">Customer address...</label>
-                                            </div>
-                                        </div>
-                                        <div class="pt-1">
-                                            <div class="form-label-group">
-                                                <input type="text" 
-                                                       name="customer_address2"
-                                                       id="customer_address2" 
-                                                       class="form-control" 
-                                                       placeholder="Customer address line 2" 
-                                                       value="{{old('customer_address2')}}">
-                                                <label for="customer_address2">Address line 2...</label>
-                                            </div>
-                                        </div>
-                                        <div class="pt-1">
-                                            <div class="checkbox">
-                                                <label><input id="add_customer" name="add_customer" type="checkbox" value="1"> Add to customer list</label>
-                                            </div>
-                                        </div>
-                                    </fieldset> <!-- #/new-customer-fieldset -->
-
-                                </div> <!-- ,/form-group -->
-                            </div> <!-- ./col-md-6 -->
-                            <div class="col-md-6">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="modelHeading">Shipping Address</h5>
-                                </div>
-                                <div class="form-group">
-                                    <div class="pt-1">
-                                        <div class="checkbox">
-                                            <label><input id="same_address" name="same_address" type="checkbox" value="1" checked="true"> Same as billing</label>
-                                        </div>
-                                    </div>
-                                    <fieldset id="shipping-address" disabled="true">
-                                        <div class="pt-1">
-                                            <div class="form-label-group">
-                                                <input type="text" 
-                                                       name="customer_name_shipping"
-                                                       id="customer_name_shipping" 
-                                                       class="form-control" 
-                                                       placeholder="Customer name for shipping" 
-                                                       value="{{old('customer_name_shipping')}}">
-                                                <label for="customer_name_shipping">Name...</label>
-                                            </div>
-                                        </div>
-                                        <div class="pt-1">
-                                            <div class="form-label-group">
-                                                <input type="text" 
-                                                       name="shipping_company"
-                                                       id="shipping_company" 
-                                                       class="form-control" 
-                                                       placeholder="Shipping company" 
-
-                                                       value="{{old('shipping_company')}}">
-                                                <label for="shipping_company">Company...</label>
-                                            </div>
-                                        </div>
-                                        <div class="pt-1">
-                                            <div class="form-label-group">
-                                                <input type="text" 
-                                                       name="shipping_address"
-                                                       id="shipping_address" 
-                                                       class="form-control" 
-                                                       placeholder="Shipping address" 
-                                                       value="{{old('shipping_address')}}">
-                                                <label for="shipping_address">Address line 1...</label>
-                                            </div>
-                                        </div>
-                                        <div class="pt-1">
-                                            <div class="form-label-group">
-                                                <input type="text" 
-                                                       name="shipping_address2"
-                                                       id="shipping_address2" 
-                                                       class="form-control" 
-                                                       placeholder="Shipping address line 2" 
-                                                       value="{{old('shipping_address2')}}">
-                                                <label for="shipping_address2">Address line 2...</label>
-                                            </div>
-                                        </div>
-                                    </fieldset>
-                                    <!--Unit chooser-->
-                                    <div class="pt-1">
-                                        <label class="col-form-label" for="quantity_type">Quantity Type: </label>
-                                        <select id="quantity_type" name="quantity_type" class="custom-select form-control col-md-5">
-                                            <option value="">Wholesale Packing</option>
-                                            <option value="pcs">Retail Unit/Pcs</option>
-                                            <option value="weight">Weight/Volume</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div> <!-- ./col-md-6 -->
-                        </div> <!-- ./form-row -->
-                    </div>
-                    <!-- ./form-group -->
-
-                    <!-- form-group -->
-                    <div class="form-group">
-                        <div class="form-row">
-                            <div class="table-responsive">
-                                <table class="table" id="items">
-                                    <thead>
-                                        <tr>
-                                            <th style="width: 40%">Item &amp; Desc.</th>
-                                            <th style="width: 10%">Quantity</th>
-                                            <th style="width: 20%">Rate</th>
-                                            <th>Item Total</th>
-                                            <th></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr id="summery" style="display: none">
-                                            <td class="emptyrow"></td>
-                                            <td class="emptyrow"></td>
-                                            <td class="emptyrow text-xs-center"><strong>Total</strong></td>
-                                            <td class="emptyrow text-xs-right">
-                                                <input type="number"
-                                                       min="0"
-                                                       id="total"
-                                                       name="total"
-                                                       class="form-control" 
-                                                       placeholder="total" > 
-                                            </td>
-                                            <td class="emptyrow"></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div> <!-- ./table-responsive -->
-                        </div> <!-- ./form-row -->
-                    </div> <!-- ./form-group -->
+                                        <div class="form-row">
+                                            <div class="table-responsive">
+                                                <table class="table" id="items">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="width: 40%">Item &amp; Desc.</th>
+                                                            <th style="width: 10%">Quantity</th>
+                                                            <th style="width: 20%">Rate</th>
+                                                            <th>Item Total</th>
+                                                            <th></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr id="summery" style="display: none">
+                                                            <td class="emptyrow"></td>
+                                                            <td class="emptyrow"></td>
+                                                            <td class="emptyrow text-xs-center"><strong>Total</strong></td>
+                                                            <td class="emptyrow text-xs-right">
+                                                                <input type="number" min="0" id="total" name="total" class="form-control form-control-sm"> 
+                                                            </td>
+                                                            <td class="emptyrow"></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div> <!-- ./table-responsive -->
+                                            <button name="add-row" id="add-row" class="btn btn-sm btn-success float-left"><i class="fas fa-plus"></i> Add Row</button>
+                                        </div> <!-- ./form-row -->
+                                    </div> <!-- ./form-group -->
+                                    
+                                </div> <!--./card-body-->
+                            </div> <!--#/collapseTwo--> 
+                        </div> <!--./card--> 
+                    </div> <!-- /#accordionExample -->
+                    <!--End of Accordion-->
                     <!--Form buttons-->
                     <div class="form-group">
                         <div class="form-row">
-                            <div class="col-md-4">
-                                <button name="add-row" id="add-row" class="btn btn-success form-control">Add Row</button>
-                            </div>
-                            <div class="col-md-4">
+                            <div class="col-md-4 offset-md-2">
                                 <button name="saveBtn" id="saveBtn" type="submit" class="btn btn-primary form-control" value="create-order">Save</button>
                             </div>
                             <div class="col-md-4">
@@ -346,8 +284,7 @@
                         </div>
                     </div>
                     <!--End Form buttons-->
-
-                </form>
+                </form> <!--End Form -->
             </div> <!-- ./modal-body -->
         </div> <!-- ./modal-content -->
     </div> <!-- ./modal-dialog -->
@@ -364,29 +301,18 @@
     .mymodal{
         /*text-align: center;*/
     }
-
-    .close-button {
-        border: none;
-        display: inline-block;
-
-        padding: 8px 16px;
-        vertical-align: middle;
-        overflow: hidden;
-        text-decoration: none;
-        color: inherit;
-        background-color: inherit;
-        text-align: center;
-        cursor: pointer;
-        white-space: nowrap;
+    .mymodal-body{
+        background-color: lightgray;
     }
-
-    .topright {
-        position: absolute;
-        right: 0;
-        top: 0;
-        margin-right: 5px;
-    }
-
+    @media (max-width: 575px) {
+        .mymodal-dialog {
+            max-width: 95%; 
+            width: 95% !important;
+        }
+        label{
+            font-size: 0.8rem;
+        }
+    }  
 </style>
 @stop
 @section('scripts')
@@ -402,10 +328,10 @@ function htmlDecode(data){
     return txt.value;
 }
 
-function fillBillingAddress(customer_name = '', organization = '', address_line_1 = '', address_line_2 = ''){
+function fillBillingAddress(customer_name = '', organization = '', address = '', phone = ''){
     $('#select_customer_company').val(organization);
-    $('#select_customer_address').val(address_line_1);
-    $('#select_customer_address2').val(address_line_2);
+    $('#select_customer_address').val(address);
+    $('#select_customer_contact').val(phone);
 }
 
 function fillShippingAddress(){
@@ -414,12 +340,12 @@ function fillShippingAddress(){
             $('#customer_name_shipping').val($('#user_id option:selected').text());
             $('#shipping_company').val($('#select_customer_company').val());
             $('#shipping_address').val($('#select_customer_address').val());
-            $('#shipping_address2').val($('#select_customer_address2').val());
+            $('#shipping_contact').val($('#select_customer_contact').val());
         } else {
             $('#customer_name_shipping').val($('#customer_name').val());
             $('#shipping_company').val($('#customer_company').val());
             $('#shipping_address').val($('#customer_address').val());
-            $('#shipping_address2').val($('#customer_address2').val());
+            $('#shipping_contact').val($('#contact_no').val());
         }
     } else {
         clearShippingFields();
@@ -430,7 +356,7 @@ function clearShippingFields(){
     $('#customer_name_shipping').val('');
     $('#shipping_company').val('');
     $('#shipping_address').val('');
-    $('#shipping_address2').val('');
+    $('#shipping_contact').val('');
 }
 
 /*
@@ -455,21 +381,46 @@ function subTotal(row_no){
 }
 
 /*
-* Close (modal) function:
-*/
+ * Reset Modal:
+ * Close (modal) function:
+ */
 function closeModal(){
-   $('#orderForm').trigger("reset");
-   //remove all items:
-   $('#items .set').remove();
-   //Set data to blank:
-   $('#id').val('');
-//       $('#ref_no').val('');
-//       $('#receive_date').val('');
-//       $('#user_id').val('');
-//       $('#purchase_type').val('');
-//       $('#total').val('');
-   $('#ajaxModel').modal('hide');
+    $('#form-errors').hide();
+    $('#saveBtn').html('Save');
+    $('#orderForm').trigger("reset");
+    $('#items .set').remove();
+    $('#id').val('');
+    $('#select-customer').removeAttr('checked');
+    $('#same_address').attr('checked','checked');
+    $('#shipping-address').attr('disabled',true);
+    $('#ajaxModel').modal('hide');
 } 
+
+/*
+ * @param {boolean} status
+ * @param {string} message
+ * @returns {String}
+ * Description: This function is used to show page message.
+ */
+function showMsg(status, message)
+{
+    if(status == false)
+    {
+        var html =  '<div class="alert alert-warning alert-dismissible fade show">'+
+                        '<strong>'+ message + '</strong>'+
+                        '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
+                    '</div>'
+        return html;
+    }
+    if(status == true)
+    {
+        var html =  '<div class="alert alert-success alert-dismissible fade show">'+
+                        '<strong>'+ message + '</strong>'+
+                        '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
+                    '</div>'
+        return html;
+    }
+}
 
 
 $(document).ready(function(){
@@ -508,9 +459,6 @@ $(document).ready(function(){
     $.get("{{ route('orders.create') }}", function (data) {
         //var ptype = data.purchase_type;
         var buyers = data.buyers;
-        //            $.each(ptype, function( index, value ) {
-        //                $('#purchase_type').append($("<option></option>").attr('value', value).text(value));
-        //            });
         $.each(buyers, function(index, value) {
             $('#user_id').append($("<option></option>").attr('value', value['id']).text(value['name']));
         });
@@ -553,14 +501,6 @@ $(document).ready(function(){
         fieldsetForNew.show();
         fieldsetForSelect.attr('disabled', 'true');
         fieldsetForSelect.hide();
-    });
-
-
-    /*
-    * xClose icon click event:
-    */
-    $('#xClose').click(function(e){
-        e.preventDefault();
         closeModal();
     });
 
@@ -599,7 +539,7 @@ $(document).ready(function(){
     $('#customer_name').keyup(function(){ fillShippingAddress(); })
     $('#customer_company').keyup(function(){ fillShippingAddress(); })
     $('#customer_address').keyup(function(){ fillShippingAddress(); })
-    $('#customer_address2').keyup(function(){ fillShippingAddress(); })
+    $('#contact_no').keyup(function(){ fillShippingAddress(); })
     /*
      * Customer select on change function:
      */
@@ -607,56 +547,74 @@ $(document).ready(function(){
         var user_id = $(this).val();
         var customer_name = $('#user_id option:selected').text();
         var organization = '';
-        var address_line_1 = '';
-        var address_line_2 = '';
+        var address = '';
+        var phone = '';
         var action = '{{ route("ajax-order.getaddress") }}';
         var method = 'GET';
         $.ajax({
-        data: { "id": user_id },
-                url: action,
-                type: method,
-                dataType: 'json',
-                success: function(data) {
-                //console.log('Success:', data); 
+            data: { "id": user_id },
+            url: action,
+            type: method,
+            dataType: 'json',
+            success: function(data) {
+                console.log('Success:', data); 
                 organization = data['buyer']['organization'];
+
+                var contactArray = [];
+                $.each(data['contacts'], function(index, value){
+                    var ph = data['contacts'][index]['country_code'] +'-' 
+                            + data['contacts'][index]['city_code'] + '-' 
+                            + data['contacts'][index]['number'];
+                    contactArray.push(ph);
+                });
+                phone = contactArray.toString();
+
                 var addressOptions = [];
                 $.each(data['address'], function(index, value){
-                if (data['address'][index]['pivot']['is_primary']){
-                addressOptions.push({ 'text': data['address'][index]['address'], 'value': data['address'][index]['id'] });
-                }
+                    //if (data['address'][index]['pivot']['is_primary']){
+                        //addressOptions.push({ 'text': data['address'][index]['address'], 'value': data['address'][index]['id'] });
+                    //}
+                    addressOptions.push({ 'text': data['address'][index]['address'], 'value': data['address'][index]['id'] });
                 });
                 if (addressOptions.length > 1){
-                bootbox.prompt({
-                title: "Address selector",
-                        message: '<p>Please select an address to use from below:</p>',
-                        inputType: 'radio',
-                        inputOptions: addressOptions,
-                        callback: function (result) {
-                        //console.log(result);
-                        $.each(data['address'], function(index, value){
-                        if (data['address'][index]['id'] == result){
-                        address_line_1 = data['address'][index]['address'];
-                        address_line_2 = data['address'][index]['city'] + ' ' + data['address'][index]['postal_code'];
-                        fillBillingAddress(customer_name, organization, address_line_1, address_line_2);
+                    bootbox.prompt({
+                    title: "Address selector",
+                            message: '<p>Please select an address to use from below:</p>',
+                            inputType: 'radio',
+                            inputOptions: addressOptions,
+                            callback: function (result) {
+                                //console.log(result);
+                                $.each(data['address'], function(index, value){
+                                    if (data['address'][index]['id'] == result){
+                                        address = data['address'][index]['address'] + '\r\n' + data['address'][index]['city'] + ' ' + data['address'][index]['postal_code'];
+                                        fillBillingAddress(customer_name, organization, address, phone);
+                                        fillShippingAddress();
+                                    }
+                                });
+                            }
+                    });
+                } 
+                else 
+                {
+                    $.each(data['address'], function(index, value){
+    //                            if (data['address'][index]['pivot']['is_primary'])
+    //                            {
+    //                                address = data['address'][index]['address'] + '\r\n' + data['address'][index]['city'] + ' ' + data['address'][index]['postal_code'];
+    //                                fillBillingAddress(customer_name, organization, address, phone);
+    //                                fillShippingAddress();
+    //                            }
+                        address = data['address'][index]['address'];
+                        if(data['address'][index]['city'] !== null){ address += '\r\n' + data['address'][index]['city']; }
+                        if(data['address'][index]['postal_code'] !== null){ address += ' '+data['address'][index]['postal_code']; }
+                        fillBillingAddress(customer_name, organization, address, phone);
                         fillShippingAddress();
-                        }
-                        });
-                        }
-                });
-                } else {
-                $.each(data['address'], function(index, value){
-                if (data['address'][index]['pivot']['is_primary']){
-                address_line_1 = data['address'][index]['address'];
-                address_line_2 = data['address'][index]['city'] + ' ' + data['address'][index]['postal_code'];
-                fillBillingAddress(customer_name, organization, address_line_1, address_line_2);
-                fillShippingAddress();
-                }
-                });
+
+                    });
                 }
 
 
-                },
-                error: function(data) { console.log('Error:', data); }
+            },
+            error: function(data) { console.log('Error:', data); }
         });
     //console.log(user_id);
     });
@@ -712,18 +670,16 @@ $(document).ready(function(){
         // Storing HTML code block in a variable
         var html = '<tr id="' + trID + '" class="set">' +
                 '<td>' +
-                '<select name="product_ids[]" class="form-control">' +
-                '<option value="">-- Choose Product --</option>' +
+                '<select name="product_ids[]" class="custom-select custom-select-sm">' +
+                '<option value="">-- Choose product --</option>' +
                 options +
                 '</select>' +
                 '</td>' +
-                '<td><input type="number" min="0" id="qty' + row_no + '" name="quantities[]" class="form-control qty"/></td>' +
-                '<td><input type="number" min="0" id="unit_price' + row_no + '" name="unit_prices[]" class="form-control unit_price"/></td>' +
-                '<td><input type="number" min="0" id="item_total' + row_no + '"  name="item_totals[]" class="form-control item_total"/></td>' +
+                '<td><input type="number" min="0" id="qty' + row_no + '" name="quantities[]" class="form-control form-control-sm qty"/></td>' +
+                '<td><input type="number" min="0" id="unit_price' + row_no + '" name="unit_prices[]" class="form-control form-control-sm unit_price"/></td>' +
+                '<td><input type="number" min="0" id="item_total' + row_no + '"  name="item_totals[]" class="form-control form-control-sm item_total"/></td>' +
                 '<td><button id="remove' + row_no + '" type="button" class="close" data-dismiss="alert">&times;</button></td>' +
                 '</tr>';
-        //$('#items').append(html);  
-        //$('#items').find('tr:last').prev().after(html);
         $('#summery').before(html);
         
         /*
@@ -801,33 +757,37 @@ $(document).ready(function(){
         $('#shipping-address').removeAttr("disabled");
         //Ajax call to save data:
         $.ajax({
-        data: $('#orderForm').serialize(),
-                url: action,
-                type: method,
-                dataType: 'json',
-                success: function (data) {
-                    console.log('Success:', data);
-                    $('#form-errors').hide();
-                    $('#orderForm').trigger("reset");
-                    $('#saveBtn').html('Save');
-                    $('#shipping-address').attr("disabled", "disabled");
+            data: $('#orderForm').serialize(),
+            url: action,
+            type: method,
+            dataType: 'json',
+            success: function (data) {
+                console.log('Success:', data);
+                if($('#select-customer').prop('checked')==false){ 
+                    closeModal();
+                    location.reload(true); 
+                } else {
                     closeModal();
                     $('#dataTable').DataTable().ajax.reload();
-                },
-                error: function (data) {
-                    console.log('Error:', data);    
-                    var errors = data.responseJSON.errors;
-                    var firstItem = Object.keys(errors)[0];
-                    var firstItemErrorMsg = errors[firstItem][0];
-                    //Set Error Messages:
-                    $('#form-errors').html('<strong>Attention!!!</strong> ' + firstItemErrorMsg);
-                    $('#form-errors').show();
-                    //Change button text.
-                    $('#saveBtn').html('Save');
-                    $('#shipping-address').attr("disabled", "disabled");
                 }
+            },
+            error: function (data) {
+                console.log('Error:', data);    
+                var errors = data.responseJSON.errors;
+                var firstItem = Object.keys(errors)[0];
+                var firstItemErrorMsg = errors[firstItem][0];
+                //Set Error Messages:
+                $('#form-errors').html('<strong>Attention!!!</strong> ' + firstItemErrorMsg);
+                $('#form-errors').show();
+                //Change button text.
+                $('#saveBtn').html('Save');
+                $('#shipping-address').attr("disabled", "disabled");
+                //$(window).scrollTo(0);
+                //$('#orderForm').scrollTop(0);
+                //$('.modal').animate({scrollTop : '0px'}, 0);
+                $('#order_no').trigger('focus');
+            }
         }); // Ajax call
-        
     });
 
 
@@ -868,6 +828,8 @@ $(document).ready(function(){
                                 $('#closeBtn').html('Delete');
                                 $('#ajaxModel').modal('hide');
                                 $('#dataTable').DataTable().ajax.reload();
+                                //Page message:
+                                $('#pageMsg').html(showMsg(data.status, data.message));
                             },
                             error: function (data) {
                                 //Change button text.
@@ -912,15 +874,16 @@ $(document).ready(function(){
                 $('#id').val(data.order.id);
                 $('#order_no').val(data.order.order_no);
                 $('#order_date').val(data.order.unformated_order_date);
-                $('#customer_name').val(data.order.customer_name);
-                $('#customer_company').val(data.order.customer_company);
-                $('#customer_address').val(data.order.customer_address1);
-                $('#customer_address2').val(data.order.customer_address2);
+                $('#user_id').val(data.order.user_id).attr('selected', 'selected');
+                $('#select_customer_company').val(data.order.customer_company);
+                $('#select_customer_address').val(data.order.customer_address);
+                $('#select_customer_contact').val(data.order.customer_contact);
                 $('#customer_name_shipping').val(data.order.shipp_to_name);
                 $('#shipping_company').val(data.order.shipp_to_company);
-                $('#shipping_address').val(data.order.shipping_address1);
-                $('#shipping_address2').val(data.order.shipping_address2);
+                $('#shipping_address').val(data.order.shipping_address);
+                $('#shipping_contact').val(data.order.shipping_contact);
                 $('#quantity_type').val(data.order.quantity_type).attr('selected', 'selected').trigger('change');
+                //Get ordered products:
                 $.ajax({
                     url: "{{ route('ajax-order.get.product.options') }}",
                     type: "GET",
@@ -945,14 +908,14 @@ $(document).ready(function(){
                             })
                             var html = '<tr id="' + trID + '" class="set">' +
                                 '<td>' +
-                                '<select name="product_ids[]" class="form-control">' +
+                                '<select name="product_ids[]" class="custom-select custom-select-sm">' +
                                 '<option value="">-- Choose Product --</option>' +
                                 options +
                                 '</select>' +
                                 '</td>' +
-                                '<td><input type="number" min="0" id="qty' + row_no + '" name="quantities[]" class="form-control qty" value="'+ value.pivot.quantity +'"/></td>' +
-                                '<td><input type="number" min="0" id="unit_price' + row_no + '" name="unit_prices[]" class="form-control unit_price" value="'+ value.pivot.unit_price +'"/></td>' +
-                                '<td><input type="number" min="0" id="item_total' + row_no + '"  name="item_totals[]" class="form-control item_total" value="'+ value.pivot.item_total +'"/></td>' +
+                                '<td><input type="number" min="0" id="qty' + row_no + '" name="quantities[]" class="form-control form-control-sm qty" value="'+ value.pivot.quantity +'"/></td>' +
+                                '<td><input type="number" min="0" id="unit_price' + row_no + '" name="unit_prices[]" class="form-control form-control-sm unit_price" value="'+ value.pivot.unit_price +'"/></td>' +
+                                '<td><input type="number" min="0" id="item_total' + row_no + '"  name="item_totals[]" class="form-control form-control-sm item_total" value="'+ value.pivot.item_total +'"/></td>' +
                                 '<td><button id="remove' + row_no + '" type="button" class="close" data-dismiss="alert">&times;</button></td>' +
                                 '</tr>';
                             $('#summery').before(html);
@@ -1019,13 +982,13 @@ $(document).ready(function(){
                 console.log(data); 
             }
         });
-
-        $('#select-customer-fieldset').hide();
-        $('#select-customer-fieldset').attr('disabled', 'disabled');
-        $('#new-customer-fieldset').show();
-        $('#new-customer-fieldset').removeAttr('disabled');
-        $('#add_customer').removeAttr('checked');
+        $('#select-customer').attr('checked','checked');
         $('#same_address').removeAttr('checked');
+        $('#select-customer-fieldset').show();
+        $('#select-customer-fieldset').removeAttr('disabled');
+        $('#new-customer-fieldset').hide();
+        $('#new-customer-fieldset').attr('disabled','disabled');
+        //$('#add_customer').removeAttr('checked');
         $('#shipping-address').removeAttr('disabled');
         $('#closeBtn').html("Delete");
         $('#closeBtn').val("delete");
@@ -1076,7 +1039,8 @@ $(document).ready(function(){
                         success: function (data) {
                             console.log(data);
                             $('#dataTable').DataTable().ajax.reload();
-                            alert('Order no. '+data.order+' deleted.');
+                            //Page message:
+                            $('#pageMsg').html(showMsg(data.status, data.message));
                         },
                         error: function (data) {
                             console.log(data);
@@ -1096,9 +1060,7 @@ $(document).ready(function(){
               }
             }
           }) //Confirm Box
-        
     });
-
 
 }); //Document ready function.
 </script>

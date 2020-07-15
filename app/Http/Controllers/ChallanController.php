@@ -211,6 +211,8 @@ class ChallanController extends Controller
             $order = Order::findOrFail($request->order_id);
             if($order->isComplete()){
                 $order->update(['order_status' => 'complete']);
+            } else {
+                $order->update(['order_status' => 'processing']);
             }           
         }
         return response()->json(['success' => 'Challan stored', 'request' => $request->all()]);
@@ -339,7 +341,7 @@ class ChallanController extends Controller
             if($order->isComplete()){
                 $order->update(['order_status' => 'complete']);
             } else {
-                if($order->isInvoiced()){
+                if($order->isInvoiced() OR $order->issuedChalan()){
                     $order->update(['order_status' => 'processing']);
                 } else {
                     $order->update(['order_status' => 'pending']);

@@ -98,7 +98,7 @@ class UsersController extends Controller
         $request->has('is_primary') ? $is_primary = 1 : $is_primary = 0 ;
         $request->has('is_billing') ? $is_billing = 1 : $is_billing = 0 ;
         $request->has('is_shipping') ? $is_shipping = 1 : $is_shipping = 0 ;
-        !empty($request->password) ? $password = Hash::make($request->password) : $password = "" ;
+        !empty($request->password) ? $password = Hash::make($request->password) : $password = Hash::make('password') ;
         //Create user
         $user = User::create([ 
             'name'=> ucwords($request->name), 

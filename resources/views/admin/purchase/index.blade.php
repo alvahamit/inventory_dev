@@ -26,7 +26,7 @@
 <!--Add new button-->
 <div class="form-group text-right d-print-none">
     <!--<a class="btn btn-primary right" href="{{route('purchases.create')}}">Add new</a>-->
-    <button id="createNew" class="btn btn-primary col-1 right">Add new</button>
+    <button id="createNew" class="btn btn-primary right">Add new</button>
 </div> 
 <!-- DataTables Example -->
 <div class="card mb-3">
@@ -69,120 +69,107 @@
 <div class="modal fade bd-example-modal-lg my-modal" id="ajaxModel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable modal-lg my-modal-dialog">
         <div class="modal-content">
-            <!--<button type="button" class="close close-button topright" data-dismiss="modal" aria-hidden="true">×</button>-->
-            <button id="xClose" type="button" class="close close-button topright" aria-label="Close" data-dismiss="modal">
-                <span aria-hidden="true">&times;</span>
-            </button>
             <div class="modal-header">
                 <h4 class="modal-title" id="modelHeading"></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
-            <div class="modal-body">
-                
+            <div class="modal-body mymodal-body">
+                <!--Purchase form-->
                 <form id="purchaseForm" name="purchaseForm" class="form-horizontal">
                     <div id="form-errors" class="alert alert-warning"></div>
                     @csrf
-                    <!--hidden id input-->
-                    <input type="hidden" name="id" id="id">
-                    <!-- form-group -->
-                    <div class="form-group">
-                        <div class="form-row">
-                            <div class="col-md-6">
-                                <div class="form-label-group">
-                                    <input type="text" 
-                                           name="ref_no"
-                                           id="ref_no" 
-                                           class="form-control" 
-                                           placeholder="Reference no." 
-                                           autofocus="autofocus"
-                                           value="{{old('ref_no')}}">
-                                    <label for="ref_no">Purchase reference no#</label>
+                    <!--Card-->
+                    <div class="card">
+                        <div class="card-body">
+                            <!--hidden id input-->
+                            <input type="hidden" name="id" id="id">
+                            <!-- form-group -->
+                            <div class="form-group">
+                                <div class="form-row">
+                                    <div class="col-md-6">
+                                        <label for="ref_no">PO Ref.#</label>
+                                        <input type="text" name="ref_no" id="ref_no" class="form-control" autofocus="autofocus" value="{{old('ref_no')}}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="receive_date">Date:</label>
+                                        <input type="date" name="receive_date" id="receive_date" class="form-control" value="{{old('receive_date')}}">
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="form-label-group">
-                                    <input type="date"
-                                           name="receive_date"
-                                           id="receive_date" 
-                                           class="form-control"
-                                           placeholder="receive_date"
-                                           value="{{old('receive_date')}}">
-                                    <label for="receive_date">Receive Date</label>
+                            <!-- ./form-group -->
+
+                            <!-- form-group -->
+                            <div class="form-group">
+                                <div class="form-row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="user_id">Vendor:</label>
+                                            <select name="user_id" id="user_id" class="custom-select">
+                                                <option value="">Select vendor...</option>
+                                            </select>   
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="purchase_type">Purchase Type:</label>
+                                            <select name="purchase_type" id="purchase_type" class="custom-select">
+                                                <option value="">Select type...</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
+                            <!-- ./form-group -->
                         </div>
                     </div>
-                    <!-- ./form-group -->
-
-                    <!-- form-group -->
-                    <div class="form-group">
-                        <div class="form-row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <select name="user_id"
-                                            id="user_id"
-                                            class="form-control">
-                                        <option value="">Select Supplier...</option>
-                                    </select>   
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <select name="purchase_type"
-                                            id="purchase_type"
-                                            class="form-control">
-                                        <option value="">Purchase Type...</option>
-                                    </select>
-                                </div>
-                            </div>
+                    <!--End Card-->
+                    <!--Card-->
+                    <div class="card">
+                        <div class="card-body">
+                            <!-- form-group -->
+                            <div class="form-group">
+                                <div class="form-row">
+                                    <div class="table-responsive">
+                                        <table class="table" id="items">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width: 30%">Product</th>
+                                                    <th style="width: 10%">Quantity</th>
+                                                    <th style="width: 10%">Unit Price</th>
+                                                    <th>Manufacture Date</th>
+                                                    <th>Expire Date</th>
+                                                    <th>Item Total</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr id="summery" style="display: none">
+                                                    <td class="emptyrow"></td>
+                                                    <td class="emptyrow"></td>
+                                                    <td class="emptyrow"></td>
+                                                    <td class="emptyrow"></td>
+                                                    <td class="emptyrow text-xs-center"><strong>Total</strong></td>
+                                                    <td class="emptyrow text-xs-right">
+                                                        <input type="number" min="0" id="total" name="total" class="form-control form-control-sm"> 
+                                                    </td>
+                                                    <td class="emptyrow"></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div> <!-- ./table-responsive -->
+                                </div> <!-- ./form-row -->
+                            </div> <!-- ./form-group -->
+                            <button name="add-row" id="add-row" class="btn btn-sm btn-success float-left"><i class="fas fa-plus"></i> Add Row</button>
                         </div>
                     </div>
-                    <!-- ./form-group -->
+                    <!--End Card-->
 
-                    <!-- form-group -->
-                    <div class="form-group">
-                        <div class="form-row">
-                            <div class="table-responsive">
-                                <table class="table" id="items">
-                                    <thead>
-                                        <tr>
-                                            <th style="width: 30%">Product</th>
-                                            <th style="width: 10%">Quantity</th>
-                                            <th style="width: 10%">Unit Price</th>
-                                            <th>Manufacture Date</th>
-                                            <th>Expire Date</th>
-                                            <th>Item Total</th>
-                                            <th></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr id="summery" style="display: none">
-                                            <td class="emptyrow"></td>
-                                            <td class="emptyrow"></td>
-                                            <td class="emptyrow"></td>
-                                            <td class="emptyrow"></td>
-                                            <td class="emptyrow text-xs-center"><strong>Total</strong></td>
-                                            <td class="emptyrow text-xs-right">
-                                                <input type="number"
-                                                       min="0"
-                                                       id="total"
-                                                       name="total"
-                                                       class="form-control" 
-                                                       placeholder="total" > 
-                                            </td>
-                                            <td class="emptyrow"></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div> <!-- ./table-responsive -->
-                        </div> <!-- ./form-row -->
-                    </div> <!-- ./form-group -->
                     <!--Form buttons-->
                     <div class="form-group">
                         <div class="form-row">
-                            <div class="col-md-4">
-                                <button name="add-row" id="add-row" class="btn btn-success form-control">Add Row</button>
-                            </div>
-                            <div class="col-md-4">
+                            <div class="col-md-4 offset-md-2">
                                 <button name="saveBtn" id="saveBtn" type="submit" class="btn btn-primary form-control" value="create-purchase">Save</button>
                             </div>
                             <div class="col-md-4">
@@ -191,7 +178,7 @@
                         </div>
                     </div>
                     <!--End Form buttons-->
-                    
+
                 </form>
             </div> <!-- ./modal-body -->
         </div> <!-- ./modal-content -->
@@ -203,31 +190,30 @@
     .my-modal-dialog { 
         max-width: 80%; 
         width: 80%; 
-        display: inline-block; 
     }
-    .my-modal{
+    
+    .mymodal-body{
+        background-color: lightgray;
+    }
+    
+    .mymodal-body .card{
+        margin-bottom: 1rem;
+    }
+    
+    @media (max-width: 575px) {
+        .my-modal-dialog {
+            max-width: 95%; 
+            width: 95% !important;
+        }
+        label{
+            font-size: 0.8rem;
+        }
+    }
+    
+/*    .my-modal{
         text-align: center;
-    }
-    .close-button {
-        border: none;
-        display: inline-block;
-        
-        padding: 8px 16px;
-        vertical-align: middle;
-        overflow: hidden;
-        text-decoration: none;
-        color: inherit;
-        background-color: inherit;
-        text-align: center;
-        cursor: pointer;
-        white-space: nowrap;
-    }
-    .topright {
-        position: absolute;
-        right: 0;
-        top: 0;
-        margin-right: 5px;
-    }
+    }*/
+
     
 </style>
 @stop
@@ -266,6 +252,23 @@
     function subTotal(row_no){
         return $('#qty'+row_no).prop('value')*$('#unit_price'+row_no).prop('value');
     }
+    
+    /*
+    * Close (modal) function:
+    */
+    function closeModal(){
+        $('#purchseForm').trigger("reset");
+        //remove all items:
+        $('#items .set').remove();
+        //Set data to blank:
+        $('#id').val('');
+        $('#ref_no').val('');
+        $('#receive_date').val('');
+        $('#user_id').val('');
+        $('#purchase_type').val('');
+        $('#total').val('');
+        $('#ajaxModel').modal('hide');
+    } 
     
     $(document).ready(function(){
         /*
@@ -371,20 +374,18 @@
             // Storing HTML code block in a variable
             var html = '<tr id="'+trID+'" class="set">'+
                             '<td>'+
-                                '<select name="product_ids[]" class="form-control">'+
+                                '<select name="product_ids[]" class="custom-select custom-select-sm">'+
                                     '<option value="">-- Choose Product --</option>'+
                                      options+
                                 '</select>'+
                             '</td>'+
-                            '<td><input type="number" min="0" id="qty'+row_no+'" name="quantities[]" class="form-control qty"/></td>'+
-                            '<td><input type="number" min="0" id="unit_price'+row_no+'" name="unit_prices[]" class="form-control unit_price"/></td>'+
-                            '<td><input type="date" name="manufacture_dates[]" class="form-control"/></td>'+
-                            '<td><input type="date" name="expire_dates[]" class="form-control"/></td>'+
-                            '<td><input type="number" min="0" id="item_total'+row_no+'"  name="item_totals[]" class="form-control item_total"/></td>'+
+                            '<td><input type="number" min="0" id="qty'+row_no+'" name="quantities[]" class="form-control form-control-sm qty"/></td>'+
+                            '<td><input type="number" min="0" id="unit_price'+row_no+'" name="unit_prices[]" class="form-control form-control-sm unit_price"/></td>'+
+                            '<td><input type="date" name="manufacture_dates[]" class="form-control form-control-sm"/></td>'+
+                            '<td><input type="date" name="expire_dates[]" class="form-control form-control-sm"/></td>'+
+                            '<td><input type="number" min="0" id="item_total'+row_no+'"  name="item_totals[]" class="form-control form-control-sm item_total"/></td>'+
                             '<td><button id="remove'+row_no+'" type="button" class="close" data-dismiss="alert">&times;</button></td>'+
                         '</tr>';
-            //$('#items').append(html);  
-            //$('#items').find('tr:last').prev().after(html);
             $('#summery').before(html);
 
             /*
@@ -488,34 +489,20 @@
             //console.log(action);
        });
 
-        /*
-         * Close (modal) function:
-         */
-        function closeModal(){
-            $('#purchseForm').trigger("reset");
-            //remove all items:
-            $('#items .set').remove();
-            //Set data to blank:
-            $('#id').val('');
-            $('#ref_no').val('');
-            $('#receive_date').val('');
-            $('#user_id').val('');
-            $('#purchase_type').val('');
-            $('#total').val('');
-            $('#ajaxModel').modal('hide');
-        } 
         
         /*
-        * xClose icon click event:
+        * ajaxModel hidden jQuery:
+        * Clear all fields and reset form upon hide.
         */
-        $('#xClose').click(function(e){
+        $('#ajaxModel').on('hidden.bs.modal', function (e) {
             e.preventDefault();
             closeModal();
         });
         
+        
         /*
         * Close button click event: 
-         */
+        */
         $('#closeBtn').click(function(e){
             e.preventDefault();
             if($('#closeBtn').val() == "close-modal"){ 

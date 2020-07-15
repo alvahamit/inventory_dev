@@ -182,8 +182,14 @@ class MoneyReceiptController extends Controller
         //
         $mr = Mr::findOrFail($id);
         $mr_no = $mr->mr_no; 
+        $amount = $mr->amount;
         $mr->delete();
-        return response()->json(['success'=> 'MR deleted','mr_no' => $mr_no]);
+        //return response()->json(['success'=> 'MR deleted','mr_no' => $mr_no]);
+        return response()->json([
+            'status'=> true,
+            'mr_no' => $mr_no,
+            'message' => "Success!!! Money receipt ".$mr_no.", with amount of Tk. ".$amount." has been deleted."
+        ]);
     }
     
     

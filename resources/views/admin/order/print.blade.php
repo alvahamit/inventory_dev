@@ -25,15 +25,15 @@
                 <strong>Customer Address:</strong><br>
                 {{$order->customer_name}}<br>
                 {{$order->customer_company}}<br>
-                {{$order->customer_address1}}<br>
-                {{$order->customer_address2}}<br>
+                {{$order->customer_address}}<br>
+                {{$order->customer_contact}}<br>
             </div>
             <div class="col-6 offset-6 text-right">
                 <strong>Shipping Address:</strong><br>
                 {{$order->shipp_to_name}}<br>
                 {{$order->shipp_to_company}}<br>
-                {{$order->shipping_address1}}<br>
-                {{$order->shipping_address2}}<br>
+                {{$order->shipping_address}}<br>
+                {{$order->shipping_contact}}<br>
             </div>
         </div>
         <div class="row col-12">
