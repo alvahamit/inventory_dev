@@ -1,6 +1,6 @@
 <!-- 
     Author:     Alvah Amit Halder
-    Document:   Delivery challan index blade.
+    Document:   Delivery Challan create blade.
     Model/Data: App\Challan
     Controller: ChallanssController
 -->
@@ -85,7 +85,7 @@
             </div>
         </div>
         <!--Need to write a validation -->
-        <div class="form-row col-md-12">
+        <!--<div class="form-row col-md-12">
             <div class="col-md-6">
                  <div class="form-group">
                      <div class="alert alert-warning p-3">
@@ -94,7 +94,8 @@
                      </div>
                 </div>
             </div>
-        </div>
+        </div>-->
+        <!--Code is written on 6th July 2020-->
         <!--delete after validation write-->
 
 
@@ -162,8 +163,8 @@
 
 <style>
     .my-modal-dialog { 
-        max-width: 30%; 
-        width: 30% !important; 
+        max-width: 40%; 
+        width: 40% !important; 
     }
     .my-modal-body{
         background-color: lightgray;
@@ -291,33 +292,6 @@ $(document).ready(function(){
         }
     }); // Ajax call
     
-    /*
-    * Chalan type selector action 
-    * (May want to remove this code.)
-    */
-//    $('#challan_type').change(function(){
-//        if($(this).val() == 0){
-//            $('#add-for-delivery-challan').attr('hidden', 'hidden');
-//            $('#add-for-transfer-challan :input').each(function(){ $(this).attr('disabled', 'disabled'); })
-//            $('#add-for-transfer-challan').attr('hidden', 'hidden');
-//            $('#add-for-transfer-challan :input').each(function(){ $(this).attr('disabled', 'disabled'); });
-//        }
-//        if($(this).val() == 1){
-//            $('#add-for-delivery-challan').removeAttr('hidden');
-//            $('#add-for-delivery-challan :input').each(function(){ $(this).removeAttr('disabled'); });
-//            $('#add-for-transfer-challan').attr('hidden', 'hidden');
-//            $('#add-for-transfer-challan :input').each(function(){ $(this).attr('disabled', 'disabled'); });
-//        }
-//        if($(this).val() == 2){
-//            $('#add-for-delivery-challan').attr('hidden', 'hidden');
-//            $('#add-for-delivery-challan :input').each(function(){ $(this).attr('disabled','disabled'); });
-//            $('#add-for-transfer-challan').removeAttr('hidden');
-//            $('#add-for-transfer-challan :input').each(function(){ $(this).removeAttr('disabled'); });
-//        }
-//    });
-    
-    
-
     
     /*
     * Edit delivery address button click action 
@@ -332,9 +306,7 @@ $(document).ready(function(){
           $("#delivery_to").prop('disabled', true);		// if enabled, disable
           $('#delivery_to').prop('readonly', true);
         }
-        //$('#delivery_to').removeAttr('disabled');
-        //$('#delivery_to').removeAttr('readonly');
-    })
+    });
     
     /*
      * Clear customer details view area:
@@ -548,7 +520,6 @@ $(document).ready(function(){
     
     $('#closeBtn').click(function(e){
         e.preventDefault();
-        //history.go(-1);
         var route = '{{ route("orders.index") }}' + '/' + $('#order_id').val();
         window.location.href=route;
         return false;
@@ -557,26 +528,24 @@ $(document).ready(function(){
     /*
     * System notification:
      */
-    $('#supply_store').click(function(){
-        bootbox.alert({
-            title: "<span class='text-danger font-weight-bold'>Warning!!! System has limitations:</span>",
-            message: "<span class='text-danger'>Please check for sufficient stock before selecting store.<br>Validation codes are not written yet.</span>",
-            backdrop: true,
-            centerVertical: true,
-            //className: 'bg-danger',
-            //className: 'rubberBand animated',
-            //size: 'lg',
-            animate: true,
-            buttons: {
-                ok: {
-                    label: 'I understand !!!',
-                    className: 'btn-sm btn-danger'
-                }
-            }
-        });
-    });
-    
-    
+//    $('#supply_store').click(function(){
+//        bootbox.alert({
+//            title: "<span class='text-danger font-weight-bold'>Warning!!! System has limitations:</span>",
+//            message: "<span class='text-danger'>Please check for sufficient stock before selecting store.<br>Validation codes are not written yet.</span>",
+//            backdrop: true,
+//            centerVertical: true,
+//            //className: 'bg-danger',
+//            //className: 'rubberBand animated',
+//            //size: 'lg',
+//            animate: true,
+//            buttons: {
+//                ok: {
+//                    label: 'I understand !!!',
+//                    className: 'btn-sm btn-danger'
+//                }
+//            }
+//        });
+//    });
     
 }); //Document ready function.
 </script>

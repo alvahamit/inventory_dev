@@ -92,7 +92,7 @@ class ChallanController extends Controller
     
     
     /**
-     * Display a listing of Transfer Challan.
+     * Transfer Challan Index method.
      *
      * @return \Illuminate\Http\Response
      */

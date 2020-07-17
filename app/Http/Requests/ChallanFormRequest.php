@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Rules\CheckStock;
 
 class ChallanFormRequest extends FormRequest
 {
@@ -25,6 +26,8 @@ class ChallanFormRequest extends FormRequest
     {
         // Check Create or Update
         $this->method() == 'PATCH' ? $challan_no_rules = 'required' : $challan_no_rules = 'required|unique:challans' ;
+        $store = $this->request->get('supply_store');
+        $qty_type = $this->request->get('q_type');
         $rules = [
             'challan_date' => 'required|date',
             'challan_no' => $challan_no_rules,
@@ -45,7 +48,9 @@ class ChallanFormRequest extends FormRequest
             foreach($this->request->get('item_id') as $key => $val)
             {
                 //$rules['item_qty.'.$key] = 'required|not_in:"0"|lte:invoicable_qty.'.$key;
-                $rules['item_qty.'.$key] = 'required|integer|min:1|lte:invoicable_qty.'.$key;
+                //$rules['item_qty.'.$key] = 'required|integer|min:1|lte:invoicable_qty.'.$key;
+                $item_id = $val;
+                $rules['item_qty.'.$key] = ['required', 'integer','min:1','lte:invoicable_qty.'.$key, new CheckStock($store, $qty_type, $item_id)];
             }
         }
         return $rules;

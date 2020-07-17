@@ -138,7 +138,7 @@
             <div class="col-md-12">
                 <details>
                     @if($order->isInvoiced())
-                    <summary>Order has been invoiced.</summary>
+                    <summary>Order has been invoiced. ({{count($order->invoices)}} Invoice/s)</summary>
                     <ul>
                         @foreach($order->invoices as $invoice)
                         @if($invoice->invoice_type == 1)
@@ -157,13 +157,14 @@
                     <summary style="color:red">Order is {{$order->order_status}}.</summary>
                     @else
                     @if($order->order_status == "complete")
-                    <summary style="color:green">Order is {{$order->order_status}}.</summary>
+                    <summary style="color:green">Order is {{$order->order_status}}. ({{count($order->challans)}} Challan/s)</summary>
                     @else
-                    <summary>Order is {{$order->order_status}}.</summary>
+                    <summary>Order is {{$order->order_status}}. ({{count($order->challans)}} Challan/s)</summary>
                     @endif
                     <ul>
-                        <li>{{count($order->invoices)}} invoices issued.</li>
-                        <li>{{count($order->challans)}} challans issued.</li>
+                        @foreach($order->challans as $challan)
+                        <li>Challan Issued on {{$challan->challan_date}} delivered from {{$challan->store_name}}.</li>
+                        @endforeach
                     </ul>
                     @endif
                 </details>
