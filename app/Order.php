@@ -26,6 +26,7 @@ class Order extends Model
             'order_total',
             'is_invoiced',
             'order_status',
+            'order_type',
         ];
     
     /*

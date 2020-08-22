@@ -19,14 +19,14 @@
 <!-- Breadcrumbs-->
 <ol class="breadcrumb">
     <li class="breadcrumb-item">
-        <a href="#">Roles</a>
+        <a href="{{ route('home') }}">Home</a>
     </li>
-    <li class="breadcrumb-item active">Overview</li>
+    <li class="breadcrumb-item active">Roles</li>
 </ol>
 <!--<h3>Hi!! I found following user roles defined:</h3>-->
 <!--Add new button-->
 <div class="form-group text-right">
-    <a class="btn btn-primary right" href="{{route('roles.create')}}">Add new</a>
+    <a class="btn btn-primary right disabled" href="{{route('roles.create')}}">Add new</a>
 </div> 
 <!--Data table-->
 <div class="card mb-3">
@@ -56,7 +56,8 @@
                     @foreach ($roles as $role)
                     <tr>
                         <td>{{$role->id}}</td>
-                        <td><a href="{{route('roles.edit',$role->id)}}">{{$role->name}}</a></td>
+                        <!--<td><a href="{{route('roles.edit',$role->id)}}">{{$role->name}}</a></td>-->
+                        <td>{{$role->name}}</td>
                         <td>{{$role->description}}</td>
                         <td>{{!empty($role->created_at) ? $role->created_at->diffForHumans() : ''}}</td>
                         <td>{{!empty($role->updated_at) ? $role->updated_at->diffForHumans() : ''}}</td>
@@ -66,6 +67,6 @@
             </table>
         </div>
     </div>
-    <div class="card-footer small text-muted">Updated {{now()->format('g:i a l jS F Y')}}</div>
+    <div class="card-footer small text-muted">Updated {{$lastUpdated ?? ""}}</div>
 </div>
 @stop

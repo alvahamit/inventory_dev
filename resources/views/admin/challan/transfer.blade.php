@@ -19,7 +19,7 @@
 <!-- Breadcrumbs-->
 <ol class="breadcrumb">
     <li class="breadcrumb-item">
-        <a href="{{ route('admin.dash') }}">Dashboard</a>
+        <a href="{{ route('home') }}">Home</a>
     </li>
     <li class="breadcrumb-item active">Transfer Challan</li>
 </ol>
@@ -44,7 +44,8 @@
             <div class="form-group col-md-4">
                 <label for="challan_type">Challan Type</label>
                 <select class="custom-select" name="challan_type" id="challan_type">
-                    <option value="2">Transfer Challan</option>
+                    <option value="0">Choose...</option>
+                    <option value="{{config('constants.challan_type.transfer')}}" selected="selected">Challan (Transfer)</option>
                 </select>
             </div>
         </div>
@@ -83,12 +84,6 @@
                         </tr>
                     </thead>
                     <tbody>
-<!--                        <tr>
-                            <td><input type="text" name="item_name[]" id="item_name" class="form-control" readonly="readonly"></td>
-                            <td class="text-center"><input type="text" name="item_unit[]" id="item_unit" class="form-control" readonly="readonly"></td>
-                            <td class="text-center"><input type="text" name="item_qty[]" id="item_qty" class="form-control" readonly="readonly"></td>
-                            <td><button id="remove" type="button" class="close" data-dismiss="alert">&times;</button></td>
-                        </tr>-->
                     </tbody>
                 </table>
             </div> <!-- ./table-responsive -->
@@ -97,9 +92,6 @@
             <div class="form-group col-md-6">
                 <button type="submit" class="btn btn-success form-control" id="saveBtn" value="store">Save</button>
             </div>
-<!--            <div class="form-group col-md-4">
-                <button class="btn btn-danger form-control" id="deleteBtn">Delete</button>
-            </div>-->
             <div class="form-group col-md-6">
                 <button class="btn btn-danger form-control" id="closeBtn">Close</button>
 
@@ -112,8 +104,38 @@
 @section('scripts')
 <!--Script for this page--> 
 <script type="text/javascript">
+/*
+* @param {boolean} status
+* @param {string} message
+* @returns {String}
+* Description: This function is used to show page message.
+*/
+function showMsg(status, message)
+{
+    if(status == false)
+    {
+        var html =  '<div class="alert alert-warning alert-dismissible fade show">'+
+                        '<strong>'+ message + '</strong>'+
+                        '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
+                    '</div>'
+        return html;
+    }
+    if(status == true)
+    {
+        var html =  '<div class="alert alert-success alert-dismissible fade show">'+
+                        '<strong>'+ message + '</strong>'+
+                        '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
+                    '</div>'
+        return html;
+    }
+}
 $(document).ready(function(){
     $('#form-errors').hide();
+    
+    $.get("{{ route('get.challan.ref') }}", function (data) {
+        $('#challan_no').val(data);
+    });
+    
     /*
     * Get Stock data to fill form.
     * Disable selected from "To Store"
@@ -199,7 +221,6 @@ $(document).ready(function(){
            method = 'PATCH';
            action = '{{ route("challans.index") }}' + '/' + $('#id').val();
        }
-
        //Ajax call to save data:
        $.ajax({
        data: $('#challanForm').serialize(),
@@ -212,7 +233,8 @@ $(document).ready(function(){
                    $('#challanForm').trigger("reset");
                    $('#items .set').remove();
                    $('#saveBtn').html('Save');
-                   //history.go(-1);
+                   $('#pageMsg').html(showMsg(data.status, data.message));
+                   $("html, body").animate({ scrollTop: 0 }, 1000);
                },
                error: function (data) {
                    console.log('Error:', data);    

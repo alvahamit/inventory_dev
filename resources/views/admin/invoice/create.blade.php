@@ -11,7 +11,26 @@
 
 @section('logo', __('VSF Distribution'))
 
-@section('pageheading', __('Create Invoice'))
+@php
+    switch ($order->order_type)
+    {
+        case config('constants.order_type.sales'):
+            $type = 'Sales';
+            $type_val = config('constants.order_type.sales');
+            break;
+        case config('constants.order_type.sample'):
+            $type = 'Sample';
+            $type_val = config('constants.order_type.sample');
+            break;
+        default:
+            $type = 'Sales';
+            $type_val = config('constants.order_type.sales');
+    }
+@endphp
+
+@section('pageheading')
+Create Invoice ({{$type}})
+@stop
 
 @section('footer', __('Copyright © Alvah Amit Halder 2019'))
 
@@ -24,6 +43,7 @@
         <input type="hidden" name="id" id="id">
         <input type="hidden" name="q_type" id="q_type">
         <input type="hidden" name="order_id" id="order_id" value="{{$order->id}}">
+        <input type="hidden" name="order_type" id="order_type" value="{{$order->order_type}}">
         <input type="hidden" name="customer_id" id="customer_id" value="{{$order->user_id}}">
         <div class="form-row col-md-12">
             <div class="form-group col-md-3">
@@ -37,26 +57,37 @@
         </div>
         <div class="form-row col-md-12">
             <div class="form-group col-md-3">
+                @if($order->order_type == config('constants.order_type.sales'))
                 <label for="order_no">Order No.:</label>
+                @endif
+                @if($order->order_type == config('constants.order_type.sample'))
+                <label for="order_no">Request No.:</label>
+                @endif
                 <input type="text" name="order_no" id="order_no" class="form-control form-control-sm" readonly="readonly">
             </div>
             <div class="form-group col-md-3 offset-md-6">
                 <label for="invoice_type">Invoice Type:</label>
                 <select class="custom-select custom-select-sm" name="invoice_type" id="invoice_type">
+                    @if($order->order_type == config('constants.order_type.sales'))
+                    <option value="0">Choose...</option>
+                    <option value="{{config('constants.invoice_type.whole')}}" selected="selected">Whole</option>
+                    <option value="{{config('constants.invoice_type.partial')}}">Partial</option>
+                    @endif
+                    @if($order->order_type == config('constants.order_type.sample'))
                     <option value="0" selected>Choose...</option>
-                    <option value="1">Whole</option>
-                    <option value="2">Partial</option>
+                    <option value="{{config('constants.invoice_type.sample')}}" selected="selected">Sample</option>
+                    @endif
                 </select>
             </div>
         </div>
         <div class="form-row col-md-12">
             <div class="form-group col-md-6">
                 <label for="invoiced_by">Invoiced By:</label>
-                <textarea rows = "4" class="form-control form-control-sm" name = "invoiced_by" id = "invoiced_by" readonly="readonly"></textarea>
+                <textarea rows = "6" class="form-control form-control-sm" name = "invoiced_by" id = "invoiced_by" readonly="readonly">{!! auth()->user()->name!!}&#13;&#10;{!!config('constants.default_address')!!}</textarea>
             </div>
             <div class="form-group col-md-6">
                 <label for="billed_to">Billed To:</label>
-                <textarea rows = "4" class="form-control form-control-sm" name = "billed_to" id="billed_to" readonly="readonly"></textarea>
+                <textarea rows = "6" class="form-control form-control-sm" name = "billed_to" id="billed_to" readonly="readonly"></textarea>
             </div>
         </div>
 
@@ -220,10 +251,12 @@ $(document).ready(function(){
             $('#q_type').val(qt);
             $('#order_id').val(data.order.id);
             $('#order_no').val(data.order.order_no);
-            //$('#invoice_date').val(data.order.unformated_order_date);
-            //$('#billed_to .card-body').html(data.order.customer_name+'<br>'+data.order.customer_company+'<br>'+data.order.customer_address1+'<br>'+data.order.customer_address2);
+            $("#invoice_date").attr('min', data.order.unformated_order_date);
+            $.get("{{ route('get.invoice.ref') }}", function (data) {
+                $('#invoice_no').val(data);
+            });
             $('#billed_to').val(data.order.customer_name+'\n'+data.order.customer_company+'\n'+data.order.customer_address+'\n'+data.order.customer_contact);
-            $('#invoiced_by').val('VSF Distribution\r\n7/1/A Lake Circus\nKolabagan, North Dhanmondi\r\nDhaka 1205');
+            //$('#invoiced_by').val('VSF Distribution\r\n7/1/A Lake Circus\nKolabagan, North Dhanmondi\r\nDhaka 1205');
             $(data.order.products).each(function(index, value){
                 var row_count = $('#items tr').length - 5;
                 var row_no = + row_count + 1;
@@ -353,7 +386,14 @@ $(document).ready(function(){
         e.preventDefault();
         //parent.history.back();
         //location.reload(true);
-        var route = '{{ route("orders.index") }}' + '/' + $('#order_id').val();
+        var sales = {{ config('constants.order_type.sales') }};
+        var sample = {{ config('constants.order_type.sample') }};
+        if( $('#order_type').val() == sales ) {
+            var route = '{{ route("orders.index") }}' + '/' + $('#order_id').val();
+        }
+        if( $('#order_type').val() == sample) {
+            var route = '{{ route("samples.index") }}' + '/' + $('#order_id').val();
+        }
         window.location.href=route;
         //console.log(route);
         return false;

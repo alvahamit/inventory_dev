@@ -37,22 +37,26 @@
             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                 <thead>
                     <tr>
-                        <th>Id</th>
+                        <th>#</th>
                         <th>Name</th>
+                        <th>Username</th>
                         <th>Company</th>
                         <th>Email</th>
                         <th>Role</th>
+                        <th>Active?</th>
                         <th>Created</th>
                         <th>Updated</th>
                     </tr>
                 </thead>
                 <tfoot>
                     <tr>
-                        <th>Id</th>
+                        <th>#</th>
                         <th>Name</th>
+                        <th>Username</th>
                         <th>Company</th>
                         <th>Email</th>
                         <th>Role</th>
+                        <th>Active?</th>
                         <th>Created</th>
                         <th>Updated</th>
                     </tr>
@@ -133,12 +137,27 @@
                                             <div class="form-row">
                                                 <div class="col-md-6">
                                                     <label for="role">User Role:</label>
-                                                    <select class="form-control" name="role" id="role">
-                                                        <option selected="selected" value="">Select role...</option>
+                                                    <!--<select class="form-control" name="role" id="role">-->
+                                                    <select id="role" name="roles[]" class="selectpicker form-control" multiple title="Select roles..." data-selected-text-format="count" data-style="btn-success" data-actions-box="true">
+                                                        <!--<option value="">Select role...</option>-->
                                                         @foreach($roles as $key => $value)
                                                         <option value="{{$key}}">{{$value}}</option>
                                                         @endforeach
                                                     </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!--is_active-->
+                                        <div class="form-group">
+                                            <div class="form-row">
+                                                <div class="col-md-12">
+                                                    <label for="is_active" class="col-form-label text-md-right">{{ __('Is Active?') }}</label>
+                                                    <div class="offset-md-1 col-md-6 form-check form-check-inline">
+                                                        <input type="radio" class="col-md-3" id="yes" name="is_active" value="{{ old('is_active', 1) }}">
+                                                        <label for="yes" class="form-check-label">Yes</label>
+                                                        <input type="radio" class="col-md-3" id="no" name="is_active" value="{{ old('is_active', 0) }}">
+                                                        <label for="no" class="form-check-label">No</label>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -170,7 +189,7 @@
                                                     <label>Address Label: </label>
                                                     <select class="form-control" name="address_label" id="address_label">
                                                         <option selected="selected" value="">Pick a label...</option>
-                                                        @foreach ($address_labels as $key => $value)
+                                                        @foreach (config("constants.labels") as $key => $value)
                                                         <option value="{{ $value }}">{{ ucfirst($value) }}</option>
                                                         @endforeach
                                                     </select>
@@ -273,13 +292,18 @@
                                 <div class="card-header" id="headingThree">
                                     <h2 class="mb-0">
                                         <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                                            Password:
+                                            Username &#38; Password:
                                         </button>
                                     </h2>
                                 </div>
                                 <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample">
                                     <div class="card-body">
-                                        <!-- Contact input group -->
+                                        <!--name input-->
+                                        <div class="form-group">
+                                            <label for="username">Username:</label>
+                                            <input type="text" name="username" id="username" class="form-control" value="{{old('username')}}">
+                                        </div>
+                                        <!-- Password input group -->
                                         <div class="form-group">
                                             <div class="form-row pb-3">
                                                 <div class="col-md-12">
@@ -322,7 +346,7 @@
                                                     <label for="contact_label0">Contact Label:</label>
                                                     <select class="form-control" name="contact_label[]" id="contact_label0">
                                                         <option selected="selected" value="">Select label...</option>
-                                                        @foreach($contact_labels as $key => $value)
+                                                        @foreach(config("constants.labels") as $key => $value)
                                                         <option value="{{$value}}">{{ ucfirst($value) }}</option>
                                                         @endforeach
                                                     </select>
@@ -436,7 +460,7 @@
         $('#country_code').val('').attr('selected','selected');
     }
     
-$(document).ready(function(){
+$(document).ready(function(){  
     /*
      * Initialize Yaira on document table:
      */
@@ -447,15 +471,24 @@ $(document).ready(function(){
             url: "{{ route('users.index') }}"
         },
         columns: [
-            {data:'id', name:'id'},
+            {data:'DT_RowIndex', name:'DT_RowIndex'},
             {data:'name', name:'name'},
+            {data:'username', name:'username'},
             {data:'organization', name:'organization'},
             {data:'email', name:'email'},
             {data:'role', name:'role'},
+            {data:'is_active', name:'is_active'},
             {data:'created_at', name:'created_at'},
             {data:'updated_at', name:'updated_at'},
         ],
-        order:[[0,"desc"]]
+        order:[[1,"asc"]],
+        columnDefs: [
+            {
+                "targets": 6, // Count starts from 0.
+                "className": "text-center",
+                "width": "auto"
+            },
+        ],
     });
     
     /*
@@ -474,7 +507,8 @@ $(document).ready(function(){
         });
         $('#modalForm').trigger("reset");
         $('#addContactBtn').trigger('click');
-    })
+        $('#role').selectpicker("refresh");
+    });
     
     /*
      * addAddressBtn click:
@@ -500,7 +534,7 @@ $(document).ready(function(){
                                 '<label for="contact_label0">Contact Label:</label>'+
                                 '<select class="form-control" name="contact_label[]" id="contact_label'+count+'">'+
                                     '<option selected="selected" value="">Select Label...</option>'+
-                                    '@foreach($contact_labels as $key => $value)'+
+                                    '@foreach(config("constants.labels") as $key => $value)'+
                                     '<option value="{{$value}}">{{ ucfirst($value) }}</option>'+
                                     '@endforeach'+
                                 '</select>'+
@@ -569,7 +603,7 @@ $(document).ready(function(){
                         cache: false,
                         dataType: 'json',
                         success: function(response){
-                                console.log(response);
+                                //console.log(response);
                                 $('#modalForm').trigger("reset");
                                 $('#remAddressBtn').html('Del');
                                 $('#ajaxModel').modal('hide');
@@ -602,15 +636,22 @@ $(document).ready(function(){
     $('#dataTable').on('click', 'a', function (e) {
         var userId = $(this).attr('href');
         $.get('{{ route("users.index") }}' +'/' + userId, function (data) {
-            console.log(data);
+            //console.log(data);
             var addresses = data['user']['addresses'];
             var contacts = data['user']['contacts'];
-            var roleName = 'Undefined';
+            var roleName = '<ul>';
             var contactList;
             //find role name if set:
-            if(data['user']['role'].length>0){
-                roleName = data['user']['role'][0]['name'];
+            if(data['user']['roles'].length>0){
+                //roleName = data['user']['role'][0]['name'];
+                $.each(data['user']['roles'], function(index,value){
+                    //console.log(value['name']);
+                    roleName += '<li>'+value['name']+'</li>';
+                });
+            } else {
+                roleName += '<li>Undefined</li>';
             }
+            roleName += '</ul>';
             //Clear previous data:
             clearViewFields(); 
             //Set new data:
@@ -618,7 +659,7 @@ $(document).ready(function(){
             $('#modelHeading').html(data['user']['name']+'<br><small class="text-muted">'+data['user']['organization']+'</small>');
             $('#displayEmail').html( 
                         '<div class="container">'+
-                            '<span><i class="fas fa-user-tie"></i> '+
+                            '<span><i class="fas fa-user-tie"></i> Assigned Roles:'+
                             roleName+'</span><br>'+
                             '<span><i class="far fa-envelope"></i> '+
                             data['user']['email']+'</span>'+ 
@@ -739,10 +780,18 @@ $(document).ready(function(){
             var addresses = data['user']['addresses'];
             var contacts = data['user']['contacts'];
             $('#name').val(data['user']['name']);
+            $('#username').val(data['user']['username']);
             $('#organization').val(data['user']['organization']);
             if(data['user']['email']){ $('#email').val(data['user']['email']) } ;
-            if(data['user']['role'].length>0){
-                $('#role').val(data['user']['role'][0]['id']).attr('selected','selected');
+            if(data['user']['is_active']){ $("#yes").prop("checked", true); }
+            if(!data['user']['is_active']){ $("#no").prop("checked", true); }
+            //Populate selectpicker: 
+            if(data['user']['roles'].length>0){
+                var roles = [];
+                $.each(data['user']['roles'], function(index,value){
+                    roles.push(value['id']);                   
+                });
+                $('#role').selectpicker('val', roles);
             }
             if(addressId !== ""){ 
                 //console.log(addressId); 
@@ -753,7 +802,10 @@ $(document).ready(function(){
                 });
                 //console.log(selectedAddress); 
                 $('#address_id').val(selectedAddress['id']);
-                if(selectedAddress['label']){$('#address_label').val(selectedAddress['label'].toLowerCase()).attr('selected','selected')};
+                if(selectedAddress['label']){
+                    //$('#address_label').val(selectedAddress['label'].toLowerCase()).attr('selected','selected');
+                    $('#address_label').val(selectedAddress['label']).attr('selected','selected');
+                };
                 selectedAddress['pivot']['is_primary'] ? $('#is_primary').attr('checked', 'checked') : $('#is_primary').removeAttr('checked') ;
                 selectedAddress['pivot']['is_billing'] ? $('#is_billing').attr('checked', 'checked') : $('#is_billing').removeAttr('checked') ;
                 selectedAddress['pivot']['is_shipping'] ? $('#is_shipping').attr('checked', 'checked') : $('#is_shipping').removeAttr('checked') ;
@@ -783,7 +835,7 @@ $(document).ready(function(){
                                             '<label for="contact_label'+count+'">Contact Label:</label>'+
                                             '<select class="form-control" name="contact_label[]" id="contact_label'+count+'">'+
                                                 '<option selected="selected" value="">Select label...</option>'+
-                                                '@foreach($contact_labels as $key => $value)'+
+                                                '@foreach(config("constants.labels") as $key => $value)'+
                                                 '<option value="{{$value}}">{{ ucfirst($value) }}</option>'+
                                                 '@endforeach'+
                                             '</select>'+
@@ -812,9 +864,6 @@ $(document).ready(function(){
                         $('#contact_label'+count).val(value.label).attr('selected','selected');
                 });
             }
-            
-            
-            
             $('#modalForm').show();
         }); //get data.
     }); //Address Edit/Add anchor click
@@ -839,6 +888,10 @@ $(document).ready(function(){
         $('#user_id').val('');
         $('#modelHeading').html("Create New");
         $('#addContactBtn').trigger('click');
+        $('#ajaxModel').modal({
+            backdrop: 'static',
+            keyboard: false
+        });
         $('#ajaxModel').modal('show');
     });
     
@@ -859,16 +912,15 @@ $(document).ready(function(){
         };
         if(actionType == 'update'){ 
             method = 'PATCH';
-            action = '{{ route('users.index') }}' +'/' + $('#user_id').val();
+            action = '{{ route("users.index") }}' +'/' + $('#user_id').val();
         };
-
         $.ajax({
             data: $('#modalForm').serialize(),
             url: action,
             type: method,
             dataType: 'json',
             success: function (data) {
-                console.log('Success:', data);
+                //console.log('Success:', data);
                 $('#modalForm').trigger("reset");
                 $('#saveBtn').html('Save');
                 $('#ajaxModel').modal('hide');
@@ -919,7 +971,7 @@ $(document).ready(function(){
                         type: method,
                         dataType: 'json',
                         success: function (data) {
-                            console.log('Success:', data);
+                            //console.log('Success:', data);
                             $('#modalForm').trigger("reset");
                             $('#deleteBtn').html('Delete');
                             $('#ajaxModel').modal('hide');

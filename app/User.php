@@ -17,7 +17,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'role', 'organization'
+        'name', 'email', 'password', 'role', 'organization','username','is_admin', 'is_active'
     ];
 
     /**
@@ -41,8 +41,8 @@ class User extends Authenticatable
     /*
      * Defining user and role relationship.
      */
-    public function role() {
-        return $this->belongsToMany('App\Role');
+    public function roles() {
+        return $this->belongsToMany('App\Role','role_user');
     }
     
     /*

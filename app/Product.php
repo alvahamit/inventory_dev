@@ -122,7 +122,7 @@ class Product extends Model
          * this formula will give error. That is why ternerary if statement
          * is used to check in value.
          */
-        $in != 0 ? $result=($stockCount/$in)*100 : $result=0;
+        $in != 0 ? $result=($stockCount/900)*100 : $result=0;
         return $result;
     }
    

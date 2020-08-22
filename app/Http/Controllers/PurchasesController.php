@@ -9,7 +9,8 @@ use App\User as Supplier;
 use App\Http\Requests\PurchaseFormRequest;
 use PDF;
 use NumberFormatter;
-
+use Haruncpi\LaravelIdGenerator\IdGenerator;
+use Illuminate\Support\Str;
 
 
 class PurchasesController extends Controller
@@ -31,12 +32,12 @@ class PurchasesController extends Controller
             }
             else
             {
-                $lastUpdated = "00:00:00";
+                $lastUpdated = "never";
             }
         }
         else
         {
-            $lastUpdated = "00:00:00";
+            $lastUpdated = "never";
         }
         //return view with data
         return view('admin.purchase.index',compact('data','lastUpdated'));
@@ -50,7 +51,7 @@ class PurchasesController extends Controller
     public function create()
     {
         //Set a variable for Purchase Type
-        $purchase_types = ['Local', 'Import'];
+        $purchase_types = config('purchase');
         //get all suppliers from users
         $d = Supplier::all();
         foreach ($d as $item) {
@@ -203,6 +204,23 @@ class PurchasesController extends Controller
         //return $pdf->download('purchase.pdf');
         $fileName = 'purchase_'.$purchase->ref_no;
         return $pdf->stream($fileName.'.pdf');
+    }
+    
+    
+    /*
+     * Unique Reference Generator:
+     */
+    public function getUniqueRefNo() {
+        //Generate Unique Reference No:
+        $config = [
+            'table' => 'purchases',
+            'field' => 'ref_no',
+            'length' => 17,
+            'prefix' => 'vsf/'.date('y/m').'/buy-',
+            'reset_on_prefix_change' => true
+        ];
+        $id = IdGenerator::generate($config);
+        return Str::upper($id);
     }
     
     

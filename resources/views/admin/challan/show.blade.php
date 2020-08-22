@@ -11,14 +11,33 @@
 
 @section('logo', __('VSF Distribution'))
 
-@section('pageheading', __('Delivery Challan'))
+@php
+    switch ($challan->challan_type)
+    {
+        case config('constants.challan_type.sales'):
+            $type = 'Sales';
+            break;
+        case config('constants.challan_type.transfer'):
+            $type = 'Transfer';
+            break;
+        case config('constants.challan_type.sample'):
+            $type = 'Sample';
+            break;
+        default:
+            $type = 'Sales';
+    }
+@endphp  
+
+@section('pageheading')
+{{$type}} Challan
+@stop
 
 @section('footer', __('Copyright © Alvah Amit Halder 2019'))
 
 @section('content')
-<div class="tab-pane fade show active" id="challan">
+<!--<div class="tab-pane fade show active" id="challan">-->
+<div class="col-md-8 offset-md-2">
     <input type="hidden" id="challan_id" value="{{$challan->id}}">
-    
     <div class="row">
         <div class="col-md-12">
             <form method="post" action="{{route('print.challan')}}" accept-charset="UTF-8">
@@ -28,15 +47,9 @@
             </form>
         </div>
     </div>
-    
     <h4 class="mt-2 pt-1 pb-2">
         Ref No # {{$challan->challan_no}} 
-        <!--Print challan button-->
-        <!--<a id="printBtn" class="btn btn-warning btn-sm float-right"><i class="fas fa-print fa-lg"></i></a>--> 
-        <!--<a id="pdfBtn" class="btn btn-success btn-sm float-right mr-1"><i class="far fa-file-pdf fa-lg"></i></a>-->
     </h4>
-
-
     <div class="row">
         <div class="col-md-12">
             <div class="row">
@@ -47,18 +60,17 @@
                 <div class="col-xs-12 col-md-6 col-lg-6 float-xs-left float-left text-md-left">
                     <div class="col-md-6 float-left">
                         <strong>Challan by:</strong><br>
-                        VSF Distribution<br>
-                        7/1/A Lake Circus<br>
-                        Kolabagan, North Dhanmondi<br>
-                        Dhaka 1205<br>
+                        @if($challan->issued_by !== null)
+                        {{$challan->issued_by}}<br>
+                        @endif
+                        {!! str_replace('&#13;&#10;','<br>', config('constants.default_address')) !!}<br>
                         From: {{ $challan->store_name }}
                     </div>
                 </div>
                 <div class="col-xs-12 col-md-6 col-lg-6 float-xs-right float-right text-md-right">
                     <div class="col-md-6 float-right">
                         <strong>Deliver to:</strong><br>
-                        {{$challan->customer_name}}<br>
-                        {{$challan->delivery_address}}
+                        {!! nl2br($challan->delivery_address) !!}
                     </div>
                 </div>
             </div>
@@ -100,31 +112,6 @@
 <style>
     .card{margin-top: 10px}
     .card .card-block{padding: 8px}
-    .height {
-        min-height: 200px;
-    }
-
-    .icon {
-        font-size: 47px;
-        color: #5CB85C;
-    }
-
-    .iconbig {
-        font-size: 77px;
-        color: #5CB85C;
-    }
-
-    .table > tbody > tr > .emptyrow {
-        border-top: none;
-    }
-
-    .table > thead > tr > .emptyrow {
-        border-bottom: none;
-    }
-
-    .table > tbody > tr > .highrow {
-        border-top: 3px solid;
-    }
 </style>
 
 @stop

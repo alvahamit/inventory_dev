@@ -34,7 +34,7 @@ class SupplierFormRequest extends FormRequest
             //General fields:
             'name' => 'required',
             'email' => $email_rules,
-            'role' => 'required|exists:roles,id',
+            'roles' => 'required|exists:roles,id',
             'address_label' => 'required',
             'organization' => 'required',
             'address' => 'required',

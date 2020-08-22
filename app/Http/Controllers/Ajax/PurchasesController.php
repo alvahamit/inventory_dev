@@ -17,14 +17,9 @@ class PurchasesController extends Controller {
         if ($request->ajax()) {
             return DataTables::of(Purchase::query())
                 ->addColumn('ref_no', function($row) {
-                    return '<small><a class="text-success" href="' .
-                            route('purchases.show', $row->id) .
-                            '" target="_blank"><i class="fas fa-eye"></i></a> ' .
-                            '<a class="text-warning edit" href="' .
-                            $row->id .
-                            '"><i class="fas fa-edit"></i></a> <a class="text-danger delete" href="'.
-                            $row->id.
-                            '"><i class="fas fa-trash-alt"></i></a></small> ' .
+                    return '<a class="text-success" href="'.route('purchases.show', $row->id).'" target="_blank"><i class="fas fa-eye"></i></a> '.
+                            '<a class="text-warning edit" href="'.$row->id.'"><i class="fas fa-edit"></i></a> '.
+                            '<a class="text-danger delete" href="'.$row->id.'"><i class="fas fa-trash-alt"></i></a> '.
                             strtoupper($row->ref_no);
                 })
                 ->addColumn('receive_date', function($row){
@@ -53,27 +48,13 @@ class PurchasesController extends Controller {
      *
      * @return \Illuminate\Http\Response
      */
-    public function create() {
-
-        //return response()->json(['success' => 'Create method.']);
-        //Set a variable for Purchase Type
-        $purchase_types = ['Local', 'Import'];
-        $suppliers = [];
-        //get all suppliers from users
-        $d = Supplier::all();
-        foreach ($d as $item) {
-            if (count($item->role) != 0) {
-                if ($item->role()->first()->name == 'Exporter' or $item->role()->first()->name == 'Local Supplier') {
-                    $suppliers[] = $item;
-                }
-            }
-        }
-
-        if (!empty($suppliers)) {
-            return response()->json(['suppliers' => $suppliers, 'purchase_type' => $purchase_types]);
-        } else {
-            return response()->json(['error' => 'No supplier registered to system.']);
-        }
+    public function create() 
+    {
+        $ptypes = config('constants.purchase');
+        $suppliers = Supplier::whereHas('roles', function($q) {
+            $q->whereIn('name', [config('constants.roles.supplier'), config('constants.roles.exporter')]);
+        })->where('is_active',true)->get();
+        return response()->json(['ptypes'=>$ptypes, 'suppliers'=>$suppliers]);
     }
 
     /**
@@ -83,7 +64,6 @@ class PurchasesController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function store(PurchaseFormRequest $request) {
-        //return $request->all();
         $purchase = new Purchase();
         $purchase->ref_no = $request->ref_no;
         $purchase->receive_date = $request->receive_date;

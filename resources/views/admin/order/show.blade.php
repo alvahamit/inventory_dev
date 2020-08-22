@@ -19,7 +19,7 @@
 <!-- Breadcrumbs-->
 <ol class="breadcrumb">
     <li class="breadcrumb-item">
-        <a href="{{ route('admin.dash') }}">Dashboard</a>
+        <a href="{{ route('home') }}">Home</a>
     </li>
     <li class="breadcrumb-item active">
         <a href="{{ route('orders.index') }}">Orders</a>
@@ -63,14 +63,14 @@
                         <strong>Billing Address:</strong><br>
                         {{$order->customer_name}}<br>
                         {{$order->customer_company}}<br>
-                        {{$order->customer_address}}<br>
+                        {!! nl2br($order->customer_address) !!}<br>
                         <i class="fas fa-phone-square-alt"></i> {{$order->customer_contact}}<br>
                     </div>
                     <div class="col-xs-12 col-md-6 col-lg-6 float-xs-right float-right text-md-right">
                         <strong>Shipping Address:</strong><br>
                         {{$order->shipp_to_name}}<br>
                         {{$order->shipp_to_company}}<br>
-                        {{$order->shipping_address}}<br>
+                        {!!nl2br($order->shipping_address)!!}<br>
                         <i class="fas fa-phone-square-alt"></i> {{$order->shipping_contact}}<br>
                     </div>
                 </div>
@@ -178,7 +178,7 @@
         <h4 class="mt-2">Issued Invoices</h4>
         <!--Add new button-->
         <div class="form-group text-right">
-            <a class="btn btn-primary right" href="{{route('order.invoice.create',$order->id)}}">New Invoice</a>
+            <a class="btn btn-primary right" href="{{route('create.invoice',$order->id)}}">New Invoice</a>
         </div> 
         <!-- DataTables Example -->
         <div class="card mb-3">

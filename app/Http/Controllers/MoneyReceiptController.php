@@ -21,8 +21,8 @@ class MoneyReceiptController extends Controller
      */
     public function index(Request $request)
     {
-        $customers = Customer::whereHas('role', function($q){
-            $q->whereIn('name',['Buyer', 'Customer', 'Client']); 
+        $customers = Customer::whereHas('roles', function($q){
+            $q->where('name',config('constants.roles.client')); 
         })->orderBy('id','desc')->get();
         $data = Mr::query();
         $data->latest()->first() ? $lastUpdated = $data->latest()->first()->updated_at->diffForHumans() : $lastUpdated = "never";

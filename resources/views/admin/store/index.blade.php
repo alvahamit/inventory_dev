@@ -19,9 +19,9 @@
 <!-- Breadcrumbs-->
 <ol class="breadcrumb">
     <li class="breadcrumb-item">
-        <a href="#">Stores</a>
+        <a href="{{route('home')}}">Home</a>
     </li>
-    <li class="breadcrumb-item active">Overview</li>
+    <li class="breadcrumb-item active">Store</li>
 </ol>
 
 <!--<h1>Hi!! I found following stores:</h1>-->

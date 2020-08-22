@@ -19,13 +19,13 @@
 <!-- Breadcrumbs-->
 <ol class="breadcrumb">
     <li class="breadcrumb-item">
-        <a href="{{ route('admin.dash') }}">Dashboard</a>
+        <a href="{{ route('home') }}">Home</a>
     </li>
     <li class="breadcrumb-item active">Create Product</li>
 </ol>
 <!--<h1>Hi!! you can register new products here.</h1><hr>-->
-
-<form method="POST" action="{{route('products.store')}}" accept-charset="UTF-8">
+<div class="col-md-8 offset-md-2">
+    <form method="POST" action="{{route('products.store')}}" accept-charset="UTF-8">
     @csrf
     <!--card-->
     <div class="card card-register mx-auto mt-5">
@@ -106,8 +106,9 @@
         </div> <!--./card body-->
 
     </div> <!--./card card-register mx-auto mt-5-->
-
 </form>
+</div>
+
 
 @include('includes.display_form_errors')
 

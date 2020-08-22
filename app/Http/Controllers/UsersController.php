@@ -35,19 +35,30 @@ class UsersController extends Controller
      */
     public function index(Request $request)
     {
-        $address_labels = ['work','residence','club','factory','gym', 'school'];
-        $contact_labels = ['cell','work','res','club','factory','whatsapp','emergency'];
         $countries = Country::all();
         $roles = Role::pluck('name','id')->all();
         $users = User::all();
         User::latest()->first() ? $lastUpdated = User::latest()->first()->updated_at->diffForHumans() : $lastUpdated = "never" ;
         if ($request->ajax()){
             $datatable = DataTables::of($users)
+                ->addIndexColumn()
                 ->addColumn('name', function($row) {
                     return '<a href="'.$row->id.'">'.$row->name.'</a>';
                 })
                 ->addColumn('role', function($row) {
-                    return $row->role->count() > 0 ? $row->role->first()->name : '<span style="color:red">Unassigned</span>' ;
+                    if($row->roles->count() > 0){
+                        $array = $row->roles()->pluck('name');
+                        $html= "<ul>";
+                        foreach ($array as $item){
+                            $html .= "<li>".$item."</li>";
+                        }
+                        $html .= "</ul>";
+                        return $html;
+                    }
+                    //return $row->roles->count() > 0 ? $row->roles()->pluck('name') : '<span style="color:red">Unassigned</span>' ;
+                })
+                ->addColumn('is_active', function($row){
+                        return $row->is_active ? '<span class="text-success"><i class="fas fa-check-circle"></i></span>' : '<span class="text-warning"><i class="fas fa-times-circle"></i></span>';
                 })
                 ->addColumn('created_at', function($row) {
                     return $row->created_at->diffForHumans();
@@ -55,12 +66,12 @@ class UsersController extends Controller
                 ->addColumn('updated_at', function($row) {
                     return $row->updated_at->diffForHumans();
                 })
-                ->rawColumns(['name', 'role'])
+                ->rawColumns(['name', 'role','is_active'])
                 ->make(true);
             return $datatable;   
         } 
         if(!empty($users)){
-            return view('admin.user.index', compact('users', 'lastUpdated','address_labels', 'contact_labels', 'countries', 'roles'));
+            return view('admin.user.index', compact('users', 'lastUpdated', 'countries', 'roles'));
         } else {
             return view('errors.404');
         }
@@ -95,21 +106,29 @@ class UsersController extends Controller
      */
     public function store(UsersFormRequest $request)
     {
+        //return response()->json([ $request->all() ]);
         $request->has('is_primary') ? $is_primary = 1 : $is_primary = 0 ;
         $request->has('is_billing') ? $is_billing = 1 : $is_billing = 0 ;
         $request->has('is_shipping') ? $is_shipping = 1 : $is_shipping = 0 ;
         !empty($request->password) ? $password = Hash::make($request->password) : $password = Hash::make('password') ;
         //Create user
         $user = User::create([ 
-            'name'=> ucwords($request->name), 
+            'name'=> ucwords($request->name),
+            'username'=> $request->username,
             'organization' => $request->organization, 
             'email' => $request->email, 
-            'password' => $password 
+            'password' => $password,
+            'is_active' => $request->is_active
         ]);
-        //Find role
-        $role = Role::findOrFail($request->role);
-        //Save role for customer
-        $user->role()->save($role);
+        //Find admin role id:
+        $adminRoleId = Role::whereName(config('constants.roles.admin'))->first()->id;
+        //Attach roles:
+        foreach($request->roles as $role){
+            $user->roles()->attach($role);
+            if($role == $adminRoleId){
+                $user->update(['is_admin' => true]);
+            }
+        }
         //Create address
         $address = Address::create([
             'label' => $request->address_label,
@@ -155,7 +174,7 @@ class UsersController extends Controller
         //Note: Call relations otherwise it will not be available.
         $user->addresses;
         $user->contacts;
-        $user->role;
+        $user->roles;
         return response()->json(['user' => $user]);
     }
 
@@ -211,16 +230,34 @@ class UsersController extends Controller
         if(!empty($request->password)){
             $user->update([
                     'name'=> ucwords($request->name), 
+                    'username'=> $request->username,
                     'organization' => $request->organization, 
-                    'email' => $request->email, 
+                    'email' => $request->email,
+                    'is_active' => $request->is_active,
                     'password' => Hash::make($request->password) 
                 ]);
         } else {
             $user->update([
-                    'name'=> ucwords($request->name), 
+                    'name'=> ucwords($request->name),
+                    'username'=> $request->username,
                     'organization' => $request->organization, 
-                    'email' => $request->email
+                    'email' => $request->email,
+                    'is_active' => $request->is_active
                 ]);
+        }
+        
+        //Find admin role id:
+        $adminRoleId = Role::whereName(config('constants.roles.admin'))->first()->id;
+        //Sync roles:
+        $rolesArray = [];
+        foreach($request->roles as $role){
+            array_push($rolesArray,$role);
+        }
+        $user->roles()->sync($rolesArray);
+        if(in_array($adminRoleId, $rolesArray)){
+            $user->update(['is_admin' => true]);
+        } else {
+            $user->update(['is_admin' => false]);
         }
         
         if(!empty($request->address_id)){
@@ -268,12 +305,7 @@ class UsersController extends Controller
                         'is_shipping' => $is_shipping
                     ]);
         }
-        
-        //Find role
-        $role = Role::findOrFail($request->role);
-        //Sync role for user so only one role is associated: 
-        $user->role()->sync([$role->id]);
-        
+               
         if( $user->contacts->count() > 0 ){
             // Detach old contacts from lookup table.
             // Then delete old contacts.
@@ -308,7 +340,7 @@ class UsersController extends Controller
     {
         //find user by id then delete
         $user = User::findOrFail($id);
-        $user->role()->detach();
+        $user->roles()->detach();
         $user->addresses()->detach();
         $user->contacts()->detach();
         $user->delete();

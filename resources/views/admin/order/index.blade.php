@@ -21,7 +21,7 @@
 <!-- Breadcrumbs-->
 <ol class="breadcrumb">
     <li class="breadcrumb-item">
-        <a href="{{ route('admin.dash') }}">Dashboard</a>
+        <a href="{{ route('home') }}">Home</a>
     </li>
     <li class="breadcrumb-item active">Orders</li>
 </ol>
@@ -477,6 +477,9 @@ $(document).ready(function(){
         $('#form-errors').hide();
         $('#orderForm').trigger("reset");
         $('#modelHeading').html("Create New Order");
+        $.get("{{ route('get.order.ref') }}", function (data) {
+            $('#order_no').val(data);
+        });
         //Setup modal option:
         $('#ajaxModel').modal({
         backdrop: 'static',
@@ -557,9 +560,14 @@ $(document).ready(function(){
             type: method,
             dataType: 'json',
             success: function(data) {
-                console.log('Success:', data); 
+                //Clear fields:
+                clearShippingFields();
+                $('#select_customer_name').val('');
+                $('#select_customer_company').val('');
+                $('#select_customer_address').val('');
+                $('#select_customer_contact').val('');
+                //Set data:
                 organization = data['buyer']['organization'];
-
                 var contactArray = [];
                 $.each(data['contacts'], function(index, value){
                     var ph = data['contacts'][index]['country_code'] +'-' 
@@ -568,48 +576,37 @@ $(document).ready(function(){
                     contactArray.push(ph);
                 });
                 phone = contactArray.toString();
-
                 var addressOptions = [];
                 $.each(data['address'], function(index, value){
-                    //if (data['address'][index]['pivot']['is_primary']){
-                        //addressOptions.push({ 'text': data['address'][index]['address'], 'value': data['address'][index]['id'] });
-                    //}
                     addressOptions.push({ 'text': data['address'][index]['address'], 'value': data['address'][index]['id'] });
                 });
                 if (addressOptions.length > 1){
                     bootbox.prompt({
-                    title: "Address selector",
-                            message: '<p>Please select an address to use from below:</p>',
-                            inputType: 'radio',
-                            inputOptions: addressOptions,
-                            callback: function (result) {
-                                //console.log(result);
-                                $.each(data['address'], function(index, value){
-                                    if (data['address'][index]['id'] == result){
-                                        address = data['address'][index]['address'] + '\r\n' + data['address'][index]['city'] + ' ' + data['address'][index]['postal_code'];
-                                        fillBillingAddress(customer_name, organization, address, phone);
-                                        fillShippingAddress();
-                                    }
-                                });
-                            }
+                        title: "Address selector",
+                        message: '<p>Please select an address to use from below:</p>',
+                        inputType: 'radio',
+                        inputOptions: addressOptions,
+                        callback: function (result) {
+                            //console.log(result);
+                            $.each(data['address'], function(index, value){
+                                if (data['address'][index]['id'] == result){
+                                    address = data['address'][index]['address'] + '\r\n' + data['address'][index]['city'] + ' ' + data['address'][index]['postal_code'];
+                                    fillBillingAddress(customer_name, organization, address, phone);
+                                    fillShippingAddress();
+                                }
+                            });
+                        }
                     });
-                } 
-                else 
-                {
-                    $.each(data['address'], function(index, value){
-    //                            if (data['address'][index]['pivot']['is_primary'])
-    //                            {
-    //                                address = data['address'][index]['address'] + '\r\n' + data['address'][index]['city'] + ' ' + data['address'][index]['postal_code'];
-    //                                fillBillingAddress(customer_name, organization, address, phone);
-    //                                fillShippingAddress();
-    //                            }
-                        address = data['address'][index]['address'];
-                        if(data['address'][index]['city'] !== null){ address += '\r\n' + data['address'][index]['city']; }
-                        if(data['address'][index]['postal_code'] !== null){ address += ' '+data['address'][index]['postal_code']; }
-                        fillBillingAddress(customer_name, organization, address, phone);
-                        fillShippingAddress();
-
-                    });
+                } else {
+                    if(data['address'] !== null){
+                        $.each(data['address'], function(index, value){
+                            address = data['address'][index]['address'];
+                            if(data['address'][index]['city'] !== null){ address += '\r\n' + data['address'][index]['city']; }
+                            if(data['address'][index]['postal_code'] !== null){ address += ' '+data['address'][index]['postal_code']; }
+                            fillBillingAddress(customer_name, organization, address, phone);
+                            fillShippingAddress();
+                        });
+                    }
                 }
 
 
@@ -751,9 +748,6 @@ $(document).ready(function(){
             action = '{{ route("orders.index") }}' + '/' + $('#id').val();
         };
         
-        //console.log(actionType);
-        //console.log(action);
-        
         $('#shipping-address').removeAttr("disabled");
         //Ajax call to save data:
         $.ajax({
@@ -762,7 +756,6 @@ $(document).ready(function(){
             type: method,
             dataType: 'json',
             success: function (data) {
-                console.log('Success:', data);
                 if($('#select-customer').prop('checked')==false){ 
                     closeModal();
                     location.reload(true); 
@@ -782,10 +775,7 @@ $(document).ready(function(){
                 //Change button text.
                 $('#saveBtn').html('Save');
                 $('#shipping-address').attr("disabled", "disabled");
-                //$(window).scrollTo(0);
-                //$('#orderForm').scrollTop(0);
-                //$('.modal').animate({scrollTop : '0px'}, 0);
-                $('#order_no').trigger('focus');
+                $("#ajaxModel .modal-body").animate({ scrollTop: 0 }, 1000);
             }
         }); // Ajax call
     });

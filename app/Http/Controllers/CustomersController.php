@@ -10,6 +10,7 @@ use App\Address;
 use App\Contact;
 use App\Country;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\Hash;
 
 class CustomersController extends Controller
 {
@@ -20,32 +21,44 @@ class CustomersController extends Controller
      */
     public function index(Request $request)
     {
-        $roles = Role::whereIn('name',['Buyer', 'Customer', 'Client'])->pluck('name','id');
-        $rolesArr =['Buyer', 'Customer', 'Client'];
+        $roles = Role::where('name',config('constants.roles.client'))->pluck('name','id');
         $countries = Country::all();
-        $address_labels = ['work','residence','club','factory','gym', 'school'];
-        $contact_labels = ['cell','work','res','club','factory','whatsapp','emergency'];
-        $data = Customer::whereHas('role', function($q){
-            $q->whereIn('name',['Buyer', 'Customer', 'Client']);
+        $data = Customer::whereHas('roles', function($q){
+            $q->where('name',config('constants.roles.client'));
         });
         $data->latest()->first() ? $lastUpdated = $data->latest()->first()->updated_at->diffForHumans() : $lastUpdated = "never";
         
         //Get all customers(buyer, client, customer) data:
-        $data = Customer::whereHas('role', function($q){
-            $q->whereIn('name',['Buyer', 'Customer', 'Client']);
+        $data = Customer::whereHas('roles', function($q){
+            $q->whereIn('name',[config('constants.roles.client')]);
         })->orderBy('id','desc')->get();
         
         if($request->ajax()){
             return DataTables::of($data)
+                    ->addIndexColumn()
                     ->addColumn('name', function($row){
                         return '<a href="'.$row->id.'">'.$row->name.'</a>';
                     })
                     ->addColumn('role', function($row){
-                        return $row->role->first()->name;
+                        //return $row->role->first()->name;
+                        if($row->roles->count() > 0){
+                            $array = $row->roles()->pluck('name');
+                            $html= "<ul>";
+                            foreach ($array as $item){
+                                $html .= "<li>".$item."</li>";
+                            }
+                            $html .= "</ul>";
+                            return $html;
+                        }
                     })
                     ->addColumn('address_first', function($row){
-                        return $address = $row->addresses()->first()->address;
-                        //return  "No address found.";
+                        $count =  count($row->addresses()->get());
+                        return $count != 0 ? $row->addresses()->first()->address : "No address found"; 
+                    })
+                    ->addColumn('is_active', function($row){
+                        $yes = '<span class="text-success"><i class="fas fa-check-circle"></i></span>';
+                        $no = '<span class="text-warning"><i class="fas fa-times-circle"></i></span>';
+                        return $row->is_active ? $yes : $no;
                     })
                     ->addColumn('created_at', function($row){
                         return $row->created_at->diffForHumans();
@@ -53,10 +66,10 @@ class CustomersController extends Controller
                     ->addColumn('updated_at', function($row){
                         return $row->updated_at->diffForHumans();
                     })
-                    ->rawColumns(['name'])
+                    ->rawColumns(['name','role','is_active'])
                     ->make(true);
         }
-        return view('admin.customer.index', compact('roles', 'countries','contact_labels','address_labels', 'lastUpdated'));
+        return view('admin.customer.index', compact('roles', 'countries', 'lastUpdated'));
         
         
         
@@ -96,12 +109,12 @@ class CustomersController extends Controller
         $customer = Customer::create([ 
             'name'=> $request->name, 
             'organization' => $request->organization,  
-            'email' => $request->email 
+            'email' => $request->email,
+            'password' => Hash::make('password'),
+            'is_active' => $request->is_active
         ]); 
-        //Find role
-        $role = Role::findOrFail($request->role);
-        //Save role for customer
-        $customer->role()->save($role);
+        //Attach system default role for Client/Customer:
+        $customer->roles()->attach(Role::whereName(config('constants.roles.client'))->first());
         //Create address
         $address = Address::create([
             'label' => $request->address_label,
@@ -132,7 +145,11 @@ class CustomersController extends Controller
             ]);
             $customer->contacts()->save( $contact );
         }
-        return response()->json(['request' => $request->all() ]);
+        return response()->json([
+                'status' =>true,
+                'message' => 'New customer '.$customer->name.' saved.' 
+            ]);
+        //return response()->json(['request' => $request->all() ]);
     }
 
     /**
@@ -147,7 +164,7 @@ class CustomersController extends Controller
         //Note: Call relations otherwise it will not be available.
         $customer->addresses;
         $customer->contacts;
-        $customer->role;
+        $customer->roles;
         return response()->json(['customer' => $customer]);
     }
 
@@ -176,14 +193,11 @@ class CustomersController extends Controller
         $request->has('is_shipping') ? $is_shipping = 1 : $is_shipping = 0 ;
         
         $customer = Customer::findOrFail($id);
-     
-//        $customer->contacts;
-//        $customer->role;
-        
         $customer->update([ 
             'name'=> $request->name, 
             'organization' => $request->organization, 
-            'email' => $request->email 
+            'email' => $request->email,
+            'is_active' => $request->is_active
         ]);
         if(!empty($request->address_id)){
             foreach($customer->addresses as $address){
@@ -249,7 +263,11 @@ class CustomersController extends Controller
             ]);
             $customer->contacts()->save( $contact );
         }
-        return response()->json(['request' => $request->all() ]);
+        return response()->json([
+                'status' =>true,
+                'message' => 'Customer information for '.$customer->name.' has been updated.' 
+            ]);
+        //return response()->json(['request' => $request->all() ]);
     }
 
     /**
@@ -263,24 +281,33 @@ class CustomersController extends Controller
         $customer = Customer::findOrFail($id);
         $name = $customer->name;
         $company = $customer->organization;
-        if($customer->orders()->count() == 0)
-        {
-            $customer->addresses()->detach();
-            $customer->contacts()->detach();
-            $customer->delete();
-            //return response()->json(['message' => 'Customer '.$customer->name.' removed.' ]);
+        //Roles check:
+        //Check and detach appropriate roles from user:
+        $userRoleIdsArr = $customer->roles()->pluck('id')->toArray();
+        $allowedRoleIdsArr = Role::whereIn('name',[config('constants.roles.client')])->pluck('id')->toArray();
+        if(empty(array_diff($userRoleIdsArr,$allowedRoleIdsArr))){
+            if($customer->orders()->count() == 0){
+                $customer->roles()->detach();
+                $customer->addresses()->detach();
+                $customer->contacts()->detach();
+                $customer->delete();
+                return response()->json([
+                    'status'=> true,
+                    'message' => "Success!!! Customer, ".$name." of ".$company.", has been deleted."
+                ]);
+            } else{
+                return response()->json([
+                    'status' => false,
+                    'message' => "Sorry!!! ".$name." has orders. Please delete ".$name."'s orders first."
+                ]);
+            }
+        } else{
             return response()->json([
-                'status'=> true,
-                'message' => "Success!!! Customer, ".$name." of ".$company.", has been deleted."
+                'status' =>false,
+                'message' => 'Customer '.$customer->name.' is also a system user. Cannot delete user.' 
             ]);
         }
-        else
-        {
-            return response()->json([
-                'status' => false,
-                'message' => "Sorry!!! ".$name." has orders. Please delete ".$name."'s orders first."
-            ]);
-        }
+        
         
     }
     

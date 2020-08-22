@@ -18,7 +18,7 @@
 <!-- Breadcrumbs-->
 <ol class="breadcrumb">
     <li class="breadcrumb-item">
-        <a href="{{ route('admin.dash') }}">Dashboard</a>
+        <a href="{{ route('home') }}">Home</a>
     </li>
     <li class="breadcrumb-item active">Purchases</li>
 </ol>
@@ -88,11 +88,11 @@
                             <!-- form-group -->
                             <div class="form-group">
                                 <div class="form-row">
-                                    <div class="col-md-6">
+                                    <div class="col-md-3">
                                         <label for="ref_no">PO Ref.#</label>
                                         <input type="text" name="ref_no" id="ref_no" class="form-control" autofocus="autofocus" value="{{old('ref_no')}}">
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-3 offset-md-6">
                                         <label for="receive_date">Date:</label>
                                         <input type="date" name="receive_date" id="receive_date" class="form-control" value="{{old('receive_date')}}">
                                     </div>
@@ -103,7 +103,7 @@
                             <!-- form-group -->
                             <div class="form-group">
                                 <div class="form-row">
-                                    <div class="col-md-6">
+                                    <div class="col-md-3">
                                         <div class="form-group">
                                             <label for="user_id">Vendor:</label>
                                             <select name="user_id" id="user_id" class="custom-select">
@@ -111,7 +111,7 @@
                                             </select>   
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-3 offset-md-6">
                                         <div class="form-group">
                                             <label for="purchase_type">Purchase Type:</label>
                                             <select name="purchase_type" id="purchase_type" class="custom-select">
@@ -300,18 +300,17 @@
          * Setting modal options dynamically:
          */
         $.get("{{ route('ajax-purchases.create') }}", function (data) {
-            var ptype = data.purchase_type;
-            var suppliers = data.suppliers;
-            $.each(ptype, function( index, value ) {
+            $.each(data.ptypes, function( index, value ) {
                 $('#purchase_type').append($("<option></option>").attr('value', value).text(value));
             });
-            $.each(suppliers, function( index, value ) {
+            $.each(data.suppliers, function( index, value ) {
                 $('#user_id').append($("<option></option>").attr('value', value['id']).text(value['name']));
             });
-            //console.log(data.suppliers);
+            //console.log(data);
         }); //Get function.
         
         /*
+         * Create New - Click function.
          * Show/View Modal Form:
          */
         $('#createNew').click(function () {
@@ -322,6 +321,9 @@
             $('#form-errors').hide();
             $('#purchseForm').trigger("reset");
             $('#modelHeading').html("Register New Purchase");
+            $.get("{{ route('get.buy.ref') }}", function (data) {
+                $('#ref_no').val(data);
+            });
             //Setup modal option:
             $('#ajaxModel').modal({
                 backdrop: 'static',
@@ -333,7 +335,7 @@
             $('#ajaxModel').modal('handleUpdate');
             $('#add-row').trigger('click');
             $('#ref_no').trigger('focus');
-        }); //Create New - Click function.
+        });
         
         /*
          * Ajax Call goes to: PurchaseController@getProdData
@@ -342,7 +344,7 @@
          */
         var productOptions; //This value is set by ajax call.
         $.ajax({
-            url: "/v2/purchases/getProdData",
+            url: "{{ route('get.product.data') }}",
             type: "POST",
             data:{ 
                 _token:'{{ csrf_token() }}'
@@ -452,11 +454,11 @@
             var action;
             if(actionType == 'create-purchase'){ 
                 method = 'POST';
-                action = '{{ route('ajax-purchases.store') }}';
+                action = '{{ route("ajax-purchases.store") }}';
             };
             if(actionType == 'edit-purchase'){ 
                 method = 'PATCH';
-                action = '{{ route('ajax-purchases.index') }}' +'/' + $('#id').val();
+                action = '{{ route("ajax-purchases.index") }}' +'/' + $('#id').val();
             };
             
             //Ajax call to save data:

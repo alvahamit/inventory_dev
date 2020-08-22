@@ -20,7 +20,15 @@ class StoresTableSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now()
         ]);
+        DB::table('stores')->insert([
+            'name' => 'Head Office',
+            'address' => 'VSF Distribution\n7/1/A Lake Circus\nKolabagan, North Dhanmondi\nDhaka 1205',
+            'location' => 'Dhanmondi',
+            'contact_no' => '+88 02 58153080',
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
         //using factory classes.
-        factory(App\Store::class, 4)->create();
+        //factory(App\Store::class, 4)->create();
     }
 }

@@ -31,6 +31,8 @@
         <!--For Datatable Styles-->
         <link href="{{asset('vendor/datatables/dataTables.bootstrap4.css')}}" rel="stylesheet">
         
+        <!--For Bootstrap searchable multi select-->
+        <link rel="stylesheet" href="{{asset('theme/css/bootstrap-select.min.css')}}" />
     </head>
 
     <body id="page-top">
@@ -111,7 +113,8 @@
         <!--Bootbox CDN-->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.4.0/bootbox.min.js"></script>
         
-        
+        <!--For bootstrap-select-->
+        <script src="{!! asset('theme/js/bootstrap-select.min.js') !!}"></script>
         
         @yield('scripts')
         

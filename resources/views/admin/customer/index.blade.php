@@ -20,9 +20,9 @@
 <!-- Breadcrumbs-->
 <ol class="breadcrumb">
     <li class="breadcrumb-item">
-        <a href="#">Customers</a>
+        <a href="{{route('home')}}">Home</a>
     </li>
-    <li class="breadcrumb-item active">Overview</li>
+    <li class="breadcrumb-item active">Customers</li>
 </ol>
 <!--<h1>Hi!! I found following customers for you:</h1>-->
 <!--Add new button-->
@@ -44,6 +44,7 @@
                         <th>Email</th>
                         <th>Addresses</th>
                         <th>Role</th>
+                        <th>Active?</th>
                         <th>Created</th>
                         <th>Updated</th>
                     </tr>
@@ -56,6 +57,7 @@
                         <th>Email</th>
                         <th>Addresses</th>
                         <th>Role</th>
+                        <th>Active?</th>
                         <th>Created</th>
                         <th>Updated</th>
                     </tr>
@@ -150,20 +152,23 @@
                                                     value="{{old('email')}}">
                                             <!--</div>-->
                                         </div>
-                                        <!--Role picker-->
+                                        
+                                        <!--is_active-->
                                         <div class="form-group">
                                             <div class="form-row">
-                                                <div class="col-md-6">
-                                                    <label for="role">User Role:</label>
-                                                    <select class="custom-select" name="role" id="role">
-                                                        <option selected="selected" value="">User Role...</option>
-                                                        @foreach($roles as $key => $value)
-                                                        <option value="{{$key}}">{{$value}}</option>
-                                                        @endforeach
-                                                    </select>
+                                                <div class="col-md-12">
+                                                    <label for="is_active" class="col-form-label text-md-right">{{ __('Is Active?') }}</label>
+                                                    <div class="offset-md-1 col-md-6 form-check form-check-inline">
+                                                        <input type="radio" class="col-md-3" id="yes" name="is_active" value="{{ old('is_active', 1) }}">
+                                                        <label for="yes" class="form-check-label">Yes</label>
+                                                        <input type="radio" class="col-md-3" id="no" name="is_active" value="{{ old('is_active', 0) }}">
+                                                        <label for="no" class="form-check-label">No</label>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
+                                        
+                                        
                                         <!--File upload input-->
                                         <div class="form-group">
                                             <div class="form-label-group">
@@ -194,7 +199,7 @@
                                                     <label for="address_label">Address Label: </label>
                                                     <select class="custom-select" name="address_label" id="address_label">
                                                         <option selected="selected" value="">Pick a label...</option>
-                                                        @foreach ($address_labels as $key => $value)
+                                                        @foreach (config('constants.labels') as $key => $value)
                                                         <option value="{{ $value }}">{{ ucfirst($value) }}</option>
                                                         @endforeach
                                                     </select>
@@ -356,7 +361,7 @@
                                                     <label for="contact_label">Contact Label:</label>
                                                     <select class="custom-select" name="contact_label[]" id="contact_label0">
                                                         <option selected="selected" value="">Contact Label...</option>
-                                                        @foreach($contact_labels as $key => $value)
+                                                        @foreach (config('constants.labels') as $key => $value)
                                                         <option value="{{$value}}">{{ ucfirst($value) }}</option>
                                                         @endforeach
                                                     </select>
@@ -403,7 +408,8 @@
                                     </div> <!--./card-body-->
                                 </div> <!--./collapse-->
                             </div> 
-                        </div> <!-- #/accordionExample -->
+                        </div> 
+                        <!-- #/accordionExample -->
                         <!--Save and Delete buttons-->
                         <div class="form-group pt-3">
                             <div class="form-row">
@@ -504,16 +510,24 @@ $(document).ready(function(){
             url: "{{ route('customers.index') }}"
         },
         columns: [
-            {data:'id', name:'id'},
+            {data:'DT_RowIndex', name:'DT_RowIndex'},
             {data:'name', name:'name'},
             {data:'organization', name:'organization'},
             {data:'email', name:'email'},
             {data: 'address_first', name: 'address_first'},
             {data:'role', name:'role'},
+            {data:'is_active', name:'is_active'},
             {data:'created_at', name:'created_at'},
             {data:'updated_at', name:'updated_at'},
         ],
-        order:[[0,"desc"]]
+        order:[[1,"asc"]],
+        columnDefs: [
+            {
+                "targets": 6, // Count starts from 0.
+                "className": "text-center",
+                "width": "auto"
+            },
+        ],
     }); 
     
     /*
@@ -589,7 +603,7 @@ $(document).ready(function(){
                                         '<label for="contact_label0">Contact Label:</label>'+
                                         '<select class="custom-select" name="contact_label[]" id="contact_label'+count+'">'+
                                             '<option selected="selected" value="">Select Label...</option>'+
-                                            '@foreach($contact_labels as $key => $value)'+
+                                            '@foreach (config("constants.labels") as $key => $value)'+
                                             '<option value="{{$value}}">{{ ucfirst($value) }}</option>'+
                                             '@endforeach'+
                                         '</select>'+
@@ -645,6 +659,10 @@ $(document).ready(function(){
         $('#saveBtn').val("create");
         $('#user_id').val('');
         $('#modelHeading').html("Create Customer");
+        $('#ajaxModel').modal({
+            backdrop: 'static',
+            keyboard: false
+        });
         $('#addContactBtn').trigger('click');
         $('#ajaxModel').modal('show');
     });
@@ -672,11 +690,13 @@ $(document).ready(function(){
             type: method,
             dataType: 'json',
             success: function (data) {
-                console.log('Success:', data);
+                //console.log('Success:', data);
                 $('#modalForm').trigger("reset");
                 $('#saveBtn').html('Save');
                 $('#ajaxModel').modal('hide');
                 $('#dataTable').DataTable().ajax.reload();
+                $('#pageMsg').html(showMsg(data.status, data.message));
+                $("html, body").animate({ scrollTop: 0 }, 1000);
             },
             error: function (data) {
                 console.log('Error:', data);    
@@ -725,7 +745,7 @@ $(document).ready(function(){
                         cache: false,
                         dataType: 'json',
                         success: function(response){
-                                console.log(response);
+                                //console.log(response);
                                 $('#modalForm').trigger("reset");
                                 $('#remAddressBtn').html('<i class="fas fa-trash-alt"></i>');
                                 $('#ajaxModel').modal('hide');
@@ -758,10 +778,22 @@ $(document).ready(function(){
     $('#dataTable').on('click', 'a', function (e) {
         var customerId = $(this).attr('href');
         $.get('{{ route("customers.index") }}' +'/' + customerId, function (data) {
-            console.log(data);
+            //console.log(data);
             var addresses = data['customer']['addresses'];
             var contacts = data['customer']['contacts'];
             var contactList;
+            var roleName = '<ul>';
+                //find role name if set:
+                if(data['customer']['roles'].length>0){
+                    //roleName = data['user']['role'][0]['name'];
+                    $.each(data['customer']['roles'], function(index,value){
+                        //console.log(value['name']);
+                        roleName += '<li>'+value['name']+'</li>';
+                    });
+                } else {
+                    roleName += '<li>Undefined</li>';
+                }
+                roleName += '</ul>';
             //Clear previous data:
             clearViewFields(); 
             //Set new data:
@@ -769,11 +801,9 @@ $(document).ready(function(){
             $('#modelHeading').html(data['customer']['name']+'<br><small class="text-muted">'+data['customer']['organization']+'</small>');
             $('#displayEmail').html( 
                         '<div class="container">'+
-                            '<span><i class="far fa-envelope"></i> '+
-                            data['customer']['email']+'</span> '+ 
-                            ' <span><i class="fas fa-tag"></i> '+
-                            data['customer']['role'][0]['name']+
-                            '</span>'+
+                            '<span><i class="far fa-envelope"></i> '+data['customer']['email']+'</span> '+ 
+                            '<br>'+
+                            '<span><span><i class="fas fa-user-tie"></i> Assigned Roles: '+roleName+'</span>'+
                         '</div>'
                     ).show();
             
@@ -892,19 +922,17 @@ $(document).ready(function(){
             $('#name').val(data['customer']['name']);
             $('#organization').val(data['customer']['organization']);
             $('#email').val(data['customer']['email']);
-            $('#role').val(data['customer']['role'][0]['id']).attr('selected','selected');
-            
+            if(data['customer']['is_active']){ $("#yes").prop("checked", true); }
+            if(!data['customer']['is_active']){ $("#no").prop("checked", true); }
             if(addressId !== ""){ 
-                //console.log(addressId); 
                 var selectedAddress;
-                
                 $(addresses).each(function(index, value){
                     addresses[index]['id'] == addressId ? selectedAddress = addresses[index] : '' ;
-                });
-                //console.log(selectedAddress); 
+                }); 
                 $('#address_id').val(selectedAddress['id']);
                 if(selectedAddress['label'] !== null){
-                    $('#address_label').val(selectedAddress['label'].toLowerCase()).attr('selected','selected');
+                    //$('#address_label').val(selectedAddress['label'].toLowerCase()).attr('selected','selected');
+                    $('#address_label').val(selectedAddress['label']).attr('selected','selected');
                 }
                 selectedAddress['pivot']['is_primary'] ? $('#is_primary').attr('checked', 'checked') : $('#is_primary').removeAttr('checked') ;
                 selectedAddress['pivot']['is_billing'] ? $('#is_billing').attr('checked', 'checked') : $('#is_billing').removeAttr('checked') ;
@@ -917,8 +945,6 @@ $(document).ready(function(){
                 $('#latitude').val(selectedAddress['latitude']);
                 $('#longitude').val(selectedAddress['longitude']);
                 $('#country_code').val(selectedAddress['country_code']).attr('selected','selected');
-                //console.log(selectedAddress['pivot']['is_primary']);
-                
                 if(contacts.length > 0 ){
                     //remove all previous contacts:
                     $('#modalForm a[href^="remContactBtn"]').each(function(){
@@ -934,7 +960,7 @@ $(document).ready(function(){
                                                     '<label for="contact_label0">Contact Label:</label>'+
                                                     '<select class="custom-select" name="contact_label[]" id="contact_label'+count+'">'+
                                                         '<option selected="selected" value="">Contact Label...</option>'+
-                                                        '@foreach($contact_labels as $key => $value)'+
+                                                        '@foreach (config("constants.labels") as $key => $value)'+
                                                         '<option value="{{$value}}">{{ ucfirst($value) }}</option>'+
                                                         '@endforeach'+
                                                     '</select>'+
@@ -966,7 +992,7 @@ $(document).ready(function(){
                     });
                 }
             } else { 
-                console.log('empty'); 
+                console.log('No address found.'); 
             }
             $('#modalForm').show();
         }); //get data.

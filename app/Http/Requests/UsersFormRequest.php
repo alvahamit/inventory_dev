@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UsersFormRequest extends FormRequest
 {
@@ -24,17 +25,22 @@ class UsersFormRequest extends FormRequest
     public function rules()
     {
         // Check Create or Update
-        if ($this->method() == 'PATCH'){
-            $email_rules = 'required|email'; 
+        if($this->method() == 'PATCH') { 
+            $rules_username = ['required', 'string', 'max:50', Rule::unique('App\User', 'username')->ignore($this->user_id)] ;
+            $rules_email = ['required', 'string', 'email', 'max:255', Rule::unique('App\User', 'email')->ignore($this->user_id)] ;
+            
         } else {
-            $email_rules = 'required|email|unique:users'; 
+            $rules_username = ['required', 'string', 'max:50', 'unique:App\User,username'] ;
+            $rules_email = ['required', 'string', 'email', 'max:255', 'unique:App\User,email'];
         }
+        
         
         $rules = [
             //General fields:
             'name' => 'required',
-            'email' => $email_rules,
-            'role' => 'required|exists:roles,id',
+            'username' => $rules_username,
+            'email' => $rules_email,
+            'roles' => 'required|exists:roles,id',
             'address_label' => 'required',
             'organization' => 'required',
             'address' => 'required',

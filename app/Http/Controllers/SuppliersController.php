@@ -16,6 +16,7 @@ use NumberFormatter;
 use Illuminate\Support\Facades\Hash;
 
 
+
 class SuppliersController extends Controller
 {
     /**
@@ -24,38 +25,48 @@ class SuppliersController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request) {
-        $address_labels = ['work','residence','club','factory','gym', 'school'];
-        $contact_labels = ['cell','work','res','club','factory','whatsapp','emergency'];
         $countries = Country::all();
-        $roles = Role::whereIn('name',['Local Supplier', 'Exporter'])->pluck('name','id');
-        $data = Supplier::whereHas('role', function($q){
-                    $q->whereIn('name', ['Local Supplier', 'Exporter']);
+        $roles = Role::whereIn('name',[config('constants.roles.supplier'), config('constants.roles.exporter')])->pluck('name','id');
+        $data = Supplier::whereHas('roles', function($q){
+                    $q->whereIn('name', [config('constants.roles.supplier'), config('constants.roles.exporter')]);
                 });
         $data->latest()->first() ? $lastUpdated = $data->latest()->first()->updated_at->diffForHumans() : $lastUpdated = "never";
         //Get all supplier(local supplier and exporter) data:
-        $data = Supplier::whereHas('role', function($q){
-                    $q->whereIn('name', ['Local Supplier', 'Exporter']);
+        $data = Supplier::whereHas('roles', function($q){
+                    $q->whereIn('name', [config('constants.roles.supplier'), config('constants.roles.exporter')]);
                 })->orderBy('id','desc')->get();
-        
         if($request->ajax()){
             return DataTables::of($data)
+                    ->addIndexColumn()
                     ->addColumn('name', function($row){
                         return '<a href="'.$row->id.'">'.$row->name.'</a>';
                     })
                     ->addColumn('role', function($row){
-                        return $row->role->first()->name;
+                        //return $row->role->first()->name;
+                        if($row->roles->count() > 0){
+                            $array = $row->roles()->pluck('name');
+                            $html= "<ul>";
+                            foreach ($array as $item){
+                                $html .= "<li>".$item."</li>";
+                            }
+                            $html .= "</ul>";
+                            return $html;
+                        }
                     })
+                    ->addColumn('is_active', function($row){
+                        return $row->is_active ? '<span class="text-success"><i class="fas fa-check-circle"></i></span>' : '<span class="text-warning"><i class="fas fa-times-circle"></i></span>';
+                })
                     ->addColumn('created_at', function($row){
                         return $row->created_at->diffForHumans();
                     })
                     ->addColumn('updated_at', function($row){
                         return $row->updated_at->diffForHumans();
                     })
-                    ->rawColumns(['name'])
+                    ->rawColumns(['name','role', 'is_active'])
                     ->make(true);
         }
         if(!empty($data)){
-            return view('admin.supplier.index', compact('roles', 'lastUpdated', 'address_labels', 'contact_labels', 'countries'));
+            return view('admin.supplier.index', compact('roles', 'lastUpdated', 'countries'));
         } else {
             return view('errors.404');
         }
@@ -91,12 +102,15 @@ class SuppliersController extends Controller
             'name'=> ucwords($request->name), 
             'organization' => $request->organization, 
             'email' => $request->email,
-            'password' => Hash::make('password')
+            'password' => Hash::make('password'),
+            'is_active' => $request->is_active
         ]);
-        //Find role
-        $role = Role::findOrFail($request->role);
-        //Save role for customer
-        $user->role()->save($role);
+
+        //Attach roles:
+        foreach($request->roles as $role){
+            $user->roles()->attach($role);
+        }
+        
         //Create address
         $address = Address::create([
             'label' => $request->address_label,
@@ -142,7 +156,7 @@ class SuppliersController extends Controller
         //Note: Call relations otherwise it will not be available.
         $user->addresses;
         $user->contacts;
-        $user->role;
+        $user->roles;
         return response()->json(['user' => $user]);
     }
 
@@ -183,7 +197,8 @@ class SuppliersController extends Controller
         $user->update([
                     'name'=> ucwords($request->name), 
                     'organization' => $request->organization, 
-                    'email' => $request->email
+                    'email' => $request->email,
+                    'is_active' => $request->is_active
                 ]);
         if(!empty($request->address_id)){
             //Find and Update address:
@@ -231,10 +246,20 @@ class SuppliersController extends Controller
                     ]);
         }
         
-        //Find role
-        $role = Role::findOrFail($request->role);
-        //Sync role for user so only one role is associated: 
-        $user->role()->sync([$role->id]);
+        //Check and detach appropriate roles from user:
+        $idsArray = Role::whereIn('name',[config('constants.roles.supplier'), config('constants.roles.exporter')])->pluck('id')->toArray();
+        foreach($user->roles as $role){
+            if(in_array($role->id, $idsArray)){
+                $user->roles()->detach($role->id);
+            }
+        }
+        //Attach update form roles to user:
+        $rolesArray = [];
+        foreach($request->roles as $role){
+            array_push($rolesArray,$role);
+        }
+        $user->roles()->attach($rolesArray);
+        
         
         if( $user->contacts->count() > 0 ){
             // Detach old contacts from lookup table.
@@ -266,14 +291,27 @@ class SuppliersController extends Controller
      */
     public function destroy($id)
     {
+        
         //find user by id then delete
         $user = Supplier::findOrFail($id);
-        $user->role()->detach();
-        $user->addresses()->detach();
-        $user->contacts()->detach();
-        $user->delete();
-        return response()->json(['message' => 'Supplier '.$user->name.' removed.' ]);
-        //return redirect(route('suppliers.index'));
-        
+        //Roles check:
+        //Check and detach appropriate roles from user:
+        $userRoleIdsArr = $user->roles()->pluck('id')->toArray();
+        $allowedRoleIdsArr = Role::whereIn('name',[config('constants.roles.supplier'), config('constants.roles.exporter')])->pluck('id')->toArray();
+        if(empty(array_diff($userRoleIdsArr,$allowedRoleIdsArr))){
+            $user->roles()->detach();
+            $user->addresses()->detach();
+            $user->contacts()->detach();
+            $user->delete();
+            return response()->json([
+                'status' =>true,
+                'message' => 'Supplier '.$user->name.' removed.' 
+            ]);
+        } else {
+            return response()->json([
+                'status' =>false,
+                'message' => 'Supplier '.$user->name.' is also a system user. Cannot delete user.' 
+            ]);
+        }       
     }
 }

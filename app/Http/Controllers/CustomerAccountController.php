@@ -19,12 +19,13 @@ class CustomerAccountController extends Controller
      */
     public function index(Request $request)
     {
-        $customers = Customer::whereHas('role', function($q){
-            $q->whereIn('name',['Buyer', 'Customer', 'Client']); 
-        })->orderBy('id','desc')->get();
+        $customers = Customer::whereHas('roles', function($q){
+            $q->whereIn('name',[config('constants.roles.client')]); 
+        })->orderBy('name','asc')->get();
         
         if ($request->ajax()) {
             $datatable = DataTables::of($customers)
+                ->addIndexColumn()    
                 ->addColumn('name', function($row) {
                     return $row->name;
                 })

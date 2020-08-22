@@ -11,7 +11,30 @@
 
 @section('logo', __('VSF Distribution'))
 
-@section('pageheading', __('Sales Invoice'))
+@php
+    switch ($invoice->invoice_type)
+    {
+        case config('constants.invoice_type.whole'):
+            $type = 'Sales (Whole)';
+            $type_val = config('constants.invoice_type.whole');
+            break;
+        case config('constants.invoice_type.partial'):
+            $type = 'Sales (Partial)';
+            $type_val = config('constants.order_type.partial');
+            break;
+        case config('constants.invoice_type.sample'):
+            $type = 'Sample';
+            $type_val = config('constants.order_type.sample');
+            break;
+        default:
+            $type = 'Sales (Whole)';
+            $type_val = config('constants.order_type.whole');
+    }
+@endphp
+
+@section('pageheading')
+Invoice - {{$type}} 
+@stop
 
 @section('footer', __('Copyright © Alvah Amit Halder 2019'))
 
@@ -25,12 +48,7 @@
     </form>
     <h4 class="mt-2 pt-1 pb-2">
         Ref No # {{$invoice->invoice_no}} 
-        <!--Print invoice button-->
-        <!--<a id="printBtn" class="btn btn-warning btn-sm float-right"><i class="fas fa-print fa-lg"></i></a>--> 
-        <!--<a id="pdfBtn" class="btn btn-success btn-sm float-right mr-1"><i class="far fa-file-pdf fa-lg"></i></a>-->
     </h4>
-
-
     <div class="row">
         <div class="col-md-12">
             <div class="row">

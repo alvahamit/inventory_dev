@@ -1,6 +1,6 @@
 <!-- 
     Author:     Alvah Amit Halder
-    Document:   Delivery Challan create blade.
+    Document:   Challan create blade.
     Model/Data: App\Challan
     Controller: ChallanssController
 -->
@@ -11,15 +11,36 @@
 
 @section('logo', __('VSF Distribution'))
 
-@section('pageheading', __('Create Delivery Challan'))
+@php
+    switch ($order->order_type)
+    {
+        case config('constants.order_type.sales'):
+            $type = 'Sales';
+            $type_val = config('constants.order_type.sales');
+            break;
+        case config('constants.order_type.sample'):
+            $type = 'Sample';
+            $type_val = config('constants.order_type.sample');
+            break;
+        default:
+            $type = 'Sales';
+            $type_val = config('constants.order_type.sales');
+    }
+@endphp
+
+@section('pageheading')
+Create Challan ({{$type}})
+@stop
 
 @section('footer', __('Copyright © Alvah Amit Halder 2019'))
 
 @section('content')
+
+
 <!-- Breadcrumbs-->
 <ol class="breadcrumb">
     <li class="breadcrumb-item">
-        <a href="{{ route('admin.dash') }}">Dashboard</a>
+        <a href="{{ route('home') }}">Home</a>
     </li>
     <li class="breadcrumb-item active">New Challan</li>
 </ol>
@@ -35,6 +56,7 @@
         <input type="hidden" name="q_type" id="q_type" value="{{ $order->quantity_type }}">
         <input type="hidden" name="customer_id" id="customer_id" value="{{ $order->user_id }}">
         <input type="hidden" name="order_id" id="order_id" value="{{ $order->id }}">
+        <input type="hidden" name="order_type" id="order_type" value="{{$order->order_type}}">
         <div class="form-row col-md-12">
             <div class="form-group col-md-3">
                 <label for="challan_date">Challan Date</label>
@@ -51,9 +73,13 @@
             <div class="form-group col-md-3">
                 <label for="challan_type">Challan Type</label>
                 <select class="custom-select" name="challan_type" id="challan_type">
-                    <!--<option value="0" selected>Choose...</option>-->
-                    <option value="1">Delivery Challan</option>
-                    <!--<option value="2">Transfer Challan</option>-->
+                    <option value="0">Choose...</option>
+                    @if($order->order_type == config('constants.order_type.sales'))
+                    <option value="{{config('constants.challan_type.sales')}}" selected="selected">Challan ({{$type}})</option>
+                    @endif
+                    @if($order->order_type == config('constants.order_type.sample'))
+                    <option value="{{config('constants.challan_type.sample')}}" selected="selected">Challan ({{$type}})</option>
+                    @endif
                 </select>
             </div>
         </div>
@@ -61,7 +87,7 @@
             <div class="col-md-6">
                 <div class="form-group">
                     <label for="supplied_by">Supplied By:</label>
-                    <textarea rows = "4" class="form-control" name = "supplied_by" id = "supplied_by" readonly="readonly" disabled="disabled"></textarea>
+                    <textarea rows="6" class="form-control" name="supplied_by" id="supplied_by" readonly="readonly" disabled="disabled">{!! auth()->user()->name!!}&#13;&#10;{!!config('constants.default_address')!!}</textarea>
                 </div>
                 <div class="form-group">
                     <!--<label for="supply_store">Supply store:</label>-->
@@ -76,7 +102,7 @@
             <div class="col-md-6">
                 <div class="form-group">
                     <label for="delivery_to">Delivery To:</label> 
-                    <textarea rows="4" class="form-control" name="delivery_to" id="delivery_to" readonly="readonly" disabled="disabled"></textarea>
+                    <textarea rows="6" class="form-control" name="delivery_to" id="delivery_to" readonly="readonly" disabled="disabled"></textarea>
                 </div>
                 <div class="form-group">
                     <button id="choose-another-add" class="btn btn-primary btn-sm "><i class="fas fa-address-card"></i> Change</button>
@@ -84,21 +110,6 @@
                 </div>
             </div>
         </div>
-        <!--Need to write a validation -->
-        <!--<div class="form-row col-md-12">
-            <div class="col-md-6">
-                 <div class="form-group">
-                     <div class="alert alert-warning p-3">
-                         Warning!!!! Please check for sufficient stock before selecting store.<br>
-                         Validation codes are not written yet.
-                     </div>
-                </div>
-            </div>
-        </div>-->
-        <!--Code is written on 6th July 2020-->
-        <!--delete after validation write-->
-
-
         <div class="form-row col-md-12 pt-2">
             <h5>Delivery Challan Details: <span id="qty_type"></span></h5>
             
@@ -247,8 +258,12 @@ $(document).ready(function(){
             $('#q_type').val(qt);
             $('#order_id').val(data.order.id);
             $('#order_no').val(data.order.order_no);
-            $('#delivery_to').val(data.order.customer_name+'\n'+data.order.customer_company+'\n'+data.order.customer_address1+'\n'+data.order.customer_address2);
-            $('#supplied_by').val('VSF Distribution\n7/1/A Lake Circus\nKolabagan, North Dhanmondi\nDhaka 1205');
+            $("#challan_date").attr('min', data.order.unformated_order_date);
+            $.get("{{ route('get.challan.ref') }}", function (data) {
+                $('#challan_no').val(data);
+            });
+            $('#delivery_to').val(data.order.customer_name+'\n'+data.order.customer_company+'\n'+data.order.customer_address+'\n'+data.order.customer_contact);
+            //$('#supplied_by').val('VSF Distribution\n7/1/A Lake Circus\nKolabagan, North Dhanmondi\nDhaka 1205');
             $(data.order.products).each(function(index, value){
                 var row_count = $('#items tr').length - 1;
                 var row_no = + row_count + 1;
@@ -520,8 +535,16 @@ $(document).ready(function(){
     
     $('#closeBtn').click(function(e){
         e.preventDefault();
-        var route = '{{ route("orders.index") }}' + '/' + $('#order_id').val();
+        var sales = {{ config('constants.order_type.sales') }};
+        var sample = {{ config('constants.order_type.sample') }};
+        if( $('#order_type').val() == sales ) {
+            var route = '{{ route("orders.index") }}' + '/' + $('#order_id').val();
+        }
+        if( $('#order_type').val() == sample) {
+            var route = '{{ route("samples.index") }}' + '/' + $('#order_id').val();
+        }
         window.location.href=route;
+        //console.log(route);
         return false;
     });
     

@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class CustomerFormRequest extends FormRequest
 {
@@ -25,16 +26,19 @@ class CustomerFormRequest extends FormRequest
     {
         // Check Create or Update
         if ($this->method() == 'PATCH'){
-            $email_rules = 'required|email'; 
+            //$email_rules = 'required|email';
+            $email_rules = ['required', 'string', 'email', 'max:255', Rule::unique('App\User', 'email')->ignore($this->user_id)] ;
         } else {
-            $email_rules = 'required|email|unique:users'; 
+            //$email_rules = 'required|email|unique:users'; 
+            $email_rules = ['required', 'string', 'email', 'max:255', 'unique:App\User,email'];
         }
         
         $rules = [
             //General fields:
             'name' => 'required',
             'email' => $email_rules,
-            'role' => 'required|exists:roles,id',
+            'is_active' => 'required',
+            //'role' => 'required|exists:roles,id',
             'address_label' => 'required',
             'organization' => 'required',
             'address' => 'required',
@@ -50,12 +54,6 @@ class CustomerFormRequest extends FormRequest
             'number' => 'required|array|min:1',
             'number.*' => 'required',
         ];
-//        if(count($this->request->get('item_id')) > 0){
-//            foreach($this->request->get('item_id') as $key => $val)
-//            {
-//                $rules['item_qty.'.$key] = 'required|integer|min:1|lte:invoicable_qty.'.$key;
-//            }
-//        }
         return $rules;
     }
     

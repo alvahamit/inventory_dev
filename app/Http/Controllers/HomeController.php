@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\User;
 use App\Product;
 use App\Order;
 use App\Invoice;
+use App\Role;
 use App\MoneyReceipt;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -20,10 +22,10 @@ class HomeController extends Controller
      *
      * @return void
      */
-//    public function __construct()
-//    {
-//        $this->middleware('auth');
-//    }
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
 
     /**
      * Show the application dashboard.
@@ -36,29 +38,32 @@ class HomeController extends Controller
         $col_tot = MoneyReceipt::all()->sum('amount');
         $cashInMarket = 'Tk. '.number_format(($inv_tot - $col_tot),2);
         $newOrders = Order::whereOrderStatus('pending')->count();
-        $customersThisMonth = \App\User::whereHas('role', function($q){
-            $q->whereIn('name', ['Customer', 'Buyer', 'Client']);
+        $customersThisMonth = User::whereHas('roles', function($role){
+            $role->whereIn('name', [config('constants.roles.client')]);
         })->where('created_at', '>=', Carbon::now()->startOfMonth())->count();
         $collectionThisMonth = 'Tk. '.number_format((MoneyReceipt::where('created_at', '>=', Carbon::now()->startOfMonth())->sum('amount')),2);
         
         $projectData = $this->projectCardData();
          
-        if(Auth::check())
+        if(Auth::check() AND Auth::user()->is_active)
         {
-            if(Auth::user()->role->first()->name == 'Administrator')
-            { 
-                return view('admin.admin_dash.dash', compact('cashInMarket', 'newOrders', 'customersThisMonth', 'collectionThisMonth', 'projectData')); 
+            
+            //Find admin role id:
+            $adminRoleId = Role::whereName(config('constants.roles.admin'))->first()->id;
+            //Sync roles:
+            $rolesArray = [];
+            foreach (Auth::user()->roles as $role) {
+                array_push($rolesArray,$role->id);
             }
-            else
-            {
-                return view('admin.dash1');
+            if(in_array($adminRoleId, $rolesArray)){
+                return view('admin.admin_dash.dash', compact('cashInMarket', 'newOrders', 'customersThisMonth', 'collectionThisMonth', 'projectData'));
+            } else {
+                return view('home');
             }
-        }
-        else
-        {
-            return view('welcome');
         }
     }
+    
+   
     
     /*
      * Current Year Monthly Invoice Total
@@ -68,9 +73,9 @@ class HomeController extends Controller
      */
     public function getCurrentYearChartDataByMonth() 
     {
-        $mit = collect();; // Monthly Invoice Total
-        $mot = collect();; // Monthly Order Total
-        $mct = collect();; // Monthly Collection Total
+        $mit = collect(); // Monthly Invoice Total
+        $mot = collect(); // Monthly Order Total
+        $mct = collect(); // Monthly Collection Total
         $monthArr = ['01','02','03','04','05','06','07','08','09','10','11','12']; // Array of twelve months.
         /*
          * Bug Note: ('order_date', '>=', Carbon::now()->startOfYear()) 

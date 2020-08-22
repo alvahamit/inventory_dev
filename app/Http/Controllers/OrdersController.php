@@ -15,6 +15,8 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use PDF;
 use NumberFormatter;
+use Haruncpi\LaravelIdGenerator\IdGenerator;
+use Illuminate\Support\Str;
 
 
 class OrdersController extends Controller
@@ -29,16 +31,13 @@ class OrdersController extends Controller
     {
         if ($request->ajax()) {
             //return response()->json(['success' => 'ajax called']); 
-            return DataTables::of(Order::query())
+            return DataTables::of(Order::query()->where('order_type', config('constants.order_type.sales'))->get())
                             ->addColumn('order_no', function($row) {
-                                return '<small><a class="text-success" href="' .
-                                        route('orders.show', $row->id) .
-                                        '" ><i class="fas fa-eye fa-lg"></i></a> ' .
-                                        '<a class="text-warning edit" href="' .
-                                        $row->id .
-                                        '"><i class="fas fa-edit fa-lg"></i></a> <a class="text-danger delete" href="'.
-                                        $row->id.
-                                        '"><i class="fas fa-trash-alt fa-lg"></i></a></small> ' .
+                                return '<small>'.
+                                            '<a class="text-success" href="'.route('orders.show', $row->id).'" ><i class="fas fa-eye fa-lg"></i></a>'.' '.
+                                            '<a class="text-warning edit" href="'.$row->id.'"><i class="fas fa-edit fa-lg"></i></a>'.' '.
+                                            '<a class="text-danger delete" href="'.$row->id.'"><i class="fas fa-trash-alt fa-lg"></i></a>'.' '.
+                                        '</small>'.
                                         strtoupper($row->order_no);
                             })
                             ->addColumn('order_date', function($row) {
@@ -54,7 +53,7 @@ class OrdersController extends Controller
                                 return 'Tk. '.number_format($row->order_total,2);
                             })
                             ->addColumn('is_invoiced', function($row) {
-                                return $row->is_invoiced ? 'Yes' : '<a class="text-warning invoice" href="' .route('order.invoice.create',$row->id).'"><i class="fas fa-file-invoice-dollar fa-lg"></i> No </a> ';
+                                return $row->is_invoiced ? 'Yes' : '<a class="text-warning invoice" href="' .route('create.invoice',$row->id).'"><i class="fas fa-file-invoice-dollar fa-lg"></i> No </a> ';
                             })
                             ->addColumn('order_status', function($row) {
                                 return ucfirst($row->order_status);
@@ -74,15 +73,19 @@ class OrdersController extends Controller
     {
         //return response()->json(['success' => 'Create method.']);
         $products = Product::all();
-        $buyers = [];
-        $d = Buyer::all();
-        foreach ($d as $item) {
-            if (count($item->role) != 0) {
-                if ($item->role()->first()->name == 'Buyer' or $item->role()->first()->name == 'Customer') {
-                    $buyers[] = $item;
-                }
-            }
-        }
+        $buyers = Buyer::whereHas('roles', function($q){
+            $q->whereIn('name',[config('constants.roles.client')]);
+        })->where('is_active',true)->orderBy('name','asc')->get();
+        
+//        $buyers = [];
+//        $d = Buyer::all();
+//        foreach ($d as $item) {
+//            if (count($item->role) != 0) {
+//                if ($item->role()->first()->name == 'Buyer' or $item->role()->first()->name == 'Customer') {
+//                    $buyers[] = $item;
+//                }
+//            }
+//        }
 
         if (!empty($buyers)) {
             return response()->json(['buyers' => $buyers, 'products' => $products]);
@@ -148,7 +151,7 @@ class OrdersController extends Controller
     public function getOrderForInvoice(Request $request) 
     {
         $order = Order::findOrFail($request->id);
-        $order->unformated_order_date = $order->getOriginal('order_date');
+        $order->unformated_order_date = $order->getRawOriginal('order_date');
         $order->products;
         !empty($order->quantity_type) ? $quantityType = $order->quantity_type : $quantityType = 'packing';
         if(count($order->invoices) > 0){
@@ -175,7 +178,7 @@ class OrdersController extends Controller
     public function getOrderForChallan(Request $request) 
     {
         $order = Order::findOrFail($request->id);
-        $order->unformated_order_date = $order->getOriginal('order_date');
+        $order->unformated_order_date = $order->getRawOriginal('order_date');
         $order->products;
         if(count($order->challans) > 0){
             $challan_ids = $order->challans()->pluck('id')->toArray();
@@ -267,6 +270,7 @@ class OrdersController extends Controller
         $order->order_total = $request->total;
         $order->is_invoiced = false;
         $order->order_status = 'pending';
+        $order->order_type = config('constants.order_type.sales');
         
         //return response()->json(['success' => $order, 'request' => $request->all()]);
         
@@ -471,6 +475,22 @@ class OrdersController extends Controller
         $pdf = PDF::loadView('admin.order.print', compact('order'))->setPaper('a4', 'portrait');
         $fileName = 'order_'.$order->order_no;
         return $pdf->stream($fileName.'.pdf');
+    }
+    
+    /*
+     * Unique Reference Generator:
+     */
+    public function getUniqueRefNo() {
+        //Generate Unique Reference No:
+        $config = [
+            'table' => 'orders',
+            'field' => 'order_no',
+            'length' => 17,
+            'prefix' => 'vsf/'.date('y/m').'/odr-',
+            'reset_on_prefix_change' => true
+        ];
+        $id = IdGenerator::generate($config);
+        return Str::upper($id);
     }
     
     

@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Arr;
 
 class InvoiceFormRequest extends FormRequest
 {
@@ -21,15 +22,17 @@ class InvoiceFormRequest extends FormRequest
      *
      * @return array
      */
+    
     public function rules()
     {
         // Check Create or Update
         $this->method() == 'PATCH' ? $invoice_no_rules = 'required' : $invoice_no_rules = 'required|unique:invoices' ;
-        
+        list($keys, $invoice_types) = Arr::divide(config('constants.invoice_type'));
         $rules = [
             'invoice_date' => 'required',
             'invoice_no' => $invoice_no_rules,
-            'invoice_type' => 'required|in:"1","2"',
+            //'invoice_type' => 'required|in:"1","2"',
+            'invoice_type' => 'required|in:'.implode(',',$invoice_types),
             'total' => 'required',
         ];
         

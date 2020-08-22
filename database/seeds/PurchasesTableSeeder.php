@@ -20,6 +20,9 @@ class PurchasesTableSeeder extends Seeder
             'user_id' => '3',
             'purchase_type' => 'Import',
             'total' => '10000',
+            'created_at' => now(),
+            'updated_at' => now()
+            
         ]);
         DB::table($table)->insert([
             'ref_no' => 'test_pur_002',
@@ -27,6 +30,8 @@ class PurchasesTableSeeder extends Seeder
             'user_id' => '3',
             'purchase_type' => 'Import',
             'total' => '12000',
+            'created_at' => now(),
+            'updated_at' => now()
         ]);
         DB::table($table)->insert([
             'ref_no' => 'test_pur_003',
@@ -34,6 +39,8 @@ class PurchasesTableSeeder extends Seeder
             'user_id' => '2',
             'purchase_type' => 'Local',
             'total' => '8000',
+            'created_at' => now(),
+            'updated_at' => now()
         ]);
         DB::table($table)->insert([
             'ref_no' => 'test_pur_004',
@@ -41,6 +48,8 @@ class PurchasesTableSeeder extends Seeder
             'user_id' => '2',
             'purchase_type' => 'Local',
             'total' => '8000',
+            'created_at' => now(),
+            'updated_at' => now()
         ]);
         DB::table($table)->insert([
             'ref_no' => 'test_pur_005',
@@ -48,6 +57,8 @@ class PurchasesTableSeeder extends Seeder
             'user_id' => '2',
             'purchase_type' => 'Local',
             'total' => '10000',
+            'created_at' => now(),
+            'updated_at' => now()
         ]);
     }
 }

@@ -19,7 +19,7 @@
 <!-- Breadcrumbs-->
 <ol class="breadcrumb">
     <li class="breadcrumb-item">
-        <a href="{{ route('admin.dash') }}">Dashboard</a>
+        <a href="{{ route('home') }}">Home</a>
     </li>
     <li class="breadcrumb-item active">Customer Account</li>
 </ol>
@@ -91,7 +91,8 @@
                 url: "{{ route('customers.account') }}",
             },
             columns: [
-                {data: 'id', name: 'id'},
+                //{data: 'id', name: 'id'},
+                {data:'DT_RowIndex', name:'DT_RowIndex'},
                 {data: 'name', name: 'name'},
                 {data: 'company', name: 'company'},
                 {data: 'orders', name: 'orders'},
@@ -101,7 +102,7 @@
                 {data: 'received_amt', name: 'received_amt'},
                 {data: 'completes', name: 'completes'},
             ],
-            order:[[0, "desc"]],
+            //order:[[1, "asc"]],
         });
     });
 </script>

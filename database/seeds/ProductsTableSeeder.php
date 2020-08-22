@@ -20,30 +20,40 @@ class ProductsTableSeeder extends Seeder
             'description' => 'Default product description.',
             'brand' => 'Puratos',
             'country_id' => '1',
+            'created_at' => now(),
+            'updated_at' => now()
         ]);
         DB::table($table)->insert([
             'name' => 'Chocolate Premix',
             'description' => 'Default product description.',
             'brand' => 'Puratos',
             'country_id' => '1',
+            'created_at' => now(),
+            'updated_at' => now()
         ]);
         DB::table($table)->insert([
             'name' => 'Margarine',
             'description' => 'Default product description.',
             'brand' => 'EAPP',
             'country_id' => '1',
+            'created_at' => now(),
+            'updated_at' => now()
         ]);
         DB::table($table)->insert([
             'name' => 'Non-dairy Whipping Cream',
             'description' => 'Default product description.',
             'brand' => 'Anchor',
             'country_id' => '2',
+            'created_at' => now(),
+            'updated_at' => now()
         ]);
         DB::table($table)->insert([
             'name' => 'Non-dairy Whipping Cream',
             'description' => 'Default product description.',
             'brand' => 'Deli',
             'country_id' => '3',
+            'created_at' => now(),
+            'updated_at' => now()
         ]);
     }
 }

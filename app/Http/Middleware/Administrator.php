@@ -16,11 +16,12 @@ class Administrator
      */
     public function handle($request, Closure $next)
     {
-        
-        if (Auth::check()) {
+        if (Auth::user()->is_active) {
             $user = Auth::user();
-            if ($user->role()->first()->name == 'Administrator') {
-                return $next($request);
+            foreach (Auth::user()->roles as $role) {
+                if($role->name == config('constants.roles.admin')){
+                    return $next($request);
+                }
             }
         } 
         abort(403, 'Sorry!!! You are not authorized to be here.');

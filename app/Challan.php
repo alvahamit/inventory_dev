@@ -27,7 +27,8 @@ class Challan extends Model
         'to_store_address', 
         'customer_id',
         'customer_name',
-        'delivery_address'
+        'delivery_address',
+        'issued_by'
     ];
     
     /*

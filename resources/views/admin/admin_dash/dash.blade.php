@@ -10,15 +10,14 @@
 
 @section('logo', __('VSF Distribution'))
 
-@section('pageheading', __('Dashboard'))
+@section('pageheading', __('Welcome to Admin. Dashboard'))
 
 @section('content')
 <!-- Breadcrumbs-->
 <ol class="breadcrumb">
-    <li class="breadcrumb-item">
+    <li class="breadcrumb-item active">
         <a href="#">Dashboard</a>
     </li>
-    <li class="breadcrumb-item active">Overview</li>
 </ol>
 
 @include('admin.admin_dash.components.cards')

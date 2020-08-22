@@ -14,10 +14,11 @@ class UsersRolesController extends Controller
      */
     public function index()
     {
+        Role::latest()->first() ? $lastUpdated = Role::latest()->first()->updated_at->diffForHumans() : $lastUpdated = "never" ;
         //Get all roles
         $roles = Role::all();
         //Pass the value into view.
-        return view('admin.role.index', compact('roles'));
+        return view('admin.role.index', compact('roles', 'lastUpdated'));
     }
 
     /**
