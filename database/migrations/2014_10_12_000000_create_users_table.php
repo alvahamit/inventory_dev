@@ -24,6 +24,7 @@ class CreateUsersTable extends Migration
             $table->rememberToken();
             $table->boolean('is_admin')->default(false);
             $table->boolean('is_active')->default(false);
+            $table->float('credit_limit')->nullable()->default(0);
             $table->timestamps();
         });
     }

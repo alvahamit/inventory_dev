@@ -546,6 +546,8 @@ $(document).ready(function(){
      * Customer select on change function:
      */
     $('#user_id').click(function(){
+        fillBillingAddress();
+        clearShippingFields();
         var user_id = $(this).val();
         var customer_name = $('#user_id option:selected').text();
         var organization = '';
@@ -559,9 +561,8 @@ $(document).ready(function(){
             type: method,
             dataType: 'json',
             success: function(data) {
-                console.log('Success:', data); 
+                //console.log('Success:', data); 
                 organization = data['buyer']['organization'];
-
                 var contactArray = [];
                 $.each(data['contacts'], function(index, value){
                     var ph = data['contacts'][index]['country_code'] +'-' 
@@ -570,12 +571,8 @@ $(document).ready(function(){
                     contactArray.push(ph);
                 });
                 phone = contactArray.toString();
-
                 var addressOptions = [];
                 $.each(data['address'], function(index, value){
-                    //if (data['address'][index]['pivot']['is_primary']){
-                        //addressOptions.push({ 'text': data['address'][index]['address'], 'value': data['address'][index]['id'] });
-                    //}
                     addressOptions.push({ 'text': data['address'][index]['address'], 'value': data['address'][index]['id'] });
                 });
                 if (addressOptions.length > 1){
@@ -595,16 +592,8 @@ $(document).ready(function(){
                                 });
                             }
                     });
-                } 
-                else 
-                {
+                } else {
                     $.each(data['address'], function(index, value){
-    //                            if (data['address'][index]['pivot']['is_primary'])
-    //                            {
-    //                                address = data['address'][index]['address'] + '\r\n' + data['address'][index]['city'] + ' ' + data['address'][index]['postal_code'];
-    //                                fillBillingAddress(customer_name, organization, address, phone);
-    //                                fillShippingAddress();
-    //                            }
                         address = data['address'][index]['address'];
                         if(data['address'][index]['city'] !== null){ address += '\r\n' + data['address'][index]['city']; }
                         if(data['address'][index]['postal_code'] !== null){ address += ' '+data['address'][index]['postal_code']; }
@@ -618,8 +607,8 @@ $(document).ready(function(){
             },
             error: function(data) { console.log('Error:', data); }
         });
-    //console.log(user_id);
     });
+    
     /*
      * Ajax Call goes to: PurchaseController@getProdData
      * This call gets product data for adding 
@@ -809,7 +798,7 @@ $(document).ready(function(){
                 centerVertical: true,
                 size: 'medium',
                 closeButton: false,
-                message: "Are you doing this by mistake? <br> If you confirm a record will be permantly deleted. Please confirm your action.",
+                message: "<div class='text-center lead'>Are you doing this by mistake?<br>A record is going to be permantly deleted.<br>Please confirm your action!!!</div>",
                 title: "Please confirm...",
                 buttons: {
                   success: {

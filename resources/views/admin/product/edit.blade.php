@@ -19,15 +19,15 @@
 <!-- Breadcrumbs-->
 <ol class="breadcrumb">
     <li class="breadcrumb-item">
-        <a href="{{ route('admin.dash') }}">Dashboard</a>
+        <a href="{{ route('home') }}">Home</a>
     </li>
     <li class="breadcrumb-item">
         <a href="{{ route('products.index') }}">Products</a>
     </li>
     <li class="breadcrumb-item active">Edit Product</li>
 </ol>
-<!--<h1>Okay!! you can now edit this product.</h1><hr>-->
 
+<div class="col-md-8 offset-md-2">
 <form method="POST" action="{{route('products.update', $product->id)}}" accept-charset="UTF-8">
     {{method_field('PATCH')}}
     @csrf
@@ -127,15 +127,17 @@
                     <div class="col-md-4">
                         <input class="btn btn-primary btn-block" type="submit" value="Save">
                     </div> 
-                    
                     </form>
+                    <!--close Form for edit-->
                     <div class="col-md-4">
+                        <!--start Form for delete-->
                         <form method="POST" action="{{route('products.destroy', $product->id)}}" accept-charset="UTF-8">
                             {{method_field('DELETE')}}
                             @csrf
                             <input class="btn btn-danger btn-block" type="submit" value="Delete">
                             </div> 
                         </form>
+                        <!--end Form for delete-->
                         <div class="col-md-4">
                             <a class="btn btn-success btn-block" href="{{route('products.index')}}">Back</a>
                         </div> 
@@ -144,11 +146,8 @@
 
         </div> <!--./card body-->
     </div> <!--./card card-register mx-auto mt-5-->
-
-
-
+</div>
 
 @include('includes.display_form_errors')
-
 
 @stop

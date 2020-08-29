@@ -25,13 +25,6 @@ class Purchase extends Model
         return $this->belongsTo('App\User');
     }
     
-    /*
-     * Relation setup:
-     * many to Many Polimorphic using Stock.
-     */
-//    public function stock() {
-//        return $this->morphToMany('App\Stock', 'stockable');
-//    }
     
     /*
      * Relation setup:

@@ -24,7 +24,7 @@
     <li class="breadcrumb-item active">Transfer Challan</li>
 </ol>
 
-<div class="container">
+<div class="container mycontent">
     <form name="challanForm" id="challanForm" method="POST" action="{{route('challans.store')}}" accept-charset="UTF-8">
         <div id="form-errors" class="alert alert-warning">
             <button type="button" class="close" data-dismiss="alert">×</button>
@@ -99,6 +99,16 @@
         </div>
     </form> 
 </div> <!-- ./container -->
+<style type="text/css">
+    .mycontent{
+        background-color: white;
+        margin-top: 40px;
+    }
+    .mycontent form{
+        padding-top: 20px;
+        padding-bottom: 5px;
+    }
+</style>
 @stop
 
 @section('scripts')

@@ -8,6 +8,7 @@ use App\Country;
 use App\Measurement;
 use App\Packing;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Session;
 
 class ProductsController extends Controller
 {
@@ -78,7 +79,7 @@ class ProductsController extends Controller
             $packing->price = $request->price;
             $packing->save();
         }
-        
+        Session::flash('success', $newProduct->name.' created.');
         return redirect(route('products.index'));
     }
 
@@ -128,9 +129,6 @@ class ProductsController extends Controller
             $packing = new Packing();
             $packing->product_id = $id;
         }
-        
-        
-        
         //update product with request data.
         $product->name = $request->name;
         $product->description = $request->description;
@@ -148,9 +146,8 @@ class ProductsController extends Controller
         if($product->update()){
             $packing->save();
         }
-       
+        Session::flash('success', $product->name.' updated.');
         return redirect(route('products.index'));
-        
         //return $packing;
     }
 
@@ -164,11 +161,17 @@ class ProductsController extends Controller
     {
         //find product
         $product = Product::findOrFail($id);
-        //find product packing
-        $packing = Packing::findOrFail($product->packings()->first()->id);
-        //delete
-        $packing->delete();
-        $product->delete();
-        return redirect(route('products.index'));
+        if($product->purchases->count() == 0){
+            //find product packing
+            $packing = Packing::findOrFail($product->packings()->first()->id);
+            //delete
+            $packing->delete();
+            $product->delete();
+            Session::flash('success', $product->name.' deleted.');
+            return redirect(route('products.index'));
+        } else {
+            Session::flash('errors', 'Product in use. '.$product->name.' cannot be deleted.');
+            return redirect(route('products.index'));
+        }
     }
 }

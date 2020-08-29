@@ -43,7 +43,7 @@
                 <a class="collapse-item" href="{{route('purchases.index')}}">Purchases</a>
                 <div class="collapse-divider"></div>
                 <h6 class="collapse-header">Catalog:</h6>
-                <a class="collapse-item" href="{{route('categories.index')}}">Categories</a>
+                <!--<a class="collapse-item" href="{{route('categories.index')}}">Categories</a>-->
                 <a class="collapse-item" href="{{route('products.index')}}">Products</a>
             </div>
         </div>
@@ -65,7 +65,7 @@
                 <div class="collapse-divider"></div>
                 <h6 class="collapse-header">Customer:</h6>
                 <a class="collapse-item" href="{{route('customers.index')}}">Customers</a>
-                <a class="collapse-item" href="{{route('customers.account')}}">Account</a>
+                <a class="collapse-item" href="{{route('customers.account')}}">Account Status</a>
             </div>
         </div>
     </li>
@@ -86,7 +86,7 @@
                 <a class="collapse-item" href="{{route('transfer.challan.index')}}">Transfer Records</a>
                 <div class="collapse-divider"></div>
                 <h6 class="collapse-header">Stock-out (other):</h6>
-                <a class="collapse-item" href="{{route('home')}}">Wastage</a>
+                <a class="collapse-item" href="{{route('wastage.index')}}">Wastage</a>
             </div>
         </div>
     </li>
@@ -100,8 +100,9 @@
         <div id="collapseMarketing" class="collapse" aria-labelledby="headingSale" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
                 <h6 class="collapse-header">Sampling Memos:</h6>
-                <a class="collapse-item" href="#">Leads</a>
-                <a class="collapse-item" href="{{route('samples.index')}}">Samples</a>
+                <a class="collapse-item" href="{{route('leads.index')}}"">Leads</a>
+                <a class="collapse-item" href="{{route('samples.index')}}">Sample Req.</a>
+                <a class="collapse-item" href="{{route('sample.invoice.index')}}">Invoices</a>
                 <a class="collapse-item" href="{{route('sample.challan.index')}}">Challan</a>
                 <div class="collapse-divider"></div>
                 <h6 class="collapse-header">Customer:</h6>

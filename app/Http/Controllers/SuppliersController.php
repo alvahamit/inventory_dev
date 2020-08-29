@@ -37,33 +37,43 @@ class SuppliersController extends Controller
                 })->orderBy('id','desc')->get();
         if($request->ajax()){
             return DataTables::of($data)
-                    ->addIndexColumn()
-                    ->addColumn('name', function($row){
-                        return '<a href="'.$row->id.'">'.$row->name.'</a>';
-                    })
-                    ->addColumn('role', function($row){
-                        //return $row->role->first()->name;
-                        if($row->roles->count() > 0){
-                            $array = $row->roles()->pluck('name');
-                            $html= "<ul>";
-                            foreach ($array as $item){
-                                $html .= "<li>".$item."</li>";
-                            }
-                            $html .= "</ul>";
-                            return $html;
-                        }
-                    })
-                    ->addColumn('is_active', function($row){
-                        return $row->is_active ? '<span class="text-success"><i class="fas fa-check-circle"></i></span>' : '<span class="text-warning"><i class="fas fa-times-circle"></i></span>';
+                ->addIndexColumn()
+                ->addColumn('role', function($row){
+                    if($row->roles->count() > 0){
+                        $array = $row->roles()->pluck('name');
+                        $html= "<ul>";
+                        foreach ($array as $item){$html .= "<li>".$item."</li>";}
+                        $html .= "</ul>";
+                        return $html;
+                    }
                 })
-                    ->addColumn('created_at', function($row){
-                        return $row->created_at->diffForHumans();
-                    })
-                    ->addColumn('updated_at', function($row){
-                        return $row->updated_at->diffForHumans();
-                    })
-                    ->rawColumns(['name','role', 'is_active'])
-                    ->make(true);
+                ->addColumn('is_active', function($row){
+                    return $row->is_active ? '<span class="text-success"><i class="fas fa-check-circle"></i></span>' : '<span class="text-warning"><i class="fas fa-times-circle"></i></span>';
+                })
+                ->addColumn('created_at', function($row){
+                    return $row->created_at->diffForHumans();
+                })
+                ->addColumn('updated_at', function($row){
+                    return $row->updated_at->diffForHumans();
+                })
+                ->addColumn('action', function($row){
+                    $btn = '<div class="btn-group">';
+                    $btn = $btn.'<button type="button" class="btn btn-warning btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+                    $btn = $btn.'Action';
+                    $btn = $btn.'</button>';
+                    $btn = $btn.'<div class="dropdown-menu">';
+                    $btn = $btn.'<a class="show dropdown-item" href="'.$row->id.'"><i class="fas fa-eye"></i> View</a>';
+                    $btn = $btn.'<a class="edit dropdown-item" href="'.$row->id.'"><i class="fas fa-edit"></i> Edit</a>';
+                    $btn = $btn.'<a class="del dropdown-item" href="'.$row->id.'"><i class="fas fa-trash-alt"></i> Delete</a>';
+                    $btn = $btn.'<div class="dropdown-divider"></div>';
+                    $btn = $btn.'<a class="yes dropdown-item" href="'.$row->id.'"><i class="far fa-check-circle"></i> Activate</a>';
+                    $btn = $btn.'<a class="no dropdown-item" href="'.$row->id.'"><i class="far fa-times-circle"></i> Deactivate</a>';
+                    $btn = $btn.'</div>';
+                    $btn = $btn.'</div>';
+                    return $btn;
+                })
+                ->rawColumns(['role', 'is_active','action'])
+                ->make(true);
         }
         if(!empty($data)){
             return view('admin.supplier.index', compact('roles', 'lastUpdated', 'countries'));
@@ -291,22 +301,28 @@ class SuppliersController extends Controller
      */
     public function destroy($id)
     {
-        
-        //find user by id then delete
         $user = Supplier::findOrFail($id);
         //Roles check:
         //Check and detach appropriate roles from user:
         $userRoleIdsArr = $user->roles()->pluck('id')->toArray();
         $allowedRoleIdsArr = Role::whereIn('name',[config('constants.roles.supplier'), config('constants.roles.exporter')])->pluck('id')->toArray();
         if(empty(array_diff($userRoleIdsArr,$allowedRoleIdsArr))){
-            $user->roles()->detach();
-            $user->addresses()->detach();
-            $user->contacts()->detach();
-            $user->delete();
-            return response()->json([
-                'status' =>true,
-                'message' => 'Supplier '.$user->name.' removed.' 
-            ]);
+            if( $user->purchases->count() == 0 ){
+                $user->roles()->detach();
+                $user->addresses()->detach();
+                $user->contacts()->detach();
+                $user->delete();
+                return response()->json([
+                    'status' =>true,
+                    'message' => 'Supplier '.$user->name.' removed.' 
+                ]);
+            } else {
+                return response()->json([
+                    'status' =>false,
+                    'message' => 'Sorry!!! Supplier cannot be removed. Purchases have been made from '.$user->name.'.' 
+                ]);
+            }
+            
         } else {
             return response()->json([
                 'status' =>false,

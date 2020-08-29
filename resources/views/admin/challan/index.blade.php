@@ -46,6 +46,7 @@
                         <th>Products</th>
                         <th>Qty. Type</th>
                         <th>Delivered From</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tfoot>
@@ -58,6 +59,7 @@
                         <th>Products</th>
                         <th>Qty. Type</th>
                         <th>Delivered From</th>
+                        <th>Action</th>
                     </tr>
                 </tfoot>
 
@@ -92,16 +94,23 @@ $(document).ready(function(){
             {data: 'customer_name', name: 'customer_name'},
             {data: 'transfer_items', name: 'transfer_items'},
             {data: 'quantity_type', name: 'quantity_type'},
-            {data: 'store_name', name: 'store_name'}
+            {data: 'store_name', name: 'store_name'},
+            {data: 'action', name: 'action'},
         ],
-        order:[[0, "desc"]]
+        order:[[0, "desc"]],
+        columnDefs: [
+            {
+                "targets": 8, // Count starts from 0.
+                "className": "text-center",
+                "width": "auto"
+            },
+        ],
    });
     
     /*
-    * challanDataTable Delete icon click:
-    * Deleting Challan.
+    * Datatable Action Column:
     */
-    $('#challanDataTable').on('click', 'a.text-danger.delete', function (e){
+    $('#challanDataTable').on('click', 'a.del', function (e){
         e.preventDefault();
         var id = $(this).attr('href');
         // Confirm box
@@ -110,7 +119,7 @@ $(document).ready(function(){
             //centerVertical: true,
             //size: '50%',
             closeButton: false,
-            message: "Are you doing this by mistake? <br> If you confirm a record will be permantly deleted. Please confirm your action.",
+            message: "<div class='text-center lead'>Are you doing this by mistake?<br>A record is going to be permantly deleted.<br>Please confirm your action!!!</div>",
             title: "Please confirm...",
             buttons: {
               success: {
@@ -153,6 +162,24 @@ $(document).ready(function(){
             }
           }) //Confirm Box
     }) //Delete Icon click end.
+    $('#challanDataTable').on('click', 'a.edit', function (e) {
+        e.preventDefault();
+        bootbox.alert({
+            size: "small",
+            title: "Opps!!!",
+            message: "This functionality is not written yet! <br> If you need this Cry out to your developer.",
+            backdrop: true
+        });
+    })
+    $('#challanDataTable').on('click', 'a.pdf', function (e) {
+        e.preventDefault();
+        bootbox.alert({
+            size: "small",
+            title: "Opps!!!",
+            message: "This functionality is not written yet! <br> If you need this Cry out to your developer.",
+            backdrop: true
+        });
+    })
 
 
 

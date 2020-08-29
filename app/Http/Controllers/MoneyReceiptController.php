@@ -29,14 +29,14 @@ class MoneyReceiptController extends Controller
         $data = Mr::all();
         if ($request->ajax()) {
             return DataTables::of($data)
-                ->addColumn('mr_no', function($row) {
-                    return '<small>'.
-                                '<a class="text-success" href="'.route('mrs.show',$row->id).'" target="_blank"><i class="fas fa-eye fa-lg"></i></a> '.
-                                '<a class="text-warning edit" href="'.$row->id.'"><i class="fas fa-edit fa-lg"></i></a>'.
-                                '<a class="text-danger delete" href="'.$row->id.'"><i class="fas fa-trash-alt fa-lg"></i></a>'.
-                            '</small> '.
-                            strtoupper($row->mr_no);
-                })
+//                ->addColumn('mr_no', function($row) {
+//                    return '<small>'.
+//                                '<a class="text-success" href="'.route('mrs.show',$row->id).'" target="_blank"><i class="fas fa-eye fa-lg"></i></a> '.
+//                                '<a class="text-warning edit" href="'.$row->id.'"><i class="fas fa-edit fa-lg"></i></a>'.
+//                                '<a class="text-danger delete" href="'.$row->id.'"><i class="fas fa-trash-alt fa-lg"></i></a>'.
+//                            '</small> '.
+//                            strtoupper($row->mr_no);
+//                })
                 ->addColumn('mr_date', function($row) {
                     return !empty($row->mr_date) ? Carbon::create($row->mr_date)->toFormattedDateString() : "";
                 })
@@ -53,7 +53,22 @@ class MoneyReceiptController extends Controller
                 ->addColumn('pay_mode', function($row) {
                     return $row->pay_mode;
                 })
-                ->rawColumns(['mr_no', 'customer_name'])
+                ->addColumn('action', function($row){
+                    $btn = '<div class="btn-group">';
+                    $btn = $btn.'<button type="button" class="btn btn-warning btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+                    $btn = $btn.'Action';
+                    $btn = $btn.'</button>';
+                    $btn = $btn.'<div class="dropdown-menu">';
+                    $btn = $btn.'<a class="show dropdown-item" href="'.route('mrs.show', $row->id).'" target="_blank"><i class="fas fa-eye"></i> Show</a>';
+                    $btn = $btn.'<a class="edit dropdown-item" href="'.$row->id.'"><i class="fas fa-edit"></i> Edit</a>';
+                    $btn = $btn.'<a class="del dropdown-item" href="'.$row->id.'"><i class="fas fa-trash-alt"></i> Delete</a>';
+                    $btn = $btn.'<div class="dropdown-divider"></div>';
+                    $btn = $btn.'<a class="pdf dropdown-item" href="'.$row->id.'"><i class="far fa-file-pdf"></i> PDF</a>';
+                    $btn = $btn.'</div>';
+                    $btn = $btn.'</div>';
+                    return $btn;
+                })
+                ->rawColumns(['action', 'customer_name'])
                 ->make(true);
         } else {
             return view("admin.moneyreceipt.index", compact('customers','lastUpdated'));

@@ -56,6 +56,7 @@ class UsersFormRequest extends FormRequest
             'country_code_contact.*' => 'required',
             'number' => 'required|array|min:1',
             'number.*' => 'required',
+            'credit_limit' => 'nullable|numeric',
         ];
         return $rules;
     }

@@ -54,6 +54,7 @@ Route::group(['middleware' => 'auth'], function(){
    Route::resource('/orders', 'OrdersController');
    Route::resource('/customers', 'CustomersController');
    Route::resource('/invoices', 'InvoiceController');
+     Route::resource('/wastage', 'WastageController');
    Route::get('/create-invoice/{id}', 'InvoiceController@create')->name('create.invoice');
    //Route::get('/create-invoice/{id}', 'InvoiceController@createSampleInvoice')->name('sample.invoice.create');
    Route::resource('/challans', 'ChallanController');
@@ -62,8 +63,10 @@ Route::group(['middleware' => 'auth'], function(){
    Route::get('/transfer-challan/{id}', 'ChallanController@showtrch')->name('show.trch');
    Route::get('/transfer/index', 'ChallanController@transferChallanIndex')->name('transfer.challan.index');
    Route::get('/sample-challan/index', 'ChallanController@sampleChallanIndex')->name('sample.challan.index');
+   Route::get('/sample-invoice/index', 'InvoiceController@sampleInvoiceIndex')->name('sample.invoice.index');
    Route::resource('/mrs', 'MoneyReceiptController');
    Route::resource('/samples', 'SampleController');
+   Route::resource('/leads', 'LeadsController');
    /*
     * For accounts personnel
     */
@@ -86,16 +89,21 @@ Route::group(['middleware' => 'auth'], function(){
    Route::get('/get-store-stock', 'StoresController@getStoreProducts')->name('get.store.stock');
    Route::POST('/challans-store-transfer', 'ChallanController@storeTransfer')->name('challans.store.transfer');
    Route::get('/mr/get', 'MoneyReceiptController@getMr')->name('mr.ajax.get');
+   Route::POST('leads/convert', 'LeadsController@convert')->name('convert.lead');
+   Route::POST('user/activate', 'UsersController@activate')->name('activate.user');
+   Route::POST('user/deactivate', 'UsersController@deactivate')->name('deactivate.user');
    
    /*
     * Printing routes
     */
    Route::post('/purchase/pdf','PurchasesController@pdf')->name('print.purchase');
    Route::post('/order/pdf','OrdersController@pdf')->name('print.order');
+   Route::post('/order/dl','OrdersController@dlpdf')->name('dl.order');
    Route::post('/invoice/pdf','InvoiceController@pdf')->name('print.invoice');
    Route::post('/challan/pdf','ChallanController@pdf')->name('print.challan');
    Route::post('/trch/pdf','ChallanController@pdftrch')->name('print.trch');
    Route::post('/mr/pdf','MoneyReceiptController@pdf')->name('print.mr');
+   Route::post('/wastage/pdf','WastageController@pdf')->name('print.wastage');
 });
 
 /*
@@ -106,6 +114,8 @@ Route::get('/ref-no-for-buy', 'PurchasesController@getUniqueRefNo')->name('get.b
 Route::get('/ref-no-for-order', 'OrdersController@getUniqueRefNo')->name('get.order.ref');
 Route::get('/ref-no-for-invoice', 'InvoiceController@getUniqueRefNo')->name('get.invoice.ref');
 Route::get('/ref-no-for-challan', 'ChallanController@getUniqueRefNo')->name('get.challan.ref');
+Route::get('/ref-no-for-wastage', 'WastageController@getUniqueRefNo')->name('get.wastage.ref');
+
 
 
 /*

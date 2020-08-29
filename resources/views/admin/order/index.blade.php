@@ -48,6 +48,7 @@
                         <th>Total</th>
                         <th>Invoiced?</th>
                         <th>Status</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tfoot>
@@ -60,6 +61,7 @@
                         <th>Total</th>
                         <th>Invoiced?</th>
                         <th>Status</th>
+                        <th>Action</th>
                     </tr>
                 </tfoot>
 
@@ -83,7 +85,9 @@
                 
                 <!--Order Form-->
                 <form id="orderForm" name="orderForm" class="form-horizontal" autocomplete="off">
-                    <div id="form-errors" class="alert alert-warning"></div>
+                    <div id="form-errors" class="alert alert-warning alert-dismissible fade show">
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    </div>
                     @csrf
                     <!--hidden id input-->
                     <input type="hidden" name="id" id="id">
@@ -428,25 +432,30 @@ $(document).ready(function(){
      * Initialize Yajra on document table.
      */
     $('#dataTable').DataTable({
-    processing: true,
-            servirSide: true,
-            ajax: {
+        processing: true,
+        servirSide: true,
+        ajax: {
             url: "{{ route('orders.index') }}",
-            },
-            columns: [
+        },
+        columns: [
             {data: 'id', name: 'id'},
-            {data: 'order_no',
-                    name: 'order_no',
-                    render: function(data){return htmlDecode(data); }
-            },
+            {data: 'order_no', name: 'order_no'},
             {data: 'order_date', name: 'order_date'},
             {data: 'customer_name', name: 'customer_name'},
             {data: 'quantity_type', name: 'quantity_type'},
             {data: 'order_total', name: 'order_total'},
             {data: 'is_invoiced', name: 'is_invoiced'},
             {data: 'order_status', name: 'order_status'},
-            ],
-            order:[[0, "desc"]],
+            {data: 'action', name: 'action'},
+        ],
+        order:[[0, "desc"]],
+        columnDefs: [
+            {
+                "targets": 8, // Count starts from 0.
+                "className": "text-center",
+                "width": "auto"
+            },
+        ],
     });
     /*
      * Initialize form with:
@@ -845,10 +854,10 @@ $(document).ready(function(){
     });
 
     /*
-    * Datatable Edit icon click:
-    * Editing Order.
+    * Datatable Action column:
+    * Actions.
     */
-    $('#dataTable').on('click', 'a.text-warning.edit', function (e) {
+    $('#dataTable').on('click', 'a.edit', function (e) {
         e.preventDefault();
         var id = $(this).attr('href');
         //console.log(id);
@@ -998,12 +1007,7 @@ $(document).ready(function(){
         $('#ajaxModel').modal('handleUpdate');
         $('#order_no').trigger('focus');
     });
-    
-    /*
-    * Datatable Delete icon click:
-    * Deleting Order.
-    */
-    $('#dataTable').on('click', 'a.text-danger.delete', function (e){
+    $('#dataTable').on('click', 'a.del', function (e){
         e.preventDefault();
         var id = $(this).attr('href');
         // Confirm box
@@ -1012,7 +1016,7 @@ $(document).ready(function(){
             //centerVertical: true,
             size: '50%',
             closeButton: false,
-            message: "Are you doing this by mistake? <br> If you confirm a record will be permantly deleted. Please confirm your action.",
+            message: "<div class='text-center lead'>Are you doing this by mistake?<br>A record is going to be permantly deleted.<br>Please confirm your action!!!</div>",
             title: "Please confirm...",
             buttons: {
               success: {
@@ -1050,6 +1054,14 @@ $(document).ready(function(){
               }
             }
           }) //Confirm Box
+    });
+    $('#dataTable').on('click', 'a.pdf', function (e){
+        e.preventDefault();
+        bootbox.alert({
+            title: "Not working...",
+            message: "Aparently downloading pdf via AJAX is not possible. Have to find other solution.",
+            size: 'small'
+        });
     });
 
 }); //Document ready function.

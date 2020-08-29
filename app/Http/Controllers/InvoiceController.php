@@ -24,7 +24,66 @@ class InvoiceController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            return DataTables::of(Invoice::query()->get())
+            $data = Invoice::where('invoice_type', '!=', config('constants.invoice_type.sample'))->get();
+            return DataTables::of($data)
+                ->addColumn('invoice_date', function($row) {
+                    return !empty($row->invoice_date) ? Carbon::create($row->invoice_date)->toFormattedDateString() : "";
+                })
+                ->addColumn('billed_to', function($row) {
+                    return Str::limit($row->billed_to, 35);
+                })
+                ->addColumn('quantity_type', function($row) {
+                    return ucfirst($row->quantity_type);
+                })
+                ->addColumn('invoice_total', function($row) {
+                    return 'Tk. '.number_format($row->invoice_total,2);
+                })
+                ->addColumn('invoice_type', function($row) {
+                    switch ($row->invoice_type)
+                    {
+                        case config('constants.invoice_type.whole'):
+                            $type = 'Sales (Whole)';
+                            break;
+                        case config('constants.invoice_type.partial'):
+                            $type = 'Sales (Partial)';
+                            break;
+                        case config('constants.invoice_type.sample'):
+                            $type = 'Sample';
+                            break;
+                        default:
+                            $type = 'Sales (Whole)';
+                    }
+                    return $type;
+                })
+                ->addColumn('action', function($row){
+                    $btn = '<div class="btn-group">';
+                    $btn = $btn.'<button type="button" class="btn btn-warning btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+                    $btn = $btn.'Action';
+                    $btn = $btn.'</button>';
+                    $btn = $btn.'<div class="dropdown-menu">';
+                    $btn = $btn.'<a class="show dropdown-item" href="'.route('invoices.show', $row->id).'" target="_blank"><i class="fas fa-eye"></i> View</a>';
+                    $btn = $btn.'<a class="edit dropdown-item" href="'.$row->id.'"><i class="fas fa-edit"></i> Edit</a>';
+                    $btn = $btn.'<a class="del dropdown-item" href="'.$row->id.'"><i class="fas fa-trash-alt"></i> Delete</a>';
+                    $btn = $btn.'<div class="dropdown-divider"></div>';
+                    $btn = $btn.'<a class="pdf dropdown-item" href="'.$row->id.'"><i class="far fa-file-pdf"></i> PDF</a>';
+                    $btn = $btn.'</div>';
+                    $btn = $btn.'</div>';
+                    return $btn;
+                })
+                ->rawColumns(['invoice_no', 'billed_to','action'])
+                ->make(true);
+        } else {
+            return view('admin.invoice.index');
+        }
+        
+    }
+
+    
+    public function sampleInvoiceIndex(Request $request)
+    {
+        if ($request->ajax()) {
+            $data = Invoice::where('invoice_type', '=', config('constants.invoice_type.sample'))->get();
+            return DataTables::of($data)
                 ->addColumn('invoice_no', function($row) {
                     return '<small>'.
                                 '<a class="text-success" href="'.route('invoices.show',$row->id).'"target="_blank"><i class="fas fa-eye fa-lg"></i></a> '.
@@ -64,11 +123,14 @@ class InvoiceController extends Controller
                 ->rawColumns(['invoice_no', 'billed_to'])
                 ->make(true);
         } else {
-            return view('admin.invoice.index');
+            return view('admin.invoice.index_sample');
         }
         
     }
-
+    
+    
+    
+    
     
     /**
      * Display a listing of the resource for a specific Order.

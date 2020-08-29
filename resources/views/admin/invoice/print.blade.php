@@ -24,14 +24,14 @@ $type = 'Sales (Whole)';
 
 @section('title', __('VSF-Print Invoice'))
 
-@section('pageheading')<h3 class="display-3">Invoice</h3>@stop
+@section('pageheading')<h4 class="display-4">Invoice</h4>@stop
 
 @section('content')    
 
 <div class="col-12 mt-5">
     <div class="row">
         <div class="col-6">
-            <strong>Invoice No#</strong> {!! strtoupper($invoice->invoice_no) !!}
+            <strong>Ref No #</strong> {!! strtoupper($invoice->invoice_no) !!}
         </div>
         <div class="offset-6 text-right">
             <strong>Date:</strong> {{$invoice->invoice_date}} <br>
@@ -119,6 +119,17 @@ $type = 'Sales (Whole)';
         </div>
     </div>
     
+    @if($invoice->invoice_type == config('constants.invoice_type.sample'))
+    <div style="margin-top: 2%">
+        <div class="row" >
+        <div class="col-4" style="background-color: lightgray; padding: 1rm; border-radius: 1rm;">
+            <strong>Declaration: </strong>
+            <p>Sample Only. <br>Have No Commercial Value.</p>
+        </div>
+    </div>
+    </div>
+    
+    @endif
 </div>
 
 <style>

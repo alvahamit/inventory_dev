@@ -23,7 +23,7 @@ class Product extends Model
      * One to Many with Purchase (via pivot).
      */
     public function purchases() {
-        return $this->belongsToMany('App\Purchase','product_purchase', 'purchase_id', 'product_id');
+        return $this->belongsToMany('App\Purchase','product_purchase','product_id', 'purchase_id');
     }
     
     
@@ -54,7 +54,7 @@ class Product extends Model
     /*
      * Method to explain stock
      * Cmt: for total stock.
-     * @returns $result[]
+     * @returns $result[] of unit, qty, price
      */
     public function itemStock($inFormat = '', $storeId = '') {
         //Note: If store id is provided use id to get store specific stock otherwise get all stock:
@@ -78,7 +78,7 @@ class Product extends Model
                 $unit = $this->units()->first()->short;
                 $result = [
                     'unit' => $unit,
-                    'qty' => $qty,
+                    'qty' => round($qty,2),
                     'price' => $price
                 ];
                 break;
@@ -87,16 +87,25 @@ class Product extends Model
                 $price = round($this->packings()->first()->price/($this->packings()->first()->multiplier),2);
                 $result = [
                     'unit' => 'pcs',
-                    'qty' => $qty,
+                    'qty' => round($qty,2),
                     'price' => $price
                 ];
+                break;
+            case "packing":
+                $unit = $this->packings()->first()->name;
+                $price = round($this->packings()->first()->price, 2);
+                $result = [
+                    'unit' => $unit,
+                    'qty' => round($count,2),
+                    'price' => $price
+                ]; 
                 break;
             default:
                 $unit = $this->packings()->first()->name;
                 $price = round($this->packings()->first()->price, 2);
                 $result = [
                     'unit' => $unit,
-                    'qty' => $count,
+                    'qty' => round($count,2),
                     'price' => $price
                 ];          
         }
@@ -146,5 +155,26 @@ class Product extends Model
         }
         return $qty;
     }
+    /*
+     * Reverse quantity:
+     */
+    public function qtyDenormalizer($inFormat = '', $count){
+        switch ($inFormat){
+            case "weight":
+                $qty = $count*($this->packings()->first()->quantity / $this->packings()->first()->multiplier);
+                break;
+            case "pcs":
+                $qty = $count*$this->packings()->first()->multiplier;
+                break;
+            case "packing":
+                $qty = $count;
+                break;
+            default:
+                $qty = $count;        
+        }
+        return $qty;
+    }
+    
+    
     
 }

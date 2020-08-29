@@ -16,12 +16,6 @@ class PurchasesController extends Controller {
     public function index(Request $request) {
         if ($request->ajax()) {
             return DataTables::of(Purchase::query())
-                ->addColumn('ref_no', function($row) {
-                    return '<a class="text-success" href="'.route('purchases.show', $row->id).'" target="_blank"><i class="fas fa-eye"></i></a> '.
-                            '<a class="text-warning edit" href="'.$row->id.'"><i class="fas fa-edit"></i></a> '.
-                            '<a class="text-danger delete" href="'.$row->id.'"><i class="fas fa-trash-alt"></i></a> '.
-                            strtoupper($row->ref_no);
-                })
                 ->addColumn('receive_date', function($row){
                     return !empty($row->receive_date) ? Carbon::create($row->receive_date)->toFormattedDateString() : "";
                 })
@@ -38,6 +32,22 @@ class PurchasesController extends Controller {
                 ->addColumn('updated_at', function($row) {
                     return !empty($row->updated_at) ? $row->updated_at->diffForHumans() : "";
                 })
+                ->addColumn('action', function($row){
+                    $btn = '<div class="btn-group">';
+                    $btn = $btn.'<button type="button" class="btn btn-warning btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+                    $btn = $btn.'Action';
+                    $btn = $btn.'</button>';
+                    $btn = $btn.'<div class="dropdown-menu">';
+                    $btn = $btn.'<a class="show dropdown-item" href="'.route('purchases.show', $row->id).'" target="_blank"><i class="fas fa-eye"></i> View</a>';
+                    $btn = $btn.'<a class="edit dropdown-item" href="'.$row->id.'"><i class="fas fa-edit"></i> Edit</a>';
+                    $btn = $btn.'<a class="del dropdown-item" href="'.$row->id.'"><i class="fas fa-trash-alt"></i> Delete</a>';
+                    $btn = $btn.'<div class="dropdown-divider"></div>';
+                    $btn = $btn.'<a class="pdf dropdown-item" href="'.$row->id.'"><i class="far fa-file-pdf"></i> PDF</a>';
+                    $btn = $btn.'</div>';
+                    $btn = $btn.'</div>';
+                    return $btn;
+                })
+                ->rawColumns(['action'])    
                 ->make(true);
         }
         //return view('admin.purchase.index');
@@ -173,13 +183,41 @@ class PurchasesController extends Controller {
     public function destroy($id) {
         //find purchase by id:
         $purchase = Purchase::findOrFail($id);
-        //Detach all Purchase items from PIVOT:
-        $purchase->products()->detach();
-        //Detach all stocks from PIVOT:
-        $purchase->stock()->detach();
-        //Finally delete purchase:
-        $purchase->delete();
-        return response()->json(['success' => 'Item has been destroyed.']);
+        $result = true;
+        foreach($purchase->products as $product)
+        {
+            $stockQty = $product->itemStock()['qty'];
+            //return response()->json(['product' => $product->name,'stock' => $stockQty]);
+            $purchQty = $product->pivot->quantity;
+            //return response()->json(['product' => $product->name,'purchase qty' => $purchQty]);
+            if(($stockQty - $purchQty) >= 0 ){
+                $result = $result*true;
+            } else {
+                $result = $result*false;
+            }
+        }
+        /*
+         * Note: 
+         * If stock of all items of this purchase calculates to 0 or more
+         * $result will return "true" else $result will return "false".
+         */
+        if($result){
+            //Detach all Purchase items from PIVOT:
+            $purchase->products()->detach();
+            //Detach all stocks from PIVOT:
+            $purchase->stock()->detach();
+            //Finally delete purchase:
+            $purchase->delete();
+            return response()->json([
+                'status' =>true,
+                'message' => 'Purchase '.$purchase->ref_no.' receive dated '.$purchase->receive_date.' deleted.'
+            ]);
+        } else {
+            return response()->json([
+                'status' =>false,
+                'message' => 'Purchased items may have already been traded. Cannot deleted this purchase now.'
+            ]);
+        }
     }
 
 }

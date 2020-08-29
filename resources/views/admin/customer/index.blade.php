@@ -47,6 +47,7 @@
                         <th>Active?</th>
                         <th>Created</th>
                         <th>Updated</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tfoot>
@@ -60,6 +61,7 @@
                         <th>Active?</th>
                         <th>Created</th>
                         <th>Updated</th>
+                        <th>Action</th>
                     </tr>
                 </tfoot>
             </table>
@@ -151,6 +153,11 @@
                                                     class="form-control" 
                                                     value="{{old('email')}}">
                                             <!--</div>-->
+                                        </div>
+                                        <!--Credit Limit-->
+                                        <div class="form-group">
+                                            <label for="credit_limit">Credit Limit:</label>
+                                            <input type="number" step="1" min="0" name="credit_limit" id="credit_limit" class="form-control" value="{{old('credit_limit')}}">
                                         </div>
                                         
                                         <!--is_active-->
@@ -519,11 +526,17 @@ $(document).ready(function(){
             {data:'is_active', name:'is_active'},
             {data:'created_at', name:'created_at'},
             {data:'updated_at', name:'updated_at'},
+            {data:'action', name:'action'},
         ],
         order:[[1,"asc"]],
         columnDefs: [
             {
                 "targets": 6, // Count starts from 0.
+                "className": "text-center",
+                "width": "auto"
+            },
+            {
+                "targets": 9, // Count starts from 0.
                 "className": "text-center",
                 "width": "auto"
             },
@@ -772,10 +785,9 @@ $(document).ready(function(){
     });
     
     /*
-     * Datatable Anchor tag click:
-     * Open modal for viewing data:
+     * Datatable Action column:
      */
-    $('#dataTable').on('click', 'a', function (e) {
+    $('#dataTable').on('click', 'a.show', function (e) {
         var customerId = $(this).attr('href');
         $.get('{{ route("customers.index") }}' +'/' + customerId, function (data) {
             //console.log(data);
@@ -896,7 +908,220 @@ $(document).ready(function(){
         });
         //Stop following the link address:
         return false;
-    }); //Anchor tag click function.
+    }); //Action Show.
+    $('#dataTable').on('click', 'a.edit', function (e) {
+        var customerId = $(this).attr('href');
+        $.get('{{ route("customers.index") }}' +'/' + customerId, function (data) {
+            //console.log(data);
+            var addresses = data['customer']['addresses'];
+            var contacts = data['customer']['contacts'];
+            var contactList;
+            var roleName = '<ul>';
+                //find role name if set:
+                if(data['customer']['roles'].length>0){
+                    //roleName = data['user']['role'][0]['name'];
+                    $.each(data['customer']['roles'], function(index,value){
+                        //console.log(value['name']);
+                        roleName += '<li>'+value['name']+'</li>';
+                    });
+                } else {
+                    roleName += '<li>Undefined</li>';
+                }
+                roleName += '</ul>';
+            //Clear previous data:
+            clearViewFields(); 
+            //Set new data:
+            $('#user_id').val(data['customer']['id']);
+            $('#modelHeading').html(data['customer']['name']+'<br><small class="text-muted">'+data['customer']['organization']+'</small>');
+            $('#displayEmail').html( 
+                        '<div class="container">'+
+                            '<span><i class="far fa-envelope"></i> '+data['customer']['email']+'</span> '+ 
+                            '<br>'+
+                            '<span><span><i class="fas fa-user-tie"></i> Assigned Roles: '+roleName+'</span>'+
+                        '</div>'
+                    ).show();
+            
+            if(contacts.length>0){
+                $('#displayContact').html('<div class="container"></div>');
+                $(contacts).each(function(index, value){
+                    var country_code;
+                    var city_code;
+                    value.country_code != null ? country_code = value.country_code : country_code = '';
+                    value.city_code != null ? city_code = value.city_code : city_code = '';
+                    $('#displayContact .container').append( 
+                        '<span><i class="fas fa-phone"></i> '+
+                        country_code+'-'+city_code+'-'+value.number+ 
+                        '</span> '+ 
+                        '<span><i class="fas fa-tag"></i> '+value.label+'</span><br>' 
+                    ); 
+                });
+            } else {
+                $('#displayContact').html('No contacts added yet.');
+            }
+            
+            if(addresses.length > 0){
+                $(addresses).each(function(index, value){
+                    var is_primary; 
+                    var is_billing; 
+                    var is_shipping;
+                    var contact =[];
+                    if(value.pivot.is_primary) { 
+                        is_primary = '<input class="form-check-input" type="checkbox" checked="checked">';
+                    } else { is_primary = '<input class="form-check-input" type="checkbox">'; }
+                    if(value.pivot.is_billing) { 
+                        is_billing = '<input class="form-check-input" type="checkbox" checked="checked">';
+                    } else { is_billing = '<input class="form-check-input" type="checkbox">'; }
+                    if(value.pivot.is_shipping) { 
+                        is_shipping = '<input class="form-check-input" type="checkbox" checked="checked">';
+                    } else { is_shipping = '<input class="form-check-input" type="checkbox">'; } 
+                    
+                    
+                    
+                    //Set up contacts html:
+                    var list = '<ul>';
+                    $(contact).each( function(index, value){list += '<li>'+value+'</li>' ; });
+                    list += '</ul>';
+                    //conlose.log(list);
+                    $('#carouselIndicators ol').append('<li data-target="#carouselIndicators" data-slide-to="'+index+'"></li>');
+                    $('#carouselInner').append(
+                        '<div class="carousel-item">'
+                        +'<span class="float-left">Address type: <strong>'+value.label+'</strong></span><br>'
+                        +'<div class="form-check form-check-inline">'
+                        +is_primary
+                        +'<label class="form-check-label">Primary</label>'
+                        +'</div>'
+                        +'<div class="form-check form-check-inline">'
+                        +is_billing
+                        +'<label class="form-check-label">Billing</label>'
+                        +'</div>'
+                        +'<div class="form-check form-check-inline">'
+                        +is_shipping
+                        +'<label class="form-check-label">Shipping</label>'
+                        +'</div><br>'
+                        +value.address+'<br>'
+                        +value.state+', '
+                        +value.city+'<br>'
+                        +value.postal_code+'</p>'
+                        +'<a id="editBtn" class="btn btn-primary right col-3 float-right" href="'+ value.id +'">Edit</a>'
+                        +'</div>'
+                    );
+                    //console.log(value.pivot.is_primary);
+                });
+            } else {
+                $('#carouselInner').append(
+                    '<div class="carousel-item">'
+                    +'<p>No addresses found for this user.</p>'
+                    +'<p>To add an address please click "Add" button below.</p>'
+                    +'<a class="btn btn-primary col-3 float-right" href="">Add</a>'
+                    +'</div>'
+                );
+            }
+            //Set active classes for carousal to function properly:
+            $('#carouselIndicators ol li').each(function(){
+                $(this).attr('data-slide-to') == '0' ? $(this).attr('class','active') : '' ;
+                //console.log($(this).attr('data-slide-to'));
+            });
+            $('#carouselInner div').first().addClass('active');
+            //Finally show modal:
+            $('#modalForm').hide();
+            $('#carouselIndicators').show();
+            $('#ajaxModel').modal('show');
+            
+        });
+        //Stop following the link address:
+        return false;
+    }); //Action Edit.
+    $('#dataTable').on('click', 'a.del', function (e) {
+        e.preventDefault();
+        var id = $(this).attr('href');
+        bootbox.dialog({
+            backdrop: true,
+            centerVertical: false,
+            closeButton: false,
+            message: "<div class='text-center lead'>Are you doing this by mistake?<br>A record is going to be permantly deleted.<br>Please confirm your action!!!</div>",
+            title: "Please confirm...",
+            buttons: {
+              success: {
+                label: "Confirm",
+                className: "btn-danger",
+                callback: function() {
+                    var action = '{{ route("customers.index") }}'+'/' + id;
+                    var method = 'DELETE';
+                    $.ajax({
+                        data: {'_token': '{{ csrf_token() }}'},
+                        url: action,
+                        type: method,
+                        dataType: 'json',
+                        success: function (data) {
+                            //console.log(data);
+                            $('#dataTable').DataTable().ajax.reload();
+                            $('#pageMsg').html(showMsg(data.status, data.message));
+                            //Sctoll to top:
+                            $("html, body").animate({ scrollTop: 0 }, 1000);
+                        },
+                        error: function (data) {
+                            console.log(data);
+                            $('#pageMsg').html(showMsg(false, 'Something is not right!!!'));
+                        }
+                    }); // Ajax call
+                }
+              },
+              danger: {
+                label: "Cancel",
+                className: "btn-success",
+                callback: function() {
+                    $('#modalForm').trigger("reset");
+                }
+              }
+            }
+          });
+    }); //Action Delete.
+    $('#dataTable').on('click', 'a.yes', function (e) {
+        e.preventDefault();
+        var id = $(this).attr('href');
+        var action = '{{ route("activate.user") }}';
+        var method = 'POST';
+        $.ajax({
+            data: {'_token': '{{ csrf_token() }}', 'id':id},
+            url: action,
+            type: method,
+            dataType: 'json',
+            success: function (data) {
+                //console.log(data);
+                $('#dataTable').DataTable().ajax.reload();
+                $('#pageMsg').html(showMsg(data.status, data.message));
+                //Sctoll to top:
+                $("html, body").animate({ scrollTop: 0 }, 1000);
+            },
+            error: function (data) {
+                console.log(data);
+                $('#pageMsg').html(showMsg(false, 'Something is not right!!!'));
+            }
+        }); // Ajax call
+    }); //Action Activate.
+    $('#dataTable').on('click', 'a.no', function (e) {
+        e.preventDefault();
+        var id = $(this).attr('href');
+        var action = '{{ route("deactivate.user") }}';
+        var method = 'POST';
+        $.ajax({
+            data: {'_token': '{{ csrf_token() }}', 'id':id},
+            url: action,
+            type: method,
+            dataType: 'json',
+            success: function (data) {
+                //console.log(data);
+                $('#dataTable').DataTable().ajax.reload();
+                $('#pageMsg').html(showMsg(data.status, data.message));
+                //Sctoll to top:
+                $("html, body").animate({ scrollTop: 0 }, 1000);
+            },
+            error: function (data) {
+                console.log(data);
+                $('#pageMsg').html(showMsg(false, 'Something is not right!!!'));
+            }
+        }); // Ajax call
+    }); //Action Deactivate.
     
     /*
      * Edit User with Selected Address:
@@ -922,6 +1147,7 @@ $(document).ready(function(){
             $('#name').val(data['customer']['name']);
             $('#organization').val(data['customer']['organization']);
             $('#email').val(data['customer']['email']);
+            $('#credit_limit').val(data['customer']['credit_limit']);
             if(data['customer']['is_active']){ $("#yes").prop("checked", true); }
             if(!data['customer']['is_active']){ $("#no").prop("checked", true); }
             if(addressId !== ""){ 
@@ -1010,7 +1236,7 @@ $(document).ready(function(){
             backdrop: true,
             //centerVertical: true,
             closeButton: false,
-            message: "Are you doing this by mistake? <br> If you confirm a record will be permantly deleted. Please confirm your action.",
+            message: "<div class='text-center lead'>Are you doing this by mistake?<br>A record is going to be permantly deleted.<br>Please confirm your action!!!</div>",
             title: "Please confirm...",
             buttons: {
               success: {

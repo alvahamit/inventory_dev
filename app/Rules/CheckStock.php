@@ -49,7 +49,7 @@ class CheckStock implements Rule
     {
         if($this->store_id > 0){
             $store = Store::findOrFail($this->store_id);
-            return 'Sufficient stock may not be available in <strong>'.$store->name.'.' ;
+            return 'Item quantity exceeded available stock at <strong>'.$store->name.'.' ;
         } else {
             return 'You have selected an invalid store.' ;
         }

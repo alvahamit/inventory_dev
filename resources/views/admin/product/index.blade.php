@@ -23,7 +23,8 @@
     </li>
     <li class="breadcrumb-item active">Products</li>
 </ol>
-<!--<h1>Hi!! I found following products:</h1>-->
+@include('errors.myerrormsg')
+@include('errors.mysuccessmsg')
 <!--Add new button-->
 <div class="form-group text-right d-print-none">
     <a class="btn btn-primary right" href="{{route('products.create')}}">Add new</a>

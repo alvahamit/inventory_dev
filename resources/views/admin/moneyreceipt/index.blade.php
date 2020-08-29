@@ -45,6 +45,7 @@
                         <th>Company</th>
                         <th>Amount</th>
                         <th>Pay Mode</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tfoot>
@@ -56,6 +57,7 @@
                         <th>Company</th>
                         <th>Amount</th>
                         <th>Pay Mode</th>
+                        <th>Action</th>
                     </tr>
                 </tfoot>
 
@@ -423,15 +425,23 @@
             url: "{{ route('mrs.index') }}",
             },
             columns: [
-            {data: 'id', name: 'id'},
-            {data: 'mr_no', name: 'mr_no'},
-            {data: 'mr_date', name: 'mr_date'},
-            {data: 'customer_name', name: 'customer_name'},
-            {data: 'customer_company', name: 'customer_company'},
-            {data: 'amount', name: 'amount'},
-            {data: 'pay_mode', name: 'pay_mode'},
+                {data: 'id', name: 'id'},
+                {data: 'mr_no', name: 'mr_no'},
+                {data: 'mr_date', name: 'mr_date'},
+                {data: 'customer_name', name: 'customer_name'},
+                {data: 'customer_company', name: 'customer_company'},
+                {data: 'amount', name: 'amount'},
+                {data: 'pay_mode', name: 'pay_mode'},
+                {data: 'action', name: 'action'},
             ],
             order:[[0, "desc"]],
+            columnDefs: [
+                {
+                    "targets": 7, // Count starts from 0.
+                    "className": "text-center",
+                    "width": "auto"
+                },
+            ]
         });
 
         /*
@@ -645,10 +655,9 @@
         });
 
         /*
-        * Datatable Edit icon click:
-        * Editing MR.
+        * Datatable Action column:
         */
-        $('#dataTable').on('click', 'a.text-warning.edit', function (e) {
+        $('#dataTable').on('click', 'a.edit', function (e) {
             e.preventDefault();
             var id = $(this).attr('href');
             //console.log(id);
@@ -716,12 +725,7 @@
             $('#ajaxModel').modal('handleUpdate');
             $('#order_no').trigger('focus');
         });
-
-        /*
-        * Datatable Delete icon click:
-        * Deleting MR.
-        */
-        $('#dataTable').on('click', 'a.text-danger.delete', function (e){
+        $('#dataTable').on('click', 'a.del', function (e){
             e.preventDefault();
             var id = $(this).attr('href');
             // Confirm box
@@ -771,6 +775,14 @@
                 }
               }) //Confirm Box
 
+        });
+        $('#dataTable').on('click', 'a.pdf', function (e){
+            e.preventDefault();
+            bootbox.alert({
+                title: "Not working...",
+                message: "Aparently downloading pdf via AJAX is not possible. Have to find other solution.",
+                size: 'small'
+            });
         });
 
     }); //Document ready function.

@@ -32,7 +32,7 @@
 </div> 
 <!-- DataTables Example -->
 <div class="card mb-3">
-    <div class="card-header"><i class="fas fa-table"></i> Customer Account Data Table </div>
+    <div class="card-header"><i class="fas fa-table"></i> Customer Status Data Table </div>
     <div class="card-body">
         <div class="table-responsive">
             <table class="table table-striped" id="dataTable" width="100%" cellspacing="0">
@@ -46,6 +46,7 @@
                         <th>Invoiced</th>
                         <th>Invoiced Amt.</th>
                         <th>Received Amt.</th>
+                        <th>Credit</th>
                         <th>Completed</th>
                     </tr>
                 </thead>
@@ -59,6 +60,7 @@
                         <th>Invoiced</th>
                         <th>Invoiced Amt.</th>
                         <th>Received Amt.</th>
+                        <th>Credit</th>
                         <th>Completed</th>
                     </tr>
                 </tfoot>
@@ -100,6 +102,7 @@
                 {data: 'invoiced', name: 'invoiced'},
                 {data: 'invoice_amt', name: 'invoice_amt'},
                 {data: 'received_amt', name: 'received_amt'},
+                {data: 'credit', name: 'credit'},
                 {data: 'completes', name: 'completes'},
             ],
             //order:[[1, "asc"]],

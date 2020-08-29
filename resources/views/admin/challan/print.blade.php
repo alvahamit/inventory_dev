@@ -12,12 +12,14 @@ switch ($challan->challan_type)
 {
 case config('constants.challan_type.sales'):
 $type = 'Sales';
+$refLabel = 'Odr No #';
 break;
 case config('constants.challan_type.transfer'):
 $type = 'Transfer';
 break;
 case config('constants.challan_type.sample'):
 $type = 'Sample';
+$refLabel = 'Req No #';
 break;
 default:
 $type = 'Sales';
@@ -26,16 +28,16 @@ $type = 'Sales';
 
 @section('title', __('VSF-Print Challan'))
 
-@section('pageheading')<h3 class="display-3">{{$type}} Challan</h3>@stop
+@section('pageheading')<h4 class="display-4">{{$type}} Challan</h4>@stop
 
 @section('content')
 
 <div class="col-12 mt-5">
     <div class="row">
         <div class="col-6">
-            <strong>Challan No#</strong> {!! strtoupper($challan->challan_no) !!}
+            <strong>Ref No #</strong> {!! strtoupper($challan->challan_no) !!}
             @if($challan->order_no)
-            <br><strong>Order No#:</strong> {{$challan->order_no}}
+            <br><strong>{{$refLabel}}</strong> {{$challan->order_no}}
             @endif
         </div>
         <div class="offset-6 text-right">

@@ -25,11 +25,6 @@ class ChallanController extends Controller
     {
         if ($request->ajax()) {
             return DataTables::of(Challan::query()->where('challan_type', config('constants.challan_type.sales'))->get())
-                ->addColumn('challan_no', function($row) {
-                    return '<small><a class="text-success" href="'.route('challans.show',$row->id).'" target="_blank"><i class="fas fa-eye fa-lg"></i></a> '.
-                            '<a class="text-danger delete" href="'.$row->id.'"><i class="fas fa-trash-alt fa-lg"></i></a></small> ' .
-                            strtoupper($row->challan_no);
-                })
                 ->addColumn('challan_date', function($row) {
                     return !empty($row->challan_date) ? Carbon::create($row->challan_date)->toFormattedDateString() : "";
                 })
@@ -47,7 +42,22 @@ class ChallanController extends Controller
                 ->addColumn('store_name', function($row) {
                     return $row->store_name;
                 })
-                ->rawColumns(['challan_no', 'customer_name'])
+                ->addColumn('action', function($row){
+                    $btn = '<div class="btn-group">';
+                    $btn = $btn.'<button type="button" class="btn btn-warning btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+                    $btn = $btn.'Action';
+                    $btn = $btn.'</button>';
+                    $btn = $btn.'<div class="dropdown-menu">';
+                    $btn = $btn.'<a class="show dropdown-item" href="'.route('challans.show', $row->id).'" target="_blank"><i class="fas fa-eye"></i> View</a>';
+                    $btn = $btn.'<a class="edit dropdown-item" href="'.$row->id.'"><i class="fas fa-edit"></i> Edit</a>';
+                    $btn = $btn.'<a class="del dropdown-item" href="'.$row->id.'"><i class="fas fa-trash-alt"></i> Delete</a>';
+                    $btn = $btn.'<div class="dropdown-divider"></div>';
+                    $btn = $btn.'<a class="pdf dropdown-item" href="'.$row->id.'"><i class="far fa-file-pdf"></i> PDF</a>';
+                    $btn = $btn.'</div>';
+                    $btn = $btn.'</div>';
+                    return $btn;
+                })
+                ->rawColumns(['customer_name', 'action'])
                 ->make(true);
         } else {
             return view("admin.challan.index");
@@ -99,13 +109,16 @@ class ChallanController extends Controller
      */
     public function transferChallanIndex(Request $request)
     {
+        $data = Challan::query()->where('challan_type', config('constants.challan_type.transfer'));
+        $data->latest()->first() ? $lastUpdated = $data->latest()->first()->updated_at->diffForHumans() : $lastUpdated = "never";
+        
         if ($request->ajax()) {
             return DataTables::of(Challan::query()->where('challan_type', config('constants.challan_type.transfer'))->get())
-                ->addColumn('challan_no', function($row) {
-                    return '<small><a class="text-success" href="'.route('show.trch',$row->id).'" target="_blank"><i class="fas fa-eye fa-lg"></i></a> '.
-                            '<a class="text-danger delete" href="'.$row->id.'"><i class="fas fa-trash-alt fa-lg"></i></a></small> ' .
-                            strtoupper($row->challan_no);
-                })
+//                ->addColumn('challan_no', function($row) {
+//                    return '<small><a class="text-success" href="'.route('show.trch',$row->id).'" target="_blank"><i class="fas fa-eye fa-lg"></i></a> '.
+//                            '<a class="text-danger delete" href="'.$row->id.'"><i class="fas fa-trash-alt fa-lg"></i></a></small> ' .
+//                            strtoupper($row->challan_no);
+//                })
                 ->addColumn('challan_date', function($row) {
                     return !empty($row->challan_date) ? Carbon::create($row->challan_date)->toFormattedDateString() : "";
                 })
@@ -119,10 +132,25 @@ class ChallanController extends Controller
                     $trItems = implode(', ', $row->products->pluck('name')->toArray());
                     return $trItems;
                 })
-                ->rawColumns(['challan_no'])
+                ->addColumn('action', function($row){
+                    $btn = '<div class="btn-group">';
+                    $btn = $btn.'<button type="button" class="btn btn-warning btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+                    $btn = $btn.'Action';
+                    $btn = $btn.'</button>';
+                    $btn = $btn.'<div class="dropdown-menu">';
+                    $btn = $btn.'<a class="show dropdown-item" href="'.route('show.trch', $row->id).'" target="_blank"><i class="fas fa-eye"></i> View</a>';
+                    $btn = $btn.'<a class="edit dropdown-item" href="'.$row->id.'"><i class="fas fa-edit"></i> Edit</a>';
+                    $btn = $btn.'<a class="del dropdown-item" href="'.$row->id.'"><i class="fas fa-trash-alt"></i> Delete</a>';
+                    $btn = $btn.'<div class="dropdown-divider"></div>';
+                    $btn = $btn.'<a class="pdf dropdown-item" href="'.$row->id.'"><i class="far fa-file-pdf"></i> PDF</a>';
+                    $btn = $btn.'</div>';
+                    $btn = $btn.'</div>';
+                    return $btn;
+                })
+                ->rawColumns(['action'])
                 ->make(true);
         } else {
-            return view("admin.challan.trchindex");
+            return view("admin.challan.trchindex", compact('lastUpdated'));
         }
     }
     

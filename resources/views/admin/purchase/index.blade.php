@@ -22,7 +22,6 @@
     </li>
     <li class="breadcrumb-item active">Purchases</li>
 </ol>
-<!--<h1>Hi!! you have made following purchases:</h1>-->
 <!--Add new button-->
 <div class="form-group text-right d-print-none">
     <!--<a class="btn btn-primary right" href="{{route('purchases.create')}}">Add new</a>-->
@@ -44,6 +43,7 @@
                         <th>Total</th>
                         <th>Created</th>
                         <th>Updated</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tfoot>
@@ -56,6 +56,7 @@
                         <th>Total</th>
                         <th>Created</th>
                         <th>Updated</th>
+                        <th>Action</th>
                     </tr>
                 </tfoot>
 
@@ -233,6 +234,31 @@
     }
     
     /*
+    * @param {boolean} status
+    * @param {string} message
+    * @returns {String}
+    * Description: This function is used to show page message.
+    */
+   function showMsg(status, message)
+   {
+       if(status == false)
+       {
+           var html =  '<div class="alert alert-warning alert-dismissible fade show">'+
+                           '<strong>'+ message + '</strong>'+
+                           '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
+                       '</div>'
+           return html;
+       }
+       if(status == true)
+       {
+           var html =  '<div class="alert alert-success alert-dismissible fade show">'+
+                           '<strong>'+ message + '</strong>'+
+                           '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
+                       '</div>'
+           return html;
+       }
+   }
+    /*
      * This creates options for product selection: 
      * @param {int} id
      * @param {text} name
@@ -282,16 +308,14 @@
             },
             columns: [
                 {data: 'id', name: 'id'},
-                {data: 'ref_no', 
-                    name: 'ref_no',
-                    render: function(data){return htmlDecode(data);}
-                },
+                {data: 'ref_no', name: 'ref_no'},
                 {data: 'receive_date', name: 'receive_date'},
                 {data: 'supplier', name: 'supplier'},
                 {data: 'purchase_type', name: 'purchase_type'},
                 {data: 'total', name: 'total'},
                 {data: 'created_at', name: 'created_at'},
                 {data: 'updated_at', name: 'updated_at'},
+                {data: 'action', name: 'action'},
             ],
             order:[[0,"desc"]]
         });
@@ -519,7 +543,7 @@
                     background: 'gray',
                     size: 'md',
                     closeButton: false,
-                    message: "Are you doing this by mistake? <br> If you confirm a record will be permantly deleted. Please confirm your action.",
+                    message: "<div class='text-center lead'>Are you doing this by mistake?<br>A record is going to be permantly deleted.<br>Please confirm your action!!!</div>",
                     title: "Please confirm...",
                     buttons: {
                       success: {
@@ -570,10 +594,9 @@
         });
         
         /*
-         * Data Table icons click functions: 
+         * Datatable Action Column: 
          */
-        //Edit Icon:
-        $('#dataTable').on('click', 'a.text-warning.edit', function (e) {
+        $('#dataTable').on('click', 'a.edit', function (e) {
             e.preventDefault();
             $('#createNew').trigger('click');
             $('#items .set').remove();
@@ -627,60 +650,59 @@
             });
             //Stop following the link address:
             return false;
-        });
-        
-        //Delete Icon:
-        $('#dataTable').on('click', 'a.text-danger.delete', function (e) {
+        }); //Action Edit
+        $('#dataTable').on('click', 'a.del', function (e) {
             e.preventDefault();
             var purchaseId = $(this).attr('href');
-            var reference = $(this).parent().parent().text();
-            console.log( $(this).parent().parent().text() );
-            //console.log($(this).attr('href'));
-            
-            // Confirm box
-                bootbox.dialog({
-                    backdrop: true,
-                    centerVertical: true,
-                    size: 'md',
-                    closeButton: true,
-                    message: "You are about to delete <strong>"+reference+"</strong>. Are you doing this by mistake? Records will be permantly deleted. <br>Please confirm your action.",
-                    title: "Please confirm ...",
-                    buttons: {
-                      success: {
-                        label: "Confirm",
-                        className: "btn-danger",
-                        callback: function() {
-                            //I DONT KNOW WHAT TO DO HERE
-                            var action = '{{ route('ajax-purchases.index') }}'+'/' + purchaseId;
-                            var method = 'DELETE';
-                            console.log(purchaseId, action, method);
-                            $.ajax({
-                                data: {
-                                    "_token": "{{ csrf_token() }}",
-                                    "id": purchaseId
-                                },
-                                url: action,
-                                type: method,
-                                dataType: 'json',
-                                success: function (data) {
-                                    console.log('Success:', data);
-                                    $('#dataTable').DataTable().ajax.reload();
-                                },
-                                error: function (data) {
-                                    console.log('Error:', data);
-                                }
-                            }); // Ajax call
-                        }
-                      },
-                      danger: {
-                        label: "Cancel",
-                        className: "btn-success",
-                        callback: function() {}
-                      }
+            bootbox.dialog({
+                backdrop: true,
+                centerVertical: false,
+                size: 'md',
+                closeButton: true,
+                message: "<div class='text-center lead'>Are you doing this by mistake?<br>A record is going to be permantly deleted.<br>Please confirm your action!!!</div>",
+                title: "Please confirm ...",
+                buttons: {
+                  success: {
+                    label: "Confirm",
+                    className: "btn-danger",
+                    callback: function() {
+                        //I DONT KNOW WHAT TO DO HERE
+                        var action = '{{ route('ajax-purchases.index') }}'+'/' + purchaseId;
+                        var method = 'DELETE';
+                        console.log(purchaseId, action, method);
+                        $.ajax({
+                            data: {
+                                "_token": "{{ csrf_token() }}",
+                                "id": purchaseId
+                            },
+                            url: action,
+                            type: method,
+                            dataType: 'json',
+                            success: function (data) {
+                                console.log('Success:', data);
+                                $('#dataTable').DataTable().ajax.reload();
+                                $('#pageMsg').html(showMsg(data.status, data.message));
+                                $("html, body").animate({ scrollTop: 0 }, 1000);
+                            },
+                            error: function (data) {
+                                console.log('Error:', data);
+                                $('#pageMsg').html(showMsg(false, 'Something is not right!!!'));
+                            }
+                        }); // Ajax call
                     }
-                  });
-        });
-        
+                  },
+                  danger: {
+                    label: "Cancel",
+                    className: "btn-success",
+                    callback: function() {}
+                  }
+                }
+              });
+        }); //Action Delete
+        $('#dataTable').on('click', 'a.pdf', function (e) {
+            e.preventDefault();
+            bootbox.alert("Function not available yet!");
+        }); //Action PDF.
         
     }); //Document Ready function.
 </script>

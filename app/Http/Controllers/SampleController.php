@@ -69,20 +69,12 @@ class SampleController extends Controller
      */
     public function create()
     {
-        //return response()->json(['success' => 'Create method.']);
+        $buyers = Buyer::whereHas('roles', function($q){
+            $q->whereIn('name',[config('constants.roles.client'),config('constants.roles.lead')]);
+        })->where('is_active',true)->orderBy('name','asc')->get();       
         $products = Product::all();
-        $buyers = [];
-        $d = Buyer::all();
-        foreach ($d as $item) {
-            if (count($item->role) != 0) {
-                if ($item->role()->first()->name == 'Buyer' or $item->role()->first()->name == 'Customer') {
-                    $buyers[] = $item;
-                }
-            }
-        }
         if (!empty($buyers)) {
             return response()->json(['buyers' => $buyers, 'products' => $products]);
-            //return view('admin.order.create', compact('buyers','products'));
         } else {
             return response()->json(['error' => 'No supplier registered to system.']);
         }

@@ -21,12 +21,12 @@
     <li class="breadcrumb-item">
         <a href="{{ route('home') }}">Home</a>
     </li>
-    <li class="breadcrumb-item active">Invoices</li>
+    <li class="breadcrumb-item active">Sample Invoices</li>
 </ol>
 
 <!-- DataTables Example -->
 <div class="card mb-3">
-    <div class="card-header"><i class="fas fa-table"></i> Invoice Data Table </div>
+    <div class="card-header"><i class="fas fa-table"></i> Sample Invoice Data Table </div>
     <div class="card-body">
         <div class="table-responsive">
             <table class="table table-bordered" id="invoiceDataTable" width="100%" cellspacing="0">
@@ -40,10 +40,18 @@
                         <th>Qty Type</th>
                         <th>Invoiced Amt.</th>
                         <th>Invoice Type</th>
-                        <th>Action</th>
                     </tr>
                 </thead>
-                <tbody></tbody>
+                <tbody>
+                    <tr>
+                        <td>01</td>
+                        <td>INV_001</td>
+                        <td>12-2-20</td>
+                        <td>Whole</td>
+                        <td>Company XYZ</td>
+                        <td>Tk. 45000.00</td>
+                    </tr>
+                </tbody>
                 <tfoot>
                     <tr>
                         <th>Id</th>
@@ -54,7 +62,6 @@
                         <th>Qty Type</th>
                         <th>Invoiced Amt.</th>
                         <th>Invoice Type</th>
-                        <th>Action</th>
                     </tr>
                 </tfoot>
 
@@ -77,7 +84,7 @@ $(document).ready(function(){
         processing: true,
         servirSide: true,
         ajax: {
-            url: '{{ route("invoices.index") }}',
+            url: '{{ route("sample.invoice.index") }}',
             //success: function(data){ console.log(data); },
         },
         columns: [
@@ -89,22 +96,15 @@ $(document).ready(function(){
             {data: 'quantity_type', name: 'quantity_type'},
             {data: 'invoice_total', name: 'invoice_total'},
             {data: 'invoice_type', name: 'invoice_type'},
-            {data: 'action', name: 'action'},
         ],
         order:[[0, "desc"]],
-        columnDefs: [
-            {
-                "targets": 8, // Count starts from 0.
-                "className": "text-center",
-                "width": "auto"
-            },
-        ],
    })
    
    /*
-    * Datatable Action Column:
+    * invoiceDataTable Delete icon click:
+    * Deleting Order.
     */
-    $('#invoiceDataTable').on('click', 'a.del', function (e){
+    $('#invoiceDataTable').on('click', 'a.text-danger.delete', function (e){
         e.preventDefault();
         var id = $(this).attr('href');
         // Confirm box
@@ -113,7 +113,7 @@ $(document).ready(function(){
             //centerVertical: true,
             //size: '50%',
             closeButton: false,
-            message: "<div class='text-center lead'>Are you doing this by mistake?<br>A record is going to be permantly deleted.<br>Please confirm your action!!!</div>",
+            message: "Are you doing this by mistake? <br> If you confirm a record will be permantly deleted. Please confirm your action.",
             title: "Please confirm...",
             buttons: {
               success: {
@@ -157,16 +157,12 @@ $(document).ready(function(){
             }
           }) //Confirm Box
     }) //Delete Icon Click end.
-    $('#invoiceDataTable').on('click', 'a.edit', function (e) {
-        e.preventDefault();
-        bootbox.alert({
-            size: "small",
-            title: "Opps!!!",
-            message: "This functionality is not written yet! <br> If you need this CRY out to your developer.",
-            backdrop: true
-        });
-    })
-    $('#invoiceDataTable').on('click', 'a.pdf', function (e) {
+    
+    /*
+    * Datatable Edit icon click:
+    * Editing Order.
+    */
+    $('#invoiceDataTable').on('click', 'a.text-warning.edit', function (e) {
         e.preventDefault();
         bootbox.alert({
             size: "small",

@@ -24,12 +24,11 @@
     <li class="breadcrumb-item active">Challan</li>
 </ol>
 
-<!--<h1>Your stock transfer records are below:</h1>-->
 <!--Add new button-->
-<div class="form-group text-right">
+<!--<div class="form-group text-right">-->
     <!--<a class="btn btn-primary right" href="{{route('purchases.create')}}">Add new</a>-->
     <!--<button id="createNew" class="btn btn-primary col-1 right">New Order</button>-->
-</div> 
+<!--</div>--> 
 <!-- DataTables Example -->
 <div class="card mb-3">
     <div class="card-header"><i class="fas fa-table"></i> Challan Data Table </div>
@@ -44,6 +43,7 @@
                         <th>From Store</th>
                         <th>To Store</th>
                         <th>Transfered Items</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tfoot>
@@ -54,13 +54,14 @@
                         <th>From Store</th>
                         <th>To Store</th>
                         <th>Transfered Items</th>
+                        <th>Action</th>
                     </tr>
                 </tfoot>
 
             </table>
         </div>
     </div>
-    <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
+    <div class="card-footer small text-muted">Updated {{$lastUpdated}}</div>
 </div>
 @stop
 
@@ -85,16 +86,23 @@ $(document).ready(function(){
             {data: 'challan_date', name: 'challan_date'},
             {data: 'store_name', name: 'store_name'},
             {data: 'to_store_name', name: 'to_store_name'},
-            {data: 'transfer_items', name: 'transfer_items'}
+            {data: 'transfer_items', name: 'transfer_items'},
+            {data: 'action', name: 'action'}
         ],
-        order:[[0, "desc"]]
+        order:[[0, "desc"]],
+        columnDefs: [
+            {
+                "targets": 6, // Count starts from 0.
+                "className": "text-center",
+                "width": "auto"
+            },
+        ],
    });
     
     /*
-    * challanDataTable Delete icon click:
-    * Deleting Challan.
-    */
-    $('#challanDataTable').on('click', 'a.text-danger.delete', function (e){
+     * Datatable Action column:
+     */
+    $('#challanDataTable').on('click', 'a.del', function (e){
         e.preventDefault();
         var id = $(this).attr('href');
         // Confirm box
@@ -103,7 +111,7 @@ $(document).ready(function(){
             //centerVertical: true,
             //size: '50%',
             closeButton: false,
-            message: "Are you doing this by mistake? <br> If you confirm a record will be permantly deleted. Please confirm your action.",
+            message: "<div class='text-center lead'>Are you doing this by mistake?<br>A record is going to be permantly deleted.<br>Please confirm your action!!!</div>",
             title: "Please confirm...",
             buttons: {
               success: {
@@ -145,7 +153,23 @@ $(document).ready(function(){
               }
             }
           }) //Confirm Box
-    }) //Delete Icon click end.
+    }) //Action Delete.
+    $('#challanDataTable').on('click', 'a.edit', function (e){
+        e.preventDefault();
+        bootbox.alert({
+            title: "Functionality unavailable...",
+            message: "<div class='text-center lead'>Sorry! Cannot edit challan at this time. If you made mistake try delete instead.</div>",
+            size: 'small'
+        });
+    }) //Action Edit.
+    $('#challanDataTable').on('click', 'a.pdf', function (e){
+        e.preventDefault();
+        bootbox.alert({
+            title: "Functionality unavailable...",
+            message: "<div class='text-center lead'>Sorry! PDF download option is not available from this view at this time.</div>",
+            size: 'small'
+        });
+    }) //Action PDF.
 }); //Document ready function.
 </script>
 @stop

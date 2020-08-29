@@ -53,7 +53,7 @@ class Challan extends Model
      * Polimorphic Many to Many  using Productable.
      */
     public function stock() {
-        return $this->morphToMany('App\Product', 'productable');
+        return $this->morphToMany('App\Product', 'productable')->withTimeStamps();
     }
     
     /*

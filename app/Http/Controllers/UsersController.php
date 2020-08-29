@@ -42,9 +42,6 @@ class UsersController extends Controller
         if ($request->ajax()){
             $datatable = DataTables::of($users)
                 ->addIndexColumn()
-                ->addColumn('name', function($row) {
-                    return '<a href="'.$row->id.'">'.$row->name.'</a>';
-                })
                 ->addColumn('role', function($row) {
                     if($row->roles->count() > 0){
                         $array = $row->roles()->pluck('name');
@@ -66,7 +63,23 @@ class UsersController extends Controller
                 ->addColumn('updated_at', function($row) {
                     return $row->updated_at->diffForHumans();
                 })
-                ->rawColumns(['name', 'role','is_active'])
+                ->addColumn('action', function($row){
+                    $btn = '<div class="btn-group">';
+                    $btn = $btn.'<button type="button" class="btn btn-warning btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+                    $btn = $btn.'Action';
+                    $btn = $btn.'</button>';
+                    $btn = $btn.'<div class="dropdown-menu">';
+                    $btn = $btn.'<a class="show dropdown-item" href="'.$row->id.'"><i class="fas fa-eye"></i> View</a>';
+                    $btn = $btn.'<a class="edit dropdown-item" href="'.$row->id.'"><i class="fas fa-edit"></i> Edit</a>';
+                    $btn = $btn.'<a class="del dropdown-item" href="'.$row->id.'"><i class="fas fa-trash-alt"></i> Delete</a>';
+                    $btn = $btn.'<div class="dropdown-divider"></div>';
+                    $btn = $btn.'<a class="yes dropdown-item" href="'.$row->id.'"><i class="far fa-check-circle"></i> Active</a>';
+                    $btn = $btn.'<a class="no dropdown-item" href="'.$row->id.'"><i class="far fa-times-circle"></i> Deactive</a>';
+                    $btn = $btn.'</div>';
+                    $btn = $btn.'</div>';
+                    return $btn;
+                })
+                ->rawColumns(['role','is_active', 'action'])
                 ->make(true);
             return $datatable;   
         } 
@@ -348,6 +361,34 @@ class UsersController extends Controller
         //return redirect(route('users.index'));
         
         
+    }
+    
+    /*
+     * Activate User:
+     */
+    public function activate(Request $request) {
+        $user = User::findOrFail($request->id);
+        $user->update([
+            'is_active' => true,
+        ]);
+        return response()->json([
+            'status'=> true,
+            'message' => "Success!!! ".$user->name." has been activated."
+        ]);
+    }
+    
+    /*
+     * DeActivate User:
+     */
+    public function deactivate(Request $request) {
+        $user = User::findOrFail($request->id);
+        $user->update([
+            'is_active' => false,
+        ]);
+        return response()->json([
+            'status'=> true,
+            'message' => "Success!!! ".$user->name." has been deactivated."
+        ]);
     }
     
     

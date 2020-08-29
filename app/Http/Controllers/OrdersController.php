@@ -32,34 +32,41 @@ class OrdersController extends Controller
         if ($request->ajax()) {
             //return response()->json(['success' => 'ajax called']); 
             return DataTables::of(Order::query()->where('order_type', config('constants.order_type.sales'))->get())
-                            ->addColumn('order_no', function($row) {
-                                return '<small>'.
-                                            '<a class="text-success" href="'.route('orders.show', $row->id).'" ><i class="fas fa-eye fa-lg"></i></a>'.' '.
-                                            '<a class="text-warning edit" href="'.$row->id.'"><i class="fas fa-edit fa-lg"></i></a>'.' '.
-                                            '<a class="text-danger delete" href="'.$row->id.'"><i class="fas fa-trash-alt fa-lg"></i></a>'.' '.
-                                        '</small>'.
-                                        strtoupper($row->order_no);
-                            })
-                            ->addColumn('order_date', function($row) {
-                                return !empty($row->order_date) ? Carbon::create($row->order_date)->toFormattedDateString() : "";
-                            })
-                            ->addColumn('customer_name', function($row) {
-                                return $row->customer_name.'<br><strong>'.$row->customer_company.'</strong>';
-                            })
-                            ->addColumn('quantity_type', function($row) {
-                                return empty($row->quantity_type) ? "Packing" : ucfirst($row->quantity_type) ;
-                            })
-                            ->addColumn('order_total', function($row) {
-                                return 'Tk. '.number_format($row->order_total,2);
-                            })
-                            ->addColumn('is_invoiced', function($row) {
-                                return $row->is_invoiced ? 'Yes' : '<a class="text-warning invoice" href="' .route('create.invoice',$row->id).'"><i class="fas fa-file-invoice-dollar fa-lg"></i> No </a> ';
-                            })
-                            ->addColumn('order_status', function($row) {
-                                return ucfirst($row->order_status);
-                            })
-                            ->rawColumns(['customer_name', 'is_invoiced'])
-                            ->make(true);
+                ->addColumn('order_date', function($row) {
+                    return !empty($row->order_date) ? Carbon::create($row->order_date)->toFormattedDateString() : "";
+                })
+                ->addColumn('customer_name', function($row) {
+                    return $row->customer_name.'<br><strong>'.$row->customer_company.'</strong>';
+                })
+                ->addColumn('quantity_type', function($row) {
+                    return empty($row->quantity_type) ? "Packing" : ucfirst($row->quantity_type) ;
+                })
+                ->addColumn('order_total', function($row) {
+                    return 'Tk. '.number_format($row->order_total,2);
+                })
+                ->addColumn('is_invoiced', function($row) {
+                    return $row->is_invoiced ? 'Yes' : '<a class="text-warning invoice" href="' .route('create.invoice',$row->id).'"><i class="fas fa-file-invoice-dollar fa-lg"></i> No </a> ';
+                })
+                ->addColumn('order_status', function($row) {
+                    return ucfirst($row->order_status);
+                })
+                ->addColumn('action', function($row){
+                    $btn = '<div class="btn-group">';
+                    $btn = $btn.'<button type="button" class="btn btn-warning btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+                    $btn = $btn.'Action';
+                    $btn = $btn.'</button>';
+                    $btn = $btn.'<div class="dropdown-menu">';
+                    $btn = $btn.'<a class="show dropdown-item" href="'.route('orders.show', $row->id).'" target="_blank"><i class="fas fa-eye"></i> Show</a>';
+                    $btn = $btn.'<a class="edit dropdown-item" href="'.$row->id.'"><i class="fas fa-edit"></i> Edit</a>';
+                    $btn = $btn.'<a class="del dropdown-item" href="'.$row->id.'"><i class="fas fa-trash-alt"></i> Delete</a>';
+                    $btn = $btn.'<div class="dropdown-divider"></div>';
+                    $btn = $btn.'<a class="pdf dropdown-item" href="'.$row->id.'"><i class="far fa-file-pdf"></i> PDF</a>';
+                    $btn = $btn.'</div>';
+                    $btn = $btn.'</div>';
+                    return $btn;
+                })
+                ->rawColumns(['customer_name', 'is_invoiced','action'])
+                ->make(true);
         }
         return view('admin.order.index');
     }
@@ -476,6 +483,25 @@ class OrdersController extends Controller
         $fileName = 'order_'.$order->order_no;
         return $pdf->stream($fileName.'.pdf');
     }
+    
+    
+    /*
+     * For downloading pdf:
+     */
+    public function dlpdf(Request $request)
+    {
+        //return $request;
+        $order = Order::findOrFail($request->id);
+        $inwords = new NumberFormatter("en", NumberFormatter::SPELLOUT);
+        $order->inwords = $inwords->format($order->order_total);
+        $pdf = PDF::loadView('admin.order.print', compact('order'))->setPaper('a4', 'portrait');
+        $fileName = 'order_'.$order->order_no;
+        return $pdf->download();
+        
+        
+        
+    }
+    
     
     /*
      * Unique Reference Generator:

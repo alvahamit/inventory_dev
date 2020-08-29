@@ -8,6 +8,20 @@
  * After making new config file need to run: php artisan config:cache
  */
 return [
+    //Quantity type:
+    'quantity_type' => [
+        'packing' => 'Wholesale Pack',
+        'pcs' => 'Retail Pack/Pcs',
+        'weight' => 'Weight/Volume'
+    ],
+    //Wastage area
+    'wasted_at'=>[
+        'store'=>'Store',
+        'transportation'=>'Transportation',
+        'handling'=>'Handling',
+        'delivery'=>'Delivery',
+        'client'=>'Client Store'
+    ],
     //Labels 
     'labels'=>[
         'cell'=>'Cell','work'=>'Work','res'=>'Residence','whatsapp'=>'WhatsApp','emergency'=>'Emergency','club'=>'Club','factory'=>'Factory','gym'=>'Gym', 'school'=>'School'
@@ -28,6 +42,7 @@ return [
         'sales' => 'Sales', //This is for sales staff.
         'marketing' => 'Marketing', //This is for marketing staff.
         'store' => 'Store', //This is for store keepers.
+        'lead' => 'Lead', //Lead is for Marketing staff to convert into client.
     ],
     //Order types
     'order_type' => [
@@ -55,5 +70,9 @@ return [
     ],
     'default_pass' => 'password',
     'default_address' => 'VSF Distribution&#13;&#10;7/1/A Lake Circus&#13;&#10;Kolabagan, North Dhanmondi&#13;&#10;Dhaka 1205&#13;&#10;+88 02 58153080',
+    'messages' => [
+        'delete_alert' => "<div class='text-center lead'>Are you doing this by mistake?<br>A record is going to be permantly deleted.<br>Please confirm your action!!!</div>",
+        'update_alert' => "<div class='text-center lead'>Records are going to be updated.<br>This will cause change of data.<br>Please confirm your action!!!</div>",
+    ],
     
 ];
