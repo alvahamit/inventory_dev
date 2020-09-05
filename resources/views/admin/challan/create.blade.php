@@ -133,7 +133,8 @@ Create Challan ({{$type}})
                 <button type="submit" class="btn btn-success form-control" id="saveBtn" value="store">Save</button>
             </div>
             <div class="form-group col-md-3">
-                <button class="btn btn-danger form-control" id="closeBtn">Close</button>
+                <!--<button class="btn btn-danger form-control" id="closeBtn">Close</button>-->
+                <a class="btn btn-danger form-control" href="{{url()->previous()}}">Back</a>
             </div>
         </div>
     </form> 
@@ -538,10 +539,10 @@ $(document).ready(function(){
         var sales = {{ config('constants.order_type.sales') }};
         var sample = {{ config('constants.order_type.sample') }};
         if( $('#order_type').val() == sales ) {
-            var route = '{{ route("orders.index") }}' + '/' + $('#order_id').val();
+            var route = '{{route("orders.for.store")}}' + '/' + $('#order_id').val(); 
         }
         if( $('#order_type').val() == sample) {
-            var route = '{{ route("samples.index") }}' + '/' + $('#order_id').val();
+            var route = '{{route("orders.for.store")}}' + '/' + $('#order_id').val();
         }
         window.location.href=route;
         //console.log(route);

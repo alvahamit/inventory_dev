@@ -18,15 +18,225 @@
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>Dashboard</span></a>
     </li>
-
     <!-- Divider -->
     <hr class="sidebar-divider">
+    
+    @can('see-management')
+    <!-- Heading -->
+    <div class="sidebar-heading">
+        Management
+    </div>
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseMktRep" aria-expanded="true" aria-controls="collapseMktRep">
+            <i class="fas fa-th-list"></i>
+            <span>Marketing Reports</span>
+        </a>
+        <div id="collapseMktRep" class="collapse" aria-labelledby="headingMktRep" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <h6 class="collapse-header">Marketing:</h6>
+                <a class="collapse-item" href="#">Leads Report</a>
+                <a class="collapse-item" href="#">Sampling Report</a>
+            </div>
+        </div>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseMktRep" aria-expanded="true" aria-controls="collapseMktRep">
+            <i class="fas fa-th-list"></i>
+            <span>Accounts Reports</span>
+        </a>
+        <div id="collapseMktRep" class="collapse" aria-labelledby="headingMktRep" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <h6 class="collapse-header">Account:</h6>
+                <a class="collapse-item" href="#">Customer Status Report</a>
+            </div>
+        </div>
+    </li>
+    <!-- Divider -->
+    <hr class="sidebar-divider">
+    @endcan
+    
+    @can('see-procure')
+    <!-- Heading -->
+    <div class="sidebar-heading">
+        Procurement
+    </div>
+    <!--Nav Item-->
+    <li class="nav-item">
+        <a class="nav-link" href="{{route('suppliers.index')}}">
+            <i class="fas fa-globe"></i>
+            <span>Suppliers</span>
+        </a>
+    </li>
+    <!--Nav Item-->
+    <li class="nav-item">
+        <a class="nav-link" href="{{route('buy.index')}}">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Purchases</span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseCatalog" aria-expanded="true" aria-controls="collapseCatalog">
+            <i class="fas fa-th-list"></i>
+            <span>Catalog</span>
+        </a>
+        <div id="collapseCatalog" class="collapse" aria-labelledby="headingCatalog" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <h6 class="collapse-header">Catalog:</h6>
+                <a class="collapse-item" href="{{route('categories.index')}}">Categories</a>
+                <a class="collapse-item" href="{{route('products.index')}}">Products</a>
+            </div>
+        </div>
+    </li>
+    <!-- Divider -->
+    <hr class="sidebar-divider">
+    @endcan
+    
+    @can('see-marketing')
+    <!-- Heading -->
+    <div class="sidebar-heading">
+        Marketing
+    </div>
+    <!--Nav Item-->
+    <li class="nav-item">
+        <a class="nav-link" href="{{route('leads.index')}}">
+            <i class="fas fa-bullhorn"></i>
+            <span>Leads</span>
+        </a>
+    </li>
+    <!--Nav Item-->
+    <li class="nav-item">
+        <a class="nav-link" href="{{route('samples.index')}}">
+            <i class="fas fa-vial"></i>
+            <span>Sampling</span>
+        </a>
+    </li>
+    <!--Nav Item-->
+    <li class="nav-item">
+        <a class="nav-link" href="{{route('customers.index')}}">
+            <i class="fas fa-smile"></i>
+            <span>Customers</span>
+        </a>
+    </li>
+    <!-- Divider -->
+    <hr class="sidebar-divider">
+    @endcan
+    
+    @can('see-sales')
+    <!-- Heading -->
+    <div class="sidebar-heading">
+        Sales
+    </div>
+    <!--Nav Item-->
+    <li class="nav-item">
+        <a class="nav-link" href="{{route('orders.index')}}">
+            <i class="far fa-file-alt"></i>
+            <span>Orders</span>
+        </a>
+    </li>
+    <!--Nav Item-->
+    <li class="nav-item">
+        <a class="nav-link" href="{{route('customers.index')}}">
+            <i class="fas fa-smile"></i>
+            <span>Customers</span>
+        </a>
+    </li>
+     <!-- Divider -->
+    <hr class="sidebar-divider">
+    @endcan
+    
+    @can('see-accounts')
+    <!-- Heading -->
+    <div class="sidebar-heading">
+        Accounts
+    </div>
+    <!--Nav Item-->
+    <li class="nav-item">
+        <a class="nav-link" href="{{route('customers.account')}}">
+            <i class="fas fa-database"></i>
+            <span>Customer Overview</span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseInvoiceProcessing" aria-expanded="true" aria-controls="collapseInvoiceProcessing">
+            <i class="fas fa-file-invoice-dollar"></i>
+            <span>Invoice Processing</span>
+        </a>
+        <div id="collapseInvoiceProcessing" class="collapse" aria-labelledby="headingInvoiceProcessing" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <h6 class="collapse-header">Orders for Invoice:</h6>
+                <a class="collapse-item" href="{{route('orders.for.accounts')}}">Orders</a>
+                <h6 class="collapse-header">Invoice List:</h6>
+                <a class="collapse-item" href="{{route('invoices.index')}}">Invoices</a>
+            </div>
+        </div>
+    </li>
+    <!--Nav Item-->
+    <li class="nav-item">
+        <a class="nav-link" href="{{route('mrs.index')}}">
+            <i class="fas fa-receipt"></i>
+            <span>Money Receipt</span>
+        </a>
+    </li>
+    <!-- Divider -->
+    <hr class="sidebar-divider">
+    @endcan
+    
+    @can('see-store')
+    <!-- Heading -->
+    <div class="sidebar-heading">
+        Store Keeper
+    </div>
+    <!--Nav Item-->
+    <li class="nav-item">
+        <a class="nav-link" href="{{route('stock')}}">
+            <i class="fas fa-store-alt"></i>
+            <span>Stock</span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseChallanProcessing" aria-expanded="true" aria-controls="collapseChallanProcessing">
+            <i class="fas fa-file-invoice"></i>
+            <span>Challan Processing</span>
+        </a>
+        <div id="collapseChallanProcessing" class="collapse" aria-labelledby="headingChallanProcessing" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <h6 class="collapse-header">Orders:</h6>
+                <a class="collapse-item" href="{{route('orders.for.store')}}">Orders</a>
+                <h6 class="collapse-header">Challan List:</h6>
+                <a class="collapse-item" href="{{route('challans.index')}}">Challan</a>
+            </div>
+        </div>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseStoreTransfers" aria-expanded="true" aria-controls="collapseStoreTransfers">
+            <i class="fas fa-exchange-alt"></i>
+            <span>Store Transfers</span>
+        </a>
+        <div id="collapseStoreTransfers" class="collapse" aria-labelledby="headingStoreTransfers" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <h6 class="collapse-header">Transfer Stock:</h6>
+                <a class="collapse-item" href="{{route('transfer.challan.create')}}">Transfer Stock</a>
+                <h6 class="collapse-header">Transfer List:</h6>
+                <a class="collapse-item" href="{{route('transfer.challan.index')}}">Transfer Records</a>
+            </div>
+        </div>
+    </li>
+    <!--Nav Item-->
+    <li class="nav-item">
+        <a class="nav-link" href="{{route('wastage.index')}}">
+            <i class="fas fa-trash-alt"></i>
+            <span>Wastage</span>
+        </a>
+    </li>
+    <!-- Divider -->
+    <hr class="sidebar-divider">
+    @endcan
 
+    @can('see-admin')
     <!-- Heading -->
     <div class="sidebar-heading">
         Buy and Sell
     </div>
-
     <!-- Nav Item - Purchase Collapse Menu -->
     <li class="nav-item">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseBuy" aria-expanded="true" aria-controls="collapseBuy">
@@ -40,10 +250,10 @@
                 
                 <div class="collapse-divider"></div>
                 <h6 class="collapse-header">Purchases:</h6>
-                <a class="collapse-item" href="{{route('purchases.index')}}">Purchases</a>
+                <a class="collapse-item" href="{{route('buy.index')}}">Purchases</a>
                 <div class="collapse-divider"></div>
                 <h6 class="collapse-header">Catalog:</h6>
-                <!--<a class="collapse-item" href="{{route('categories.index')}}">Categories</a>-->
+                <a class="collapse-item" href="{{route('categories.index')}}">Categories</a>
                 <a class="collapse-item" href="{{route('products.index')}}">Products</a>
             </div>
         </div>
@@ -80,6 +290,10 @@
             <div class="bg-white py-2 collapse-inner rounded">
                 <h6 class="collapse-header">Inventory Status:</h6>
                 <a class="collapse-item" href="{{route('stock')}}">View Stock</a>
+                <div class="collapse-divider"></div>
+                <h6 class="collapse-header">Challan Processing:</h6>
+                <a class="collapse-item" href="{{route('orders.for.store')}}">Orders</a>
+                <a class="collapse-item" href="{{route('challans.index')}}">Challan</a>
                 <div class="collapse-divider"></div>
                 <h6 class="collapse-header">Transfer Stock:</h6>
                 <a class="collapse-item" href="{{route('transfer.challan.create')}}">Transfer Stock</a>
@@ -166,11 +380,9 @@
             </div>
         </div>
     </li>
-
-    
-
     <!-- Divider -->
     <hr class="sidebar-divider d-none d-md-block">
+    @endcan
 
     <!-- Sidebar Toggler (Sidebar) -->
     <div class="text-center d-none d-md-inline">

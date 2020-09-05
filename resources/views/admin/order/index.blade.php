@@ -25,11 +25,10 @@
     </li>
     <li class="breadcrumb-item active">Orders</li>
 </ol>
-
-<!--<h1>Hi!! you have following orders:</h1>-->
+@include('errors.myerrormsg')
+@include('errors.mysuccessmsg')
 <!--Add new button-->
 <div class="form-group text-right d-print-none">
-    <!--<a class="btn btn-primary right" href="{{route('purchases.create')}}">Add new</a>-->
     <button id="createNew" class="btn btn-primary right">New Order</button>
 </div> 
 <!-- DataTables Example -->

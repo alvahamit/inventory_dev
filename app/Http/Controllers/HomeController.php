@@ -50,14 +50,21 @@ class HomeController extends Controller
             
             //Find admin role id:
             $adminRoleId = Role::whereName(config('constants.roles.admin'))->first()->id;
-            //Sync roles:
-            $rolesArray = [];
-            foreach (Auth::user()->roles as $role) {
-                array_push($rolesArray,$role->id);
-            }
+            $managementRoleId = Role::whereName(config('constants.roles.management'))->first()->id;
+            $clientRoleId = Role::whereName(config('constants.roles.client'))->first()->id;
+            $exporterRoleId = Role::whereName(config('constants.roles.exporter'))->first()->id;
+            $supplierRoleId = Role::whereName(config('constants.roles.supplier'))->first()->id;
+            $leadRoleId = Role::whereName(config('constants.roles.lead'))->first()->id;
+            
+            $nonStaffArr = [$adminRoleId,$managementRoleId,$clientRoleId,$exporterRoleId,$supplierRoleId,$leadRoleId];
+            
+            $rolesArray = Auth::user()->roles->pluck('id')->toArray();
             if(in_array($adminRoleId, $rolesArray)){
-                return view('admin.admin_dash.dash', compact('cashInMarket', 'newOrders', 'customersThisMonth', 'collectionThisMonth', 'projectData'));
-            } else {
+                return view('admin.dashboards.admin.home', compact('cashInMarket', 'newOrders', 'customersThisMonth', 'collectionThisMonth', 'projectData'));
+            } elseif(empty(array_intersect($nonStaffArr, $rolesArray))){
+                return view('admin.dashboards.staff.home', compact('cashInMarket', 'newOrders', 'customersThisMonth', 'collectionThisMonth', 'projectData'));
+            } 
+            else {
                 return view('home');
             }
         }

@@ -24,7 +24,6 @@
 </ol>
 <!--Add new button-->
 <div class="form-group text-right d-print-none">
-    <!--<a class="btn btn-primary right" href="{{route('purchases.create')}}">Add new</a>-->
     <button id="createNew" class="btn btn-primary right">Add new</button>
 </div> 
 <!-- DataTables Example -->
@@ -304,7 +303,7 @@
             processing: true,
             servirSide: true,
             ajax: {
-                url: "{{ route('ajax-purchases.index') }}"
+                url: "{{ route('buy.index') }}"
             },
             columns: [
                 {data: 'id', name: 'id'},
@@ -323,7 +322,7 @@
         /*
          * Setting modal options dynamically:
          */
-        $.get("{{ route('ajax-purchases.create') }}", function (data) {
+        $.get("{{ route('buy.create') }}", function (data) {
             $.each(data.ptypes, function( index, value ) {
                 $('#purchase_type').append($("<option></option>").attr('value', value).text(value));
             });
@@ -478,11 +477,11 @@
             var action;
             if(actionType == 'create-purchase'){ 
                 method = 'POST';
-                action = '{{ route("ajax-purchases.store") }}';
+                action = '{{ route("buy.store") }}';
             };
             if(actionType == 'edit-purchase'){ 
                 method = 'PATCH';
-                action = '{{ route("ajax-purchases.index") }}' +'/' + $('#id').val();
+                action = '{{ route("buy.index") }}' +'/' + $('#id').val();
             };
             
             //Ajax call to save data:
@@ -552,7 +551,7 @@
                         callback: function() {
                             //I DONT KNOW WHAT TO DO HERE
                             var purchaseId = $('#id').val();
-                            var action = '{{ route('ajax-purchases.index') }}'+'/' + purchaseId;
+                            var action = '{{ route("buy.index") }}'+'/' + purchaseId;
                             var method = 'DELETE';
                             $.ajax({
                                 data: $('#purchaseForm').serialize(),
@@ -605,7 +604,7 @@
             $('#saveBtn').val('update-purchase');
             
             var purchaseId = $(this).attr('href');
-            $.get("{{ route('ajax-purchases.index') }}" +'/' + purchaseId +'/edit', function (data) {
+            $.get("{{ route('buy.index') }}" +'/' + purchaseId +'/edit', function (data) {
                 $('#saveBtn').val("edit-purchase");
                 $('#modelHeading').html("Edit Purchase Particulars");
                 //Set data:
@@ -667,7 +666,7 @@
                     className: "btn-danger",
                     callback: function() {
                         //I DONT KNOW WHAT TO DO HERE
-                        var action = '{{ route('ajax-purchases.index') }}'+'/' + purchaseId;
+                        var action = '{{ route("buy.index") }}'+'/' + purchaseId;
                         var method = 'DELETE';
                         console.log(purchaseId, action, method);
                         $.ajax({

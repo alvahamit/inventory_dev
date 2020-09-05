@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Product;
+use App\Category;
 use App\Country;
 use App\Measurement;
 use App\Packing;
@@ -47,12 +48,14 @@ class ProductsController extends Controller
      */
     public function create()
     {
+        //get categories
+        $categories = Category::all();
         //get countries
         $countries = Country::all();
         //get measurement units
         $units = Measurement::all();
         //return view
-        return view('admin.product.create', compact('countries', 'units'));
+        return view('admin.product.create', compact('countries', 'units', 'categories'));
     }
 
     /**
@@ -79,6 +82,10 @@ class ProductsController extends Controller
             $packing->price = $request->price;
             $packing->save();
         }
+        foreach($request->categories as $cat){
+            $newProduct->categories()->attach($cat);
+        }
+        $newProduct->countries()->attach($request->country_id);
         Session::flash('success', $newProduct->name.' created.');
         return redirect(route('products.index'));
     }
@@ -104,12 +111,15 @@ class ProductsController extends Controller
     {
         //find product
         $product = Product::findOrFail($id);
+        $product->categories;
         //get countries
         $countries = Country::all();
         //get measurement units
         $units = Measurement::all();
+        //get categories
+        $categories = Category::all();
         //return view
-        return view('admin.product.edit', compact('product', 'countries', 'units'));
+        return view('admin.product.edit', compact('product', 'countries', 'units','categories'));
     }
 
     /**
@@ -146,6 +156,12 @@ class ProductsController extends Controller
         if($product->update()){
             $packing->save();
         }
+        $product->categories()->detach();
+        foreach($request->categories as $cat){
+            $product->categories()->attach($cat);
+        }
+        $product->countries()->detach();
+        $product->countries()->attach($request->country_id);
         Session::flash('success', $product->name.' updated.');
         return redirect(route('products.index'));
         //return $packing;
@@ -166,6 +182,8 @@ class ProductsController extends Controller
             $packing = Packing::findOrFail($product->packings()->first()->id);
             //delete
             $packing->delete();
+            $product->categories()->detach();
+            $product->countries()->detach();
             $product->delete();
             Session::flash('success', $product->name.' deleted.');
             return redirect(route('products.index'));

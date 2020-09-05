@@ -17,7 +17,7 @@ use PDF;
 use NumberFormatter;
 use Haruncpi\LaravelIdGenerator\IdGenerator;
 use Illuminate\Support\Str;
-
+use Illuminate\Support\Facades\Session;
 
 class OrdersController extends Controller
 {
@@ -60,6 +60,8 @@ class OrdersController extends Controller
                     $btn = $btn.'<a class="edit dropdown-item" href="'.$row->id.'"><i class="fas fa-edit"></i> Edit</a>';
                     $btn = $btn.'<a class="del dropdown-item" href="'.$row->id.'"><i class="fas fa-trash-alt"></i> Delete</a>';
                     $btn = $btn.'<div class="dropdown-divider"></div>';
+                    $btn = $btn.'<a class="hold dropdown-item" href="'.route('hold.order', $row->id).'"><i class="far fa-pause-circle"></i></i> Hold</a>';
+                    $btn = $btn.'<a class="cancel dropdown-item" href="'.route('cancel.order', $row->id).'"><i class="fas fa-ban"></i> Cancel</a>';
                     $btn = $btn.'<a class="pdf dropdown-item" href="'.$row->id.'"><i class="far fa-file-pdf"></i> PDF</a>';
                     $btn = $btn.'</div>';
                     $btn = $btn.'</div>';
@@ -70,6 +72,115 @@ class OrdersController extends Controller
         }
         return view('admin.order.index');
     }
+    
+    /*
+     * Orders index for Accounts
+     * to issue invoice
+     */
+    public function ordersForAcc(Request $request)
+    {
+        if ($request->ajax()) {
+            return DataTables::of(Order::query())
+                ->addColumn('order_date', function($row) {
+                    return !empty($row->order_date) ? Carbon::create($row->order_date)->toFormattedDateString() : "";
+                })
+                ->addColumn('customer_name', function($row) {
+                    return $row->customer_name.'<br><strong>'.$row->customer_company.'</strong>';
+                })
+                ->addColumn('quantity_type', function($row) {
+                    return empty($row->quantity_type) ? "Packing" : ucfirst($row->quantity_type) ;
+                })
+                ->addColumn('order_total', function($row) {
+                    return 'Tk. '.number_format($row->order_total,2);
+                })
+                ->addColumn('is_invoiced', function($row) {
+                    return $row->is_invoiced ? 'Yes' : '<a class="text-warning invoice" href="' .route('create.invoice',$row->id).'"><i class="fas fa-file-invoice-dollar fa-lg"></i> No </a> ';
+                })
+                ->addColumn('order_status', function($row) {
+                    return ucfirst($row->order_status);
+                })
+                ->addColumn('action', function($row){
+                    $btn = '<div class="btn-group">';
+                    $btn = $btn.'<button type="button" class="btn btn-warning btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+                    $btn = $btn.'Action';
+                    $btn = $btn.'</button>';
+                    $btn = $btn.'<div class="dropdown-menu">';
+                    $btn = $btn.'<a class="show dropdown-item" href="'.route('showorder.for.accounts', $row->id).'" target="_blank"><i class="fas fa-eye"></i> Show</a>';
+                    $btn = $btn.'<a class="edit dropdown-item" href="'.route('order.challan.create', $row->id).'"><i class="fas fa-edit"></i> Challan</a>';
+                    $btn = $btn.'</div>';
+                    $btn = $btn.'</div>';
+                    return $btn;
+                })
+                ->rawColumns(['customer_name', 'is_invoiced','action'])
+                ->make(true);
+        }
+        return view('admin.accounts.order');
+    }
+    
+    /*
+     * Accounts' Order view:
+     */
+    public function showOrderForAcc($id)
+    {
+        //get order by id
+        $order = Order::findOrFail($id);
+        return view('admin.accounts.showorder', compact('order'));
+    }
+    
+    
+    /*
+     * Orders index for Storekeeper
+     * to issue challan
+     */
+    public function ordersForStore(Request $request)
+    {
+        if ($request->ajax()) {
+            return DataTables::of(Order::query()->where('order_status','!=',config('constants.order_status.complete')))
+                ->addColumn('order_date', function($row) {
+                    return !empty($row->order_date) ? Carbon::create($row->order_date)->toFormattedDateString() : "";
+                })
+                ->addColumn('customer_name', function($row) {
+                    return $row->customer_name.'<br><strong>'.$row->customer_company.'</strong>';
+                })
+                ->addColumn('quantity_type', function($row) {
+                    return empty($row->quantity_type) ? "Packing" : ucfirst($row->quantity_type) ;
+                })
+                ->addColumn('order_total', function($row) {
+                    return 'Tk. '.number_format($row->order_total,2);
+                })
+                ->addColumn('is_invoiced', function($row) {
+                    return $row->is_invoiced ? 'Yes' : '<a class="text-warning invoice" href="' .route('create.invoice',$row->id).'"><i class="fas fa-file-invoice-dollar fa-lg"></i> No </a> ';
+                })
+                ->addColumn('order_status', function($row) {
+                    return ucfirst($row->order_status);
+                })
+                ->addColumn('action', function($row){
+                    $btn = '<div class="btn-group">';
+                    $btn = $btn.'<button type="button" class="btn btn-warning btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+                    $btn = $btn.'Action';
+                    $btn = $btn.'</button>';
+                    $btn = $btn.'<div class="dropdown-menu">';
+                    $btn = $btn.'<a class="show dropdown-item" href="'.route('showorder.for.store', $row->id).'" target="_blank"><i class="fas fa-eye"></i> Show</a>';
+                    $btn = $btn.'<a class="edit dropdown-item" href="'.route('order.challan.create', $row->id).'"><i class="fas fa-edit"></i> Challan</a>';
+                    $btn = $btn.'</div>';
+                    $btn = $btn.'</div>';
+                    return $btn;
+                })
+                ->rawColumns(['customer_name', 'is_invoiced','action'])
+                ->make(true);
+        }
+        return view('admin.store.order');
+    }
+    /*
+     * Storekeepers Order view:
+     */
+    public function showOrderForStore($id)
+    {
+        //get order by id
+        $order = Order::findOrFail($id);
+        return view('admin.store.showorder', compact('order'));
+    }
+    
 
     /**
      * Show the form for creating a new resource.
@@ -83,17 +194,6 @@ class OrdersController extends Controller
         $buyers = Buyer::whereHas('roles', function($q){
             $q->whereIn('name',[config('constants.roles.client')]);
         })->where('is_active',true)->orderBy('name','asc')->get();
-        
-//        $buyers = [];
-//        $d = Buyer::all();
-//        foreach ($d as $item) {
-//            if (count($item->role) != 0) {
-//                if ($item->role()->first()->name == 'Buyer' or $item->role()->first()->name == 'Customer') {
-//                    $buyers[] = $item;
-//                }
-//            }
-//        }
-
         if (!empty($buyers)) {
             return response()->json(['buyers' => $buyers, 'products' => $products]);
             //return view('admin.order.create', compact('buyers','products'));
@@ -276,7 +376,7 @@ class OrdersController extends Controller
         $order->quantity_type = $request->quantity_type;
         $order->order_total = $request->total;
         $order->is_invoiced = false;
-        $order->order_status = 'pending';
+        $order->order_status = config('constants.order_status.pending');
         $order->order_type = config('constants.order_type.sales');
         
         //return response()->json(['success' => $order, 'request' => $request->all()]);
@@ -349,15 +449,11 @@ class OrdersController extends Controller
         $order = Order::findOrFail($id);
         $order->order_no = $request->order_no;
         $order->order_date = $request->order_date;
-        //$request->has('user_id') ? $order->user_id = $request->user_id : "";
-        
+       
         //Create user if not exist:
-        if($request->has('user_id'))
-        {
+        if($request->has('user_id')){
             $customer = Buyer::findOrFail($request->user_id);
-        }
-        else 
-        {
+        } else {
             //Create customer
             $customer = Buyer::create([ 
                 'name'=> $request->customer_name, 
@@ -399,8 +495,12 @@ class OrdersController extends Controller
         $order->quantity_type = $request->quantity_type;
         $order->order_total = $request->total;
         //Check if order is under processing:
-        if($order->invoices()->count() > 0 OR $order->challans()->count() > 0)
-        {$order->order_status = 'processing';} else {$order->order_status = 'pending';}
+//        if($order->invoices()->count() > 0 OR $order->challans()->count() > 0){
+//            $order->order_status = 'processing';
+//        } else {
+//            $order->order_status = 'pending';
+//        }
+        
         $order->invoices()->count() > 0 ? $order->is_invoiced = true : $order->is_invoiced = false;
         
         $order->update();
@@ -436,6 +536,18 @@ class OrdersController extends Controller
                     'product_packing' => $packing
                 ]);
         }
+        
+        //Update status:
+        if($order->isComplete()){
+            $order->update(['order_status' => config('constants.order_status.complete')]);
+        } else {
+            if($order->isInvoiced() OR $order->issuedChalan()){
+                $order->update(['order_status' => config('constants.order_status.processing')]);
+            } else {
+                $order->update(['order_status' => config('constants.order_status.pending')]);
+            }
+        }
+        
         
         return response()->json(['success' => 'Order Updated', 'request' => $request->all()]);
     }
@@ -519,5 +631,43 @@ class OrdersController extends Controller
         return Str::upper($id);
     }
     
+    /*
+     * Hold Order
+     */
+    public function hold($id){
+        $order = Order::findOrFail($id);
+        $statArr = [config('constants.order_status.complete'),config('constants.order_status.cancel')];
+        //Check status before hold:
+        if( !in_array($order->order_status, $statArr) ){
+            $order->update([
+                'order_status' => config('constants.order_status.hold')
+            ]);
+            $msg = "Order ".$order->order_no." is now on Hold.";
+            Session::flash('success', $msg);
+        } else {
+            $msg = "Order ".$order->order_no." cannot be put on hold.";
+            Session::flash('errors', $msg);
+        }
+        return back();
+    }
+    /*
+     * Cancel Order
+     */
+    public function cancel($id){
+        $order = Order::findOrFail($id);
+        $statArr = [config('constants.order_status.complete')];
+        //Check status before hold:
+        if( !in_array($order->order_status, $statArr) ){
+            $order->update([
+                'order_status' => config('constants.order_status.cancel')
+            ]);
+            $msg = "Order ".$order->order_no." has been Canceled.";
+            Session::flash('success', $msg);
+        } else {
+            $msg = "Order ".$order->order_no." cannot be canceled.";
+            Session::flash('errors', $msg);
+        }
+        return back();
+    }
     
 }

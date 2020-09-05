@@ -44,13 +44,27 @@
                     <input type="text" name="brand" id="brand" class="form-control" value="{{old('brand')}}" required="required">
                 </div>
                 <div class="form-group">
-                    <label for="country_id">Country of Origin:</label>
-                    <select class="custom-select" name="country_id" required="required">
-                        <option selected="selected" value="">Pick a country of origin...</option>
-                        @foreach($countries as $country)
-                        <option value="{{$country->id}}">{{$country->name}}</option>
-                        @endforeach
-                    </select>    
+                    <div class="form-row">
+                        <div class="col-md-6">
+                            <label for="country_id">Country of Origin:</label>
+                            <select class="custom-select" name="country_id" required="required">
+                                <option selected="selected" value="">Pick a country of origin...</option>
+                                @foreach($countries as $country)
+                                <option value="{{$country->id}}">{{$country->name}}</option>
+                                @endforeach
+                            </select> 
+                        </div>
+                        <!--Set Categories-->
+                        <div class="col-md-6">
+                            <label for="categories">Categories:</label>
+                            <select id="categories" name="categories[]" class="selectpicker form-control" multiple data-selected-text-format="count" data-style="btn-secondary" data-actions-box="true">
+                                <option value="">Select categories...</option>
+                                @foreach($categories as $category)
+                                <option value="{{$category->id}}">{{$category->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div> <!--./card body-->    
         </div> <!--./card card-register mx-auto mt-5-->

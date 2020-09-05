@@ -9,7 +9,7 @@
 
 @section('logo', __('VSF Distribution'))
 
-@section('pageheading', __('!!! Opps !!!'))
+@section('pageheading', __('Forbidden'))
 
 @section('footer', __('Copyright © Alvah Amit Halder 2019'))
 

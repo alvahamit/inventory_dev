@@ -29,7 +29,6 @@
 <!--<h1>Hi!! you have following orders:</h1>-->
 <!--Add new button-->
 <div class="form-group text-right d-print-none">
-    <!--<a class="btn btn-primary right" href="{{route('purchases.create')}}">Add new</a>-->
     <button id="createNew" class="btn btn-primary right">New Record</button>
 </div> 
 <!-- DataTables Example -->

@@ -48,7 +48,7 @@
                 <label for="brand">Brand Name:</label>
                 <input type="text" name="brand" id="brand" class="form-control" value="{{old('brand',$product->brand)}}" required="required">
             </div>
-            <div class="form-group">
+<!--            <div class="form-group">
                 <label for="country_id">Country of Origin:</label>
                 <select class="custom-select" name="country_id" required="required">
                     <option value="">Pick a country of origin...</option>
@@ -60,7 +60,49 @@
                         @endif
                     @endforeach
                 </select>
-            </div>
+            </div>-->
+            <!--Draft-->
+            <div class="form-group">
+                    <div class="form-row">
+                        <div class="col-md-6">
+                            <label for="country_id">Country of Origin:</label>
+                            <select class="custom-select" name="country_id" required="required">
+                                <option selected="selected" value="">Pick a country of origin...</option>
+                                
+                                @foreach($countries as $country)
+                                    @if($country->id == $product->country->id)
+                                    <option selected="selected" value="{{$country->id}}">{{$country->name}}</option>
+                                    @else
+                                    <option value="{{$country->id}}">{{$country->name}}</option>
+                                    @endif
+                                @endforeach
+                            </select> 
+                        </div>
+                        <!--Set Categories-->
+                        <div class="col-md-6">
+                            @php
+                                $catArray = $product->categories->pluck('id')->toArray();
+                            @endphp
+                            <label for="categories">Categories:</label>
+                            <select id="categories" name="categories[]" class="selectpicker form-control" multiple data-selected-text-format="count" data-style="btn-secondary" data-actions-box="true">
+                                <option value="">Select categories...</option>
+                                @foreach($categories as $category)
+                                    @if( in_array($category->id,$catArray) )
+                                    <option value="{{$category->id}}" selected="selected">{{$category->name}}</option>
+                                    @else
+                                    <option value="{{$category->id}}">{{$category->name}}</option>
+                                    @endif
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                </div
+            
+            
+            
+            
+            
+            
         </div> <!--./card body-->    
     </div> <!--./card card-register mx-auto mt-5-->
 

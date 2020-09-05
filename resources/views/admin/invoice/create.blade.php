@@ -133,7 +133,8 @@ Create Invoice ({{$type}})
                 <button class="btn btn-success form-control" id="saveBtn" value="store">Save</button>
             </div>
             <div class="form-group col-md-3">
-                <button class="btn btn-primary form-control" id="closeBtn">Close</button>
+                <!--<button class="btn btn-primary form-control" id="closeBtn">Close</button>-->
+                <a class="btn btn-danger form-control" href="{{url()->previous()}}">Back</a>
 
             </div>
         </div>

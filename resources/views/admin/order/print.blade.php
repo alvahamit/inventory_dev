@@ -22,7 +22,7 @@
 
 @section('title', __('VSF-Print Order'))
 
-@section('pageheading')<h3 class="display-3">Sales Order</h3>@stop
+@section('pageheading')<h3 class="display-3">{{ $type }}</h3>@stop
 
 @section('content')   
 

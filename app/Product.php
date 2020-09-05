@@ -17,6 +17,12 @@ class Product extends Model
     public function country() {
         return $this->belongsTo('App\Country');
     }
+    /*
+     * Defining Many to Many with Product and Country:
+     */
+    public function countries() {
+        return $this->belongsToMany('App\Country','country_product');
+    }
     
     /*
      * Relation setup:
@@ -48,7 +54,12 @@ class Product extends Model
     public function stocks() {
         return $this->hasMany('App\Productable');
     }
-    
+    /*
+     * Defining Many to Many with Product and Category:
+     */
+    public function categories() {
+        return $this->belongsToMany('App\Category','category_product');
+    }
     
     
     /*

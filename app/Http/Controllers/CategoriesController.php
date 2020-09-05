@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\Requests\CategoryFormRequest;
 use App\Category;
+use Illuminate\Support\Facades\Session;
 
 class CategoriesController extends Controller
 {
@@ -15,9 +17,10 @@ class CategoriesController extends Controller
     public function index()
     {
         //get all categories
-        $data = Category::all();
+        $allCat = Category::all();
+        $data = Category::whereNull('category_id')->with('childrenCategories')->get();
         //get view and pass data.
-        return view('admin.category.index',compact('data'));
+        return view('admin.category.index',compact('data','allCat'));
     }
 
     /**
@@ -37,16 +40,15 @@ class CategoriesController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CategoryFormRequest $request)
     {
-        //Create role:
-        $newCategory =new Category();
-        $newCategory->name = ucwords($request->name);
-        $newCategory->description = ucfirst($request->description);
-        //Save new category
-        $newCategory->save();
-        //redirect to index
-        return redirect(route('categories.index'));
+        $category = Category::create($request->all());
+        Session::flash('success', 'Category '.$category->name.' stored.');
+        //return response()->json(['request' => $request->all()]);
+        return response()->json([
+            'status' => true,
+            'message' => 'Category '.$category->name.' stored.'
+        ]);
     }
 
     /**
@@ -81,14 +83,22 @@ class CategoriesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(CategoryFormRequest $request, $id)
     {
-        //get instance by id
-        $data = Category::findOrFail($id);
-        //update with request data then redirect if success
-        if($data->update($request->all())){
-            return redirect(route('categories.index'));
+        $cat = Category::findOrFail($id);
+        if($request->has('root')){
+            $cat->update(['category_id' => null]);
+            $cat->update($request->all());
+        } else {
+            $cat->update($request->all());
         }
+        Session::flash('success', 'Category '.$cat->name.' updated.');
+        //return response()->json($request->all());
+        return response()->json([
+            'status' => true,
+            'message' => 'Category '.$cat->name.' updated.'
+        ]);
+
     }
 
     /**
@@ -99,8 +109,15 @@ class CategoriesController extends Controller
      */
     public function destroy($id)
     {
-        //delete
-        Category::findOrFail($id)->delete();
-        return redirect(route('categories.index'));
+        $cat = Category::findOrFail($id);
+        if($cat->categories->count() > 0){
+            Category::whereCategoryId($cat->id)->delete();
+        }
+        $cat->delete();
+        Session::flash('success', 'Category '.$cat->name.' deleted.');
+        return response()->json([
+            'status' => true,
+            'message' => 'Category '.$cat->name.' deleted.'
+        ]);
     }
 }

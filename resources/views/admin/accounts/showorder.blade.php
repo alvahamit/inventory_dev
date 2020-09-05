@@ -1,13 +1,13 @@
 <!-- 
     Author:     Alvah Amit Halder
-    Document:   Order Show Blade (with Tabbed navigation: Order>Invoice>Challan). 
-    Model/Data: App\Order, App\Invoice, App\Challan
-    Controller: OrdersController, InvoiceController, ChallanController
+    Document:   Order Show Blade for Accounts (with Tabbed navigation: Order>Invoice). 
+    Model/Data: App\Order, App\Invoice
+    Controller: OrdersController, InvoiceController
 -->
 
 @extends('theme.default')
 
-@section('title', __('VSF-Order Processing'))
+@section('title', __('VSF-Accounts'))
 
 @section('logo', __('VSF Distribution'))
 
@@ -22,7 +22,7 @@
         <a href="{{ route('home') }}">Home</a>
     </li>
     <li class="breadcrumb-item active">
-        <a href="{{ route('orders.index') }}">Orders</a>
+        <a href="{{ route('orders.for.accounts') }}">Orders</a>
     </li>
     <li class="breadcrumb-item active">{{$order->order_no}}</li>
 </ol>
@@ -32,14 +32,9 @@
     <li class="nav-item">
         <a href="#order" class="nav-link active" data-toggle="tab">Order</a>
     </li>
-    @can('see-admin')
     <li class="nav-item">
         <a href="#invoice" class="nav-link" data-toggle="tab">Invoice</a>
     </li>
-    <li class="nav-item">
-        <a href="#challan" class="nav-link" data-toggle="tab">Challan</a>
-    </li>
-    @endcan
 </ul>
 
 <div class="tab-content">
@@ -175,7 +170,6 @@
     </div>
     <!--End of Markup for Order-->
     
-    @can('see-admin')
     <!--Markup for Invoice-->
     <div class="tab-pane fade" id="invoice">
         <h4 class="mt-2">Issued Invoices</h4>
@@ -229,59 +223,7 @@
         </div>
     </div>
     <!--End of Markup for Invoice-->
-    <!--Markup for Challan-->
-    <div class="tab-pane fade" id="challan">
-        <h4 class="mt-2">Issued Challan</h4>
-        <!--Add new button-->
-        <div class="form-group text-right">
-            <a class="btn btn-primary right" href="{{route('order.challan.create', $order->id)}}">New Challan</a>
-        </div> 
-        <!-- DataTables Example -->
-        <div class="card mb-3">
-            <div class="card-header"><i class="fas fa-table"></i> Challan Data Table </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-bordered" id="challanDataTable" width="100%" cellspacing="0">
-                        <thead>
-                            <tr>
-                                <th>Id</th>
-                                <th>Challan No</th>
-                                <th>Challan Date</th>
-                                <th>Customer Name</th>
-                                <th>Products</th>
-                                <th>Qty. Type</th>
-                                <th>Delivered From</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>01</td>
-                                <td>INV_001</td>
-                                <td>12-2-20</td>
-                                <td>BADC</td>
-                                <td>Company XYZ</td>
-                            </tr>
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <th>Id</th>
-                                <th>Challan No</th>
-                                <th>Challan Date</th>
-                                <th>Customer Name</th>
-                                <th>Products</th>
-                                <th>Qty. Type</th>
-                                <th>Delivered From</th>
-                            </tr>
-                        </tfoot>
-
-                    </table>
-                </div>
-            </div>
-            <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
-        </div>
-    </div>
-    <!--End Markup for Challan-->
-    @endcan
+   
 </div> <!--./tab-content-->
 
 <style>
@@ -318,11 +260,8 @@
 @section('scripts')
 <script type="text/javascript">
 $(document).ready(function(){
-        
-    /*
-    * Initialize Yajra on invoice data table.
-    */
     var orderID = $('#order_id').val();
+    
     $('#invoiceDataTable').DataTable({
         processing: true,
         servirSide: true,
@@ -341,9 +280,8 @@ $(document).ready(function(){
             {data: 'invoice_type', name: 'invoice_type'}
         ],
         order:[[0, "desc"]]
-   });
-   
-   
+    });
+    
     /*
     * invoiceDataTable Delete icon click:
     * Deleting Order.
@@ -405,90 +343,7 @@ $(document).ready(function(){
           }); //Confirm Box
     }); //Delete Icon click end.
    
-   /*
-    * Initialize Yajra on challan data table.
-    * var orderID already decalred above.
-    */
-    $('#challanDataTable').DataTable({
-        processing: true,
-        servirSide: true,
-        ajax: {
-            data:{'order_id':orderID},
-            url: '{{ route("challans.index.by.order") }}',
-            //success: function(data){ console.log(data); },
-        },
-        columns: [
-            {data: 'id', name: 'id'},
-            {data: 'challan_no', name: 'challan_no'},
-            {data: 'challan_date', name: 'challan_date'},
-            {data: 'customer_name', name: 'customer_name'},
-            {data: 'transfer_items', name: 'transfer_items'},
-            {data: 'quantity_type', name: 'quantity_type'},
-            {data: 'store_name', name: 'store_name'}
-        ],
-        order:[[0, "desc"]]
-   });
    
-   /*
-    * challanDataTable Delete icon click:
-    * Deleting Challan.
-    */
-    $('#challanDataTable').on('click', 'a.text-danger.delete', function (e){
-        e.preventDefault();
-        var id = $(this).attr('href');
-        // Confirm box
-        bootbox.dialog({
-            backdrop: true,
-            //centerVertical: true,
-            //size: '50%',
-            closeButton: false,
-            message: "Are you doing this by mistake? <br> If you confirm a record will be permantly deleted. Please confirm your action.",
-            title: "Please confirm...",
-            buttons: {
-              success: {
-                label: "Confirm",
-                className: "btn-danger",
-                callback: function() {
-                    var action = '{{ route("challans.index") }}/'+id;
-                    var method = 'DELETE';
-                    $.ajax({
-                        data: {"_token": "{{ csrf_token() }}"},
-                        url: action,
-                        type: method,
-                        dataType: 'json',
-                        success: function (data) {
-                            console.log(data);
-                            //$('#challanDataTable').DataTable().ajax.reload();
-                            bootbox.alert({
-                                size: "small",
-                                title: "Deleted...",
-                                message: "Delivery challan <strong>"+data.challan.toUpperCase()+"</strong> deleted.",
-                                backdrop: true,
-                                callback: function () {
-                                    location.reload(true);
-                                    //setTimeout(function(){location.reload()}, 3000);
-                                }
-                            });
-                        },
-                        error: function (data) {
-                            console.log(data);
-                            alert('Something is not right!!!');
-                        }
-                    }); // Ajax call
-                }
-              },
-              danger: {
-                label: "Cancel",
-                className: "btn-success",
-                callback: function() {
-                    //$('#modalForm').trigger("reset");
-                    $('#deleteBtn').html('Delete');
-                    //$('#ajaxModel').modal('hide');
-                }
-              }
-            }
-          }); //Confirm Box
-    }); //Delete Icon click end.
    
 
 });

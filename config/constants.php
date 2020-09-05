@@ -43,6 +43,7 @@ return [
         'marketing' => 'Marketing', //This is for marketing staff.
         'store' => 'Store', //This is for store keepers.
         'lead' => 'Lead', //Lead is for Marketing staff to convert into client.
+        'accounts' => 'Accounts', //Handle all monetery actions.
     ],
     //Order types
     'order_type' => [
@@ -55,6 +56,7 @@ return [
         'processing' => 'Processing', 
         'complete' => 'Complete', 
         'hold' => 'Hold',
+        'cancel' => 'Canceled',
     ],
     //Types of Challan
     'challan_type' => [

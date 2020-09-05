@@ -1,16 +1,16 @@
 <!-- 
     Author:     Alvah Amit Halder
-    Document:   Dashboard. 
+    Document:   Dashboard for Employees. 
     Theme:      SB Admin 2
     Controller: HomeController
 -->
 @extends('theme.default')
 
-@section('title', __('VSF-Admin Dash'))
+@section('title', __('VSF-Staff Home'))
 
 @section('logo', __('VSF Distribution'))
 
-@section('pageheading', __('Welcome to Admin. Dashboard'))
+@section('pageheading', __('Welcome to Staff Dashboard'))
 
 @section('content')
 <!-- Breadcrumbs-->
@@ -20,37 +20,13 @@
     </li>
 </ol>
 
-@include('admin.admin_dash.components.cards')
+@include('admin.dashboards.staff.components.cards')
 
 <div class="row">
     <!-- Area Chart -->
-    @include('admin.admin_dash.components.area_chart')
+    @include('admin.dashboards.staff.components.area_chart')
     <!-- Pie Chart -->
-    @include('admin.admin_dash.components.pie_chart')
-</div>
-
-<div class="row">
-
-    <!-- Content Column -->
-    <div class="col-lg-6 mb-4">
-
-        <!-- Project Card Example -->
-        @include('admin.admin_dash.components.project_card')
-
-        <!-- Color System -->
-        @include('admin.admin_dash.components.color_system')
-
-    </div>
-
-    <div class="col-lg-6 mb-4">
-
-        <!-- Illustrations -->
-        @include('admin.admin_dash.components.illustration')
-
-        <!-- Approach -->
-        @include('admin.admin_dash.components.approach')
-
-    </div>
+    @include('admin.dashboards.staff.components.pie_chart')
 </div>
 
 @stop

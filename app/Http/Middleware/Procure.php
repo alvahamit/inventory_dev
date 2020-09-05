@@ -5,7 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Support\Facades\Auth;
 
-class Administrator
+class Procure
 {
     /**
      * Handle an incoming request.
@@ -16,17 +16,12 @@ class Administrator
      */
     public function handle($request, Closure $next)
     {
-        if (Auth::user()->is_active) {
-            $user = Auth::user();
+        $user = Auth::user();
+        if ($user->is_active) {
             $rolesArr = $user->roles->pluck('name')->toArray();
-            if(in_array(config('constants.roles.admin'), $rolesArr)){
+            if(in_array(config('constants.roles.procure'), $rolesArr) OR in_array(config('constants.roles.admin'), $rolesArr)){
                 return $next($request);
             }
-//            foreach (Auth::user()->roles as $role) {
-//                if($role->name == config('constants.roles.admin')){
-//                    return $next($request);
-//                }
-//            }
         } 
         abort(403, 'Sorry!!! You are not authorized to be here.');
     }

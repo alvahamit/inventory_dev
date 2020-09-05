@@ -30,19 +30,12 @@ Purchase Ref# {!! $purchase->ref_no !!}
     </div>
     <div class="row">
         <div class="col-md-12">
-            
-            <!--<div class="text-center">-->
-                <!--<h2>Purchase reference # <a href="{{route('purchases.edit',$purchase->id)}}">{{$purchase->ref_no}}</a></h2>-->
-            <!--</div>-->
-            
-            <!--<hr>-->
             <div><strong>Receive Date:</strong> {{$purchase->receive_date}}</div>
             <div class="col-xs-12 col-md-3 col-lg-3 float-xs-left float-right text-md-right">
                 <strong>Supplier:</strong><br>
-                        {{$purchase->user->name}}<br>
-                        {{$purchase->user->organization}}<br>
-                        {{$purchase->user->email}}<br>
-
+                {{$purchase->user->name}}<br>
+                {{$purchase->user->organization}}<br>
+                {{$purchase->user->email}}<br>
             </div>
         </div>
     </div>

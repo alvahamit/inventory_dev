@@ -27,7 +27,6 @@
 <!--<h1>Hi!! you have following delivery challan issued:</h1>-->
 <!--Add new button-->
 <div class="form-group text-right">
-    <!--<a class="btn btn-primary right" href="{{route('purchases.create')}}">Add new</a>-->
     <!--<button id="createNew" class="btn btn-primary col-1 right">New Order</button>-->
 </div> 
 <!-- DataTables Example -->
